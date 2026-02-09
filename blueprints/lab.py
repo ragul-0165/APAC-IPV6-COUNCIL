@@ -16,14 +16,36 @@ def index():
 
 @lab_bp.route('/api/countries')
 def get_countries():
-    """Returns list of APAC countries from local datasets."""
-    import json
+    """Returns list of APAC countries from MongoDB with local JSON fallback."""
     try:
-        with open('static/data/apac_codes.json', 'r') as f:
-            data = json.load(f)
-        return jsonify(data)
+        from services.database_service import db_service
+        if db_service.connect():
+            cursor = db_service.country_codes.find({}, {"_id": 0, "last_updated": 0})
+            codes = list(cursor)
+            if codes:
+                return jsonify({"apac_codes": codes})
+        
+        # Fallback to JSON
+        return jsonify({"error": "APAC country codes not available in database"}), 500
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@lab_bp.route('/api/map/countries.geo.json')
+def get_map_data():
+    """Serves GeoJSON map data from MongoDB with local JSON fallback."""
+    try:
+        from services.database_service import db_service
+        if db_service.connect():
+            map_doc = db_service.geojson_map.find_one({"id": "countries_map"})
+            if map_doc and "data" in map_doc:
+                return jsonify(map_doc["data"])
+        
+        # Fallback to local file
+        return jsonify({"error": "GeoJSON map data not available in database"}), 500
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @lab_bp.route('/api/apac/ipv6')
 def get_ipv6_stats():

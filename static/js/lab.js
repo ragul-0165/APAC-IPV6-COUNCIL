@@ -114,7 +114,7 @@ async function initMap() {
     try {
         // Parallel Fetch: GeoJSON + Stats
         const [resGeo, resStats] = await Promise.all([
-            fetch('/static/data/countries.geo.json'),
+            fetch('/lab/api/map/countries.geo.json'),
             fetch('/lab/api/apac/all_stats')
         ]);
 

@@ -33,14 +33,21 @@ def get_stats():
     """Return calculated readiness scores and rankings for universities."""
     data = edu_service.get_detailed_stats()
     
-    # Dynamic Country Name Mapping from apac_codes.json
+    # Dynamic Country Name Mapping from MongoDB or Fallback JSON
     try:
-        import os
-        import json
-        codes_path = 'static/data/apac_codes.json'
-        with open(codes_path, 'r') as f:
-            codes_data = json.load(f)
-            NAME_MAP = {c['code']: c['name'] for c in codes_data['apac_codes']}
+        from services.database_service import db_service
+        NAME_MAP = {}
+        if db_service.connect():
+            cursor = db_service.country_codes.find({}, {"_id": 0})
+            NAME_MAP = {c['code']: c['name'] for c in cursor}
+            
+        if not NAME_MAP:
+            import os
+            import json
+            codes_path = 'static/data/apac_codes.json'
+            with open(codes_path, 'r') as f:
+                codes_data = json.load(f)
+                NAME_MAP = {c['code']: c['name'] for c in codes_data['apac_codes']}
     except Exception:
         NAME_MAP = {}
 

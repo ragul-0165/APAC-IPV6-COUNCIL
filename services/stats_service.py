@@ -4,6 +4,7 @@ import logging
 import os
 import time
 from datetime import datetime
+from services.database_service import db_service
 
 class StatsService:
     CACHE_DIR = '.cache'
@@ -108,13 +109,30 @@ class StatsService:
 
     def get_apac_ipv6_stats(self, location_code):
         """
-        Returns normalized IPv6 stats for a specific APAC country from the local cache.
+        Returns normalized IPv6 stats for a specific APAC country from MongoDB 
+        with automatic JSON fallback.
         """
+        location_code = location_code.upper()
+
+        # 1. Try MongoDB
+        if db_service.connect():
+            try:
+                record = db_service.apac_stats.find_one({"country_code": location_code})
+                if record:
+                    return {
+                        "country": record["country_code"],
+                        "ipv6_adoption": record["ipv6_adoption"],
+                        "source": record.get("source", "APNIC Labs")
+                    }
+            except Exception as e:
+                logging.warning(f"MongoDB read failed for APAC stats, falling back to JSON: {e}")
+
+        # 2. JSON Fallback
         normalized_file = 'static/data/apac_ipv6_normalized.json'
         if not os.path.exists(normalized_file):
             logging.error(f"Normalized data file {normalized_file} not found.")
             return None
-
+            
         try:
             with open(normalized_file, 'r') as f:
                 data = json.load(f)
@@ -122,7 +140,6 @@ class StatsService:
             stats = data.get('stats', {})
             metadata = data.get('metadata', {})
             
-            location_code = location_code.upper()
             if location_code in stats:
                 country_data = stats[location_code]
                 return {
@@ -141,9 +158,26 @@ class StatsService:
 
     def get_all_apac_ipv6_stats(self):
         """
-        Returns the full normalized IPv6 stats dataset for all APAC countries.
-        Used for map coloring.
+        Returns the full normalized IPv6 stats dataset for all APAC countries from MongoDB
+        with automatic JSON fallback. Used for map coloring.
         """
+        # 1. Try MongoDB
+        if db_service.connect():
+            try:
+                cursor = db_service.apac_stats.find()
+                results = {}
+                for record in cursor:
+                    results[record["country_code"]] = {
+                        "country": record["country_code"],
+                        "ipv6_adoption": record["ipv6_adoption"],
+                        "source": record.get("source", "APNIC Labs")
+                    }
+                if results:
+                    return results
+            except Exception as e:
+                logging.warning(f"MongoDB bulk read failed for APAC stats, falling back to JSON: {e}")
+
+        # 2. JSON Fallback
         normalized_file = 'static/data/apac_ipv6_normalized.json'
         if not os.path.exists(normalized_file):
             return {}

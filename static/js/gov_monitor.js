@@ -350,7 +350,7 @@ async function initGovMap() {
 
     // Load GeoJSON
     try {
-        const response = await fetch('/static/data/countries.geo.json');
+        const response = await fetch('/lab/api/map/countries.geo.json');
         const data = await response.json();
 
         geoJsonLayer = L.geoJson(data, {

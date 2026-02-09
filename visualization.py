@@ -173,10 +173,14 @@ def generate_lab_visualizations():
     """Custom bar for Lab - keeping it readable as it's a data index."""
     try:
         setup_recon_style()
-        normalized_file = 'static/data/apac_ipv6_normalized.json'
-        if not os.path.exists(normalized_file): return
-        with open(normalized_file, 'r') as f: data = json.load(f)
-        stats = data.get('stats', {})
+        from services.stats_service import StatsService
+        stats_svc = StatsService()
+        stats = stats_svc.get_all_apac_ipv6_stats()
+        
+        if not stats: 
+            logging.warning("No stats found for lab visualization.")
+            return
+
         records = [{'Country': v.get('country', cc), 'Adoption': v.get('ipv6_adoption', 0)} for cc, v in stats.items()]
         df = pd.DataFrame(records).sort_values(by='Adoption', ascending=False).head(15)
 

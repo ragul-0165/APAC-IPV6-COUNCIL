@@ -43,6 +43,9 @@ class MongoDBService:
         "BGP_TOPOLOGY": "bgp_topology",
         "POLICY_MANDATES": "policy_mandates",
         "GLOBAL_STATS": "global_ipv6_stats",
+        "APAC_STATS": "apac_ipv6_normalized",
+        "COUNTRY_CODES": "apac_country_codes",
+        "GEOJSON_MAP": "geojson_map_data",
         "TRANSPARENCY_LEDGER": "transparency_ledger"
     }
 
@@ -326,6 +329,24 @@ class MongoDBService:
     def global_stats(self):
         if not self.is_connected: self.connect()
         return self._db[self.COLLECTION_REGISTRY["GLOBAL_STATS"]] if self._db is not None else None
+    
+    @property
+    def apac_stats(self):
+        """APAC IPv6 normalized stats collection."""
+        if not self.is_connected: self.connect()
+        return self._db[self.COLLECTION_REGISTRY["APAC_STATS"]] if self._db is not None else None
+
+    @property
+    def country_codes(self):
+        """APAC Country codes mapping collection."""
+        if not self.is_connected: self.connect()
+        return self._db[self.COLLECTION_REGISTRY["COUNTRY_CODES"]] if self._db is not None else None
+
+    @property
+    def geojson_map(self):
+        """GeoJSON map data collection."""
+        if not self.is_connected: self.connect()
+        return self._db[self.COLLECTION_REGISTRY["GEOJSON_MAP"]] if self._db is not None else None
     
     def apply_schemas(self):
         """Apply $jsonSchema validation to collections."""
