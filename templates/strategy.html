@@ -1,0 +1,496 @@
+{% extends "base.html" %}
+
+{% block title %}IPv6 Strategy - APAC IPv6{% endblock %}
+{% block header_title %}IPv6-Mostly Deployment Strategy{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto space-y-10 pb-20">
+    <!-- Header Hero Section -->
+    <div
+        class="bg-white rounded-[2.5rem] p-12 border border-blue-50 relative overflow-hidden shadow-2xl shadow-blue-500/5">
+        <div class="relative z-10 flex flex-col md:flex-row items-center gap-10">
+            <div
+                class="bg-blue-600 w-24 h-24 rounded-3xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-blue-500/40">
+                <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+            </div>
+            <div>
+                <h2 class="text-4xl font-black text-gray-900 mb-4 font-display italic">IPv6 Deployment Strategy</h2>
+                <div class="flex items-center gap-3 mb-4">
+                    <span
+                        class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Enterprise
+                        Intelligence</span>
+                    <span
+                        class="bg-gray-100 text-gray-500 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest border border-gray-200">V1.0
+                        BETA</span>
+                </div>
+                <p class="text-gray-500 text-lg leading-relaxed max-w-2xl font-medium">
+                    Tactical guidance based on the <span
+                        class="text-blue-600 font-bold underline decoration-blue-200">IETF IPv6-Mostly Networks</span>
+                    draft.
+                    Accelerate your transition while maintaining legacy mission-critical stability.
+                </p>
+            </div>
+        </div>
+        <div class="absolute -right-20 -top-20 w-80 h-80 bg-blue-50 rounded-full opacity-50 blur-3xl"></div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        <!-- Main Content (8 cols) -->
+        <div class="lg:col-span-8 space-y-10">
+            <!-- Recommendation Engine -->
+            <div id="strategy-recommendation"
+                class="bg-gradient-to-br from-[#0f172a] to-[#1e3a8a] rounded-[2.5rem] p-10 text-white shadow-2xl relative border border-white/10 overflow-hidden">
+                <div class="absolute top-0 right-0 p-6 opacity-20">
+                    <svg class="w-24 h-24" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+
+                <div id="strategy-placeholder" class="py-10 text-center space-y-6 relative z-10">
+                    <div
+                        class="w-20 h-20 bg-white/10 rounded-3xl flex items-center justify-center mx-auto border border-white/20 backdrop-blur-sm">
+                        <svg class="w-10 h-10 text-blue-300 animate-pulse" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-white mb-2">Analyzing Network DNA...</p>
+                        <p class="text-blue-200 text-sm font-bold opacity-80">Run the connectivity diagnostic to
+                            generate
+                            your industrial roadmap.</p>
+                    </div>
+                    <a href="/diagnostics"
+                        class="inline-block bg-blue-600 hover:bg-blue-500 text-white px-10 py-4 rounded-2xl font-black transition-all active:scale-95 shadow-xl shadow-blue-500/40 uppercase tracking-widest text-xs">Initialize
+                        Diagnostics</a>
+                </div>
+
+                <div id="strategy-result"
+                    class="hidden space-y-8 animate-in fade-in zoom-in-95 duration-500 relative z-10">
+                    <div class="flex items-center gap-8">
+                        <div id="strategy-icon"
+                            class="text-6xl bg-white/10 w-24 h-24 rounded-[2rem] flex items-center justify-center border border-white/20 shadow-2xl backdrop-blur-md">
+                            🚀</div>
+                        <div>
+                            <h3 id="strategy-title" class="text-4xl font-black mb-2 tracking-tighter">Transition
+                                Analysis
+                            </h3>
+                            <div class="flex items-center gap-3">
+                                <span id="strategy-when"
+                                    class="bg-blue-500/30 text-blue-200 px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-blue-400/30">
+                                    Phase 1: Optimization</span>
+                                <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/5 rounded-[2rem] p-8 border border-white/10 backdrop-blur-md">
+                        <h4
+                            class="text-blue-300 font-black uppercase text-[10px] tracking-widest mb-4 flex items-center gap-2">
+                            <span class="w-4 h-[1px] bg-blue-500"></span> Executive Recommendation
+                        </h4>
+                        <p id="strategy-why" class="text-gray-100 text-xl leading-relaxed font-bold"></p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-black/20 rounded-2xl p-6 border border-white/5">
+                            <h4 class="text-blue-300 font-black text-[10px] uppercase mb-4 tracking-widest">Tactical
+                                Action
+                                Items</h4>
+                            <ul id="strategy-evidence" class="space-y-4 text-sm text-gray-300 font-bold"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visual Transition Flow -->
+            <div class="bg-white rounded-[2.5rem] p-12 border border-gray-100 shadow-sm relative overflow-hidden">
+                <div class="flex justify-between items-end mb-12">
+                    <div>
+                        <h3 class="text-2xl font-black text-gray-900 mb-2 font-display">Transition Architecture Flow
+                        </h3>
+                        <p class="text-sm text-gray-400 font-bold uppercase tracking-wider">Evolution from Legacy to
+                            IPv6-Mostly</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col lg:flex-row items-center justify-between gap-12 relative z-10">
+                    <!-- Step 1 -->
+                    <div class="flex-1 w-full text-center group">
+                        <div
+                            class="w-20 h-20 rounded-3xl bg-slate-50 text-slate-400 mx-auto flex items-center justify-center mb-6 border border-slate-100 group-hover:bg-slate-100 transition duration-500 shadow-sm">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                            </svg>
+                        </div>
+                        <h4 class="font-black text-gray-900 text-base uppercase tracking-tight">IPv4 Only</h4>
+                        <p class="text-xs text-gray-400 font-bold mt-2 uppercase tracking-widest">Initial Legacy State
+                        </p>
+                    </div>
+
+                    <!-- Arrow -->
+                    <div class="hidden lg:block opacity-20">
+                        <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="flex-1 w-full text-center group">
+                        <div
+                            class="w-20 h-20 rounded-3xl bg-blue-50 text-blue-600 mx-auto flex items-center justify-center mb-6 border border-blue-100 group-hover:bg-blue-100 transition duration-500 shadow-md">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                            </svg>
+                        </div>
+                        <h4 class="font-black text-blue-700 text-base uppercase tracking-tight">Dual-Stack</h4>
+                        <p class="text-xs text-blue-400 font-bold mt-2 uppercase tracking-widest">Hybrid Connectivity
+                        </p>
+                    </div>
+
+                    <!-- Arrow -->
+                    <div class="hidden lg:block opacity-40">
+                        <svg class="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                    </div>
+
+                    <!-- Step 3 (Target) -->
+                    <div class="flex-1 w-full text-center group">
+                        <div
+                            class="w-24 h-24 rounded-[2rem] bg-emerald-50 text-emerald-600 mx-auto flex items-center justify-center mb-6 border-4 border-white shadow-2xl group-hover:scale-110 transition duration-500 relative">
+                            <div class="absolute inset-0 bg-emerald-400/5 animate-ping rounded-[2rem]"></div>
+                            <svg class="w-12 h-12 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h4 class="font-black text-emerald-700 text-lg uppercase tracking-tight">IPv6-Mostly</h4>
+                        <span
+                            class="inline-block bg-emerald-600 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter mt-2 shadow-lg shadow-emerald-500/20">Target
+                            Architecture</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Case Studies (MOVED HERE) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10">
+                <div
+                    class="bg-gray-900 rounded-[2.5rem] p-10 border border-white/5 relative overflow-hidden group hover:-translate-y-2 transition duration-500">
+                    <div
+                        class="absolute -right-10 -bottom-10 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition">
+                    </div>
+                    <div class="flex justify-between items-start mb-8">
+                        <div
+                            class="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center text-3xl border border-white/10">
+                            📱</div>
+                        <span
+                            class="text-[9px] font-black uppercase text-blue-400 tracking-widest border border-blue-500/30 px-3 py-1.5 rounded-xl">Carrier
+                            Grade</span>
+                    </div>
+                    <h4 class="font-black text-white text-xl mb-4 tracking-tight">APAC Mobile Carrier</h4>
+                    <p class="text-sm text-gray-400 font-bold leading-relaxed mb-8 opacity-80">
+                        Transitioned 50M+ subscribers to IPv6-only using NAT64/DNS64. Achieved 20% latency reduction in
+                        high-density RAN environments.
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                        <span class="text-[10px] font-black text-white uppercase tracking-widest leading-none">Outcome:
+                            Lower
+                            TCO & Scale</span>
+                    </div>
+                </div>
+
+                <div
+                    class="bg-white rounded-[2.5rem] p-10 border border-gray-100 relative overflow-hidden group hover:shadow-xl hover:-translate-y-2 transition duration-500">
+                    <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-gray-50 rounded-full blur-3xl transition">
+                    </div>
+                    <div class="flex justify-between items-start mb-8">
+                        <div
+                            class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center text-3xl border border-gray-100">
+                            🏢</div>
+                        <span
+                            class="text-[9px] font-black uppercase text-gray-400 tracking-widest border border-gray-200 px-3 py-1.5 rounded-xl">Enterprise</span>
+                    </div>
+                    <h4 class="font-black text-gray-900 text-xl mb-4 tracking-tight">Global Tech Campus</h4>
+                    <p class="text-sm text-gray-400 font-bold leading-relaxed mb-8">
+                        Deployed DHCPv4 Option 108. 90% of workstations auto-configured as IPv6-only, retiring 15,000+
+                        public IPv4 addresses.
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <span class="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
+                        <span
+                            class="text-[10px] font-black text-gray-900 uppercase tracking-widest leading-none">Outcome:
+                            Address Recovery</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- [NEW] Operational Cost Analyzer (Phase 18) -->
+    <section class="mt-10">
+        <div
+            class="card-premium bg-slate-900 border border-slate-700/50 p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
+            <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div class="space-y-8">
+                    <div>
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="bg-amber-500/20 text-amber-400 p-3 rounded-xl">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </span>
+                            <div>
+                                <h3 class="text-2xl font-black text-white font-display">Operational Cost Analyzer</h3>
+                                <p class="text-xs text-slate-400 font-bold uppercase tracking-widest">IPv4 NAT Overhead
+                                    Estimator</p>
+                            </div>
+                        </div>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-8">
+                            Estimate the hidden costs of maintaining Carrier-Grade NAT (CGNAT) vs transitioning to
+                            IPv6-only infrastructure.
+                        </p>
+                    </div>
+
+                    <!-- Sliders -->
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-xs font-bold text-white uppercase tracking-wider">User Base</label>
+                                <span id="calc-users-val" class="text-amber-400 font-mono font-bold">50,000</span>
+                            </div>
+                            <input type="range" id="calc-users" min="1000" max="1000000" step="1000" value="50000"
+                                class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-xs font-bold text-white uppercase tracking-wider">Traffic
+                                    Load</label>
+                                <span id="calc-traffic-val" class="text-amber-400 font-mono font-bold">20 Gbps</span>
+                            </div>
+                            <input type="range" id="calc-traffic" min="1" max="500" step="1" value="20"
+                                class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                        </div>
+                    </div>
+
+                    <button onclick="calculateNATImpact()"
+                        class="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-black py-4 rounded-xl shadow-lg shadow-amber-500/20 active:scale-95 transition-all text-sm uppercase tracking-widest flex items-center justify-center gap-3">
+                        <span id="calc-btn-text">Calculate Impact</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Results Panel -->
+                <div class="bg-white/5 rounded-[2rem] p-8 border border-white/10 relative">
+                    <div id="calc-results" class="hidden space-y-6 animate-in fade-in slide-in-from-right-4">
+                        <div class="flex justify-between items-end border-b border-white/10 pb-4">
+                            <span class="text-slate-400 text-xs font-bold uppercase tracking-widest">Est. Annual
+                                Opex</span>
+                            <span id="res-opex"
+                                class="text-4xl font-black text-white tracking-tighter tabular-nums">$0</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-4 bg-black/20 rounded-xl border border-white/5">
+                                <div class="text-slate-400 text-[10px] font-bold uppercase mb-1">CapEx Avoidance</div>
+                                <div id="res-capex" class="text-lg font-black text-amber-400">$0</div>
+                            </div>
+                            <div class="p-4 bg-black/20 rounded-xl border border-white/5">
+                                <div class="text-slate-400 text-[10px] font-bold uppercase mb-1">IPv4 Asset Value</div>
+                                <div id="res-asset" class="text-lg font-black text-green-400">$0</div>
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-amber-500/10 rounded-xl border border-amber-500/20">
+                            <div class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-amber-500 mt-0.5 shrink-0" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                <div>
+                                    <h5 class="text-amber-400 font-bold text-xs uppercase tracking-wider mb-1">
+                                        Performance Penalty</h5>
+                                    <p id="res-penalty" class="text-slate-300 text-xs font-medium"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Initial Placeholder -->
+                    <div id="calc-placeholder"
+                        class="absolute inset-0 flex flex-col items-center justify-center text-center p-8">
+                        <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4">
+                            <svg class="w-8 h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <p class="text-slate-500 font-bold text-sm">Adjust parameters to generate cost model.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Decor -->
+            <div class="absolute top-0 right-0 w-96 h-96 bg-amber-600/10 rounded-full blur-[100px] pointer-events-none">
+            </div>
+        </div>
+    </section>
+
+    <!-- Sidebar / Guidance (4 cols) -->
+    <div class="lg:col-span-4 space-y-8">
+        <!-- Strategic Definition -->
+        <div
+            class="bg-blue-600 rounded-[2.5rem] p-10 text-white shadow-2xl shadow-blue-500/20 relative overflow-hidden group">
+            <div
+                class="absolute -right-10 -top-10 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition duration-700">
+            </div>
+            <h3 class="text-2xl font-black mb-6 tracking-tight relative z-10">The Intelligence Standard</h3>
+            <p class="text-blue-50 text-base leading-relaxed mb-8 font-bold opacity-90 relative z-10">
+                "IPv6-Mostly" is a protocol-led architecture where network segments serve IPv6-only service to
+                sophisticated hosts while maintaining legacy stability.
+            </p>
+            <div
+                class="p-6 bg-white/10 rounded-2xl border border-white/20 font-mono text-[10px] text-blue-100 leading-relaxed backdrop-blur-sm relative z-10">
+                <span class="text-blue-300 font-black block mb-1 underline">RFC-LEVEL DETAIL:</span>
+                DHCPv4 Option 108: Signals modern endpoints to skip IPv4 request entirely.
+            </div>
+        </div>
+
+        <!-- Benefits / Tradeoffs (MOVED HERE) -->
+        <div class="space-y-6">
+            <!-- Advantages -->
+            <div
+                class="bg-emerald-50 rounded-[2.5rem] p-8 border border-emerald-100 group hover:bg-white transition duration-500 shadow-sm">
+                <div class="flex items-center gap-4 mb-8">
+                    <div
+                        class="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                    <h4 class="font-black text-emerald-900 text-xl tracking-tight leading-tight">Key<br>Advantages
+                    </h4>
+                </div>
+                <ul class="space-y-4 text-sm font-bold text-emerald-800/80">
+                    <li class="flex items-start gap-3">
+                        <span
+                            class="w-5 h-5 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-[10px] shrink-0 font-black">1</span>
+                        Reclaim IPv4 via Option 108
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span
+                            class="w-5 h-5 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-[10px] shrink-0 font-black">2</span>
+                        Reduction in NAT complexity
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span
+                            class="w-5 h-5 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-[10px] shrink-0 font-black">3</span>
+                        E2E Device Visibility
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Tradeoffs -->
+            <div
+                class="bg-amber-50 rounded-[2.5rem] p-8 border border-amber-100 group hover:bg-white transition duration-500 shadow-sm">
+                <div class="flex items-center gap-4 mb-8">
+                    <div
+                        class="w-12 h-12 bg-amber-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-amber-500/20">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                    <h4 class="font-black text-amber-900 text-xl tracking-tight leading-tight">Critical<br>Tradeoffs
+                    </h4>
+                </div>
+                <ul class="space-y-4 text-sm font-bold text-amber-800/80">
+                    <li class="flex items-start gap-3">
+                        <span
+                            class="w-5 h-5 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-[10px] shrink-0 font-black">!</span>
+                        NAT64/DNS64 Dependency
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span
+                            class="w-5 h-5 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-[10px] shrink-0 font-black">!</span>
+                        Legacy Device Fixed-IP Risks
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span
+                            class="w-5 h-5 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-[10px] shrink-0 font-black">!</span>
+                        Mobile OS Dependencies
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Execution Checklist -->
+        <div class="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-sm space-y-8 relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-blue-50/20 rounded-full blur-3xl"></div>
+            <h4 class="font-black text-gray-900 text-base uppercase tracking-widest flex items-center gap-3">
+                <span class="w-2 h-2 bg-blue-600 rounded-full"></span> Intelligence Checklist
+            </h4>
+
+            <div class="space-y-4 relative z-10">
+                <div class="flex items-start gap-4 p-5 rounded-2xl bg-gray-50 border border-gray-100">
+                    <div
+                        class="w-6 h-6 bg-white border-2 border-blue-500 rounded flex items-center justify-center mt-1 shrink-0 shadow-sm">
+                        <svg class="w-4 h-4 text-blue-600" viewBox="0 0 14 14" fill="none">
+                            <path d="M3 7L6 10L11 4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="block text-sm font-black text-slate-800 tracking-tight">Audit Legacy
+                            Systems</span>
+                        <span class="block text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-wider">Step
+                            01 /
+                            Pre-Flight</span>
+                    </div>
+                </div>
+
+                <div class="flex items-start gap-4 p-5 rounded-2xl border border-gray-100 opacity-60">
+                    <div class="w-6 h-6 bg-white border-2 border-gray-200 rounded mt-1 shrink-0"></div>
+                    <div>
+                        <span class="block text-sm font-black text-slate-800 tracking-tight">NAT64
+                            Provisioning</span>
+                        <span class="block text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-wider">Step
+                            02 /
+                            Preparation</span>
+                    </div>
+                </div>
+
+                <div class="flex items-start gap-4 p-5 rounded-2xl border border-gray-100 opacity-60">
+                    <div class="w-6 h-6 bg-white border-2 border-gray-200 rounded mt-1 shrink-0"></div>
+                    <div>
+                        <span class="block text-sm font-black text-slate-800 tracking-tight">Pilot Option 108</span>
+                        <span class="block text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-wider">Step
+                            03 /
+                            Alpha Deployment</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/strategy.js"></script>
+{% endblock %}

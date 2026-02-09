@@ -1,0 +1,566 @@
+import dns.resolver
+import socket
+import ssl
+import json
+import os
+import logging
+from datetime import datetime
+from services.database_service import db_service
+from services.ledger_service import ledger_service
+
+class APACDomainMonitorService:
+    def __init__(self):
+        # Keep file paths for fallback compatibility
+        self.domains_file = 'datasets/apac_gov_domains.json'
+        self.results_file = 'data/apac_gov_ipv6_results.json'
+        self.history_file = 'data/apac_gov_history.json'
+        
+        # Connect to MongoDB
+        self.use_mongodb = db_service.connect()
+        
+        if not self.use_mongodb:
+            logging.warning("MongoDB unavailable, falling back to JSON files")
+            os.makedirs(os.path.dirname(self.results_file), exist_ok=True)
+
+    def get_results(self):
+        """Retrieve cached scan results from MongoDB or JSON fallback."""
+        if self.use_mongodb:
+            try:
+                # Fetch latest scan results from MongoDB using Aggregation Pipeline
+                # Optimization: $sort + $group ensures atomic "latest record per domain" selection
+                pipeline = [
+                    {"$sort": {"checked_at": -1}},
+                    {"$group": {
+                        "_id": "$domain",
+                        "latest": {"$first": "$$ROOT"}
+                    }}
+                ]
+                
+                scans = list(db_service._db[db_service.COLLECTION_REGISTRY["GOV_SCANS"]].aggregate(pipeline))
+                results = {}
+                
+                for item in scans:
+                    scan = item['latest']
+                    
+                    country = scan.get('country')
+                    if country not in results:
+                        results[country] = []
+                    
+                    # Remove MongoDB _id field for JSON compatibility
+                    scan.pop('_id', None)
+                    results[country].append(scan)
+                
+                return results
+                
+            except Exception as e:
+                logging.error(f"MongoDB read failed, falling back to JSON: {e}")
+                self.use_mongodb = False
+        
+        # Fallback to JSON
+        if not os.path.exists(self.results_file):
+            return {}
+        try:
+            with open(self.results_file, 'r') as f:
+                return json.load(f)
+        except Exception as e:
+            logging.error(f"Error reading gov results: {e}")
+            return {}
+
+    def get_history(self, country=None):
+        """Retrieve historical adoption trends from MongoDB or JSON fallback."""
+        if self.use_mongodb:
+            try:
+                # Fetch history logs for government sector
+                query = {"sector": "government"}
+                if country:
+                    query["country"] = country.upper()
+                else:
+                    query["country"] = {"$exists": False} # Aggregate
+
+                history = list(
+                    db_service._db[db_service.COLLECTION_REGISTRY["HISTORY_LOGS"]]
+                    .find(query)
+                    .sort("date", 1)
+                )
+                
+                # Remove MongoDB _id field
+                for entry in history:
+                    entry.pop('_id', None)
+                
+                return history
+                
+            except Exception as e:
+                logging.error(f"MongoDB history read failed, falling back to JSON: {e}")
+                self.use_mongodb = False
+        
+        # Fallback to JSON
+        if not os.path.exists(self.history_file):
+            return []
+        try:
+            with open(self.history_file, 'r') as f:
+                return json.load(f)
+        except Exception as e:
+            logging.error(f"Error reading history: {e}")
+            return []
+
+    def save_history(self, results):
+        """Append current scan summary to MongoDB or JSON fallback."""
+        # Calculate stats
+        total = 0
+        ready = 0
+        partial = 0
+        
+        for country, domains in results.items():
+            for d in domains:
+                total += 1
+                score = 0
+                if d.get('ipv6_web'): score += 1
+                if d.get('ipv6_dns'): score += 1
+                if d.get('dnssec'): score += 1
+                
+                if score >= 2 and d.get('ipv6_web'):
+                    ready += 1
+                elif score > 0:
+                    partial += 1
+        
+        entry = {
+            "date": datetime.now().strftime("%Y-%m-%d"),
+            "timestamp": datetime.now().isoformat(),
+            "sector": "government",
+            "total": total,
+            "ready": ready,
+            "partial": partial,
+            "rate": round((ready / total) * 100, 1) if total > 0 else 0
+        }
+        
+        if self.use_mongodb:
+            try:
+                # Upsert to avoid duplicate entries for same day
+                db_service._db[db_service.COLLECTION_REGISTRY["HISTORY_LOGS"]].update_one(
+                    {
+                        "date": entry["date"],
+                        "sector": "government"
+                    },
+                    {"$set": entry},
+                    upsert=True
+                )
+                logging.info(f"History saved to MongoDB: {entry['date']}")
+                return
+                
+            except Exception as e:
+                logging.error(f"MongoDB history save failed, falling back to JSON: {e}")
+                self.use_mongodb = False
+        
+        # Fallback to JSON
+        history = []
+        if os.path.exists(self.history_file):
+            try:
+                with open(self.history_file, 'r') as f:
+                    history = json.load(f)
+            except:
+                pass
+        
+        # Avoid duplicate entries for same day (update instead)
+        history = [h for h in history if h['date'] != entry['date']]
+        history.append(entry)
+        
+        # Sort by date
+        history.sort(key=lambda x: x['timestamp'])
+        
+        with open(self.history_file, 'w') as f:
+            json.dump(history, f, indent=2)
+
+    def save_country_history(self, country_code, domain_list):
+        """Save adoption rate snapshot for a specific country."""
+        total = len(domain_list)
+        if total == 0: return
+
+        ready = sum(1 for d in domain_list if d.get('ipv6_web') and d.get('ipv6_dns'))
+        
+        entry = {
+            "date": datetime.now().strftime("%Y-%m-%d"),
+            "timestamp": datetime.now().isoformat(),
+            "sector": "government",
+            "country": country_code.upper(),
+            "total": total,
+            "ready": ready,
+            "rate": round((ready / total) * 100, 1) if total > 0 else 0
+        }
+
+        if self.use_mongodb:
+            try:
+                db_service._db[db_service.COLLECTION_REGISTRY["HISTORY_LOGS"]].update_one(
+                    {
+                        "date": entry["date"],
+                        "sector": "government",
+                        "country": entry["country"]
+                    },
+                    {"$set": entry},
+                    upsert=True
+                )
+            except Exception as e:
+                logging.error(f"Failed to save country history for {country_code}: {e}")
+
+    def scan_domains(self):
+        """Perform full scan of all configured government domains using threading."""
+        # Load domains from MongoDB or JSON
+        country_domains = {}
+        
+        if self.use_mongodb:
+            try:
+                # Fetch domains from MongoDB
+                domains_cursor = db_service._db[db_service.COLLECTION_REGISTRY["GOV_DOMAINS"]].find({"active": True})
+                for doc in domains_cursor:
+                    country = doc['country']
+                    if country not in country_domains:
+                        country_domains[country] = []
+                    country_domains[country].append(doc['domain'])
+                
+                logging.info(f"Loaded {sum(len(d) for d in country_domains.values())} domains from MongoDB")
+                
+            except Exception as e:
+                logging.error(f"MongoDB domain load failed, falling back to JSON: {e}")
+                self.use_mongodb = False
+        
+        # Fallback to JSON if MongoDB unavailable or empty
+        if not country_domains:
+            try:
+                with open(self.domains_file, 'r') as f:
+                    country_domains = json.load(f)
+            except FileNotFoundError:
+                logging.error("Gov domains dataset not found.")
+                return {}
+
+        results = {}
+        # Flatten the list for processing but keep track of country association
+        tasks = []
+        for country, domains in country_domains.items():
+            results[country] = [] # Initialize list
+            for domain in domains:
+                tasks.append((country, domain))
+        
+        logging.info(f"Starting batched scan for {len(tasks)} domains...")
+        
+        import concurrent.futures
+        
+        # Use ThreadPool to speed up IO-bound checks
+        with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+            # Create a dict to map future to country/domain info
+            future_to_domain = {
+                executor.submit(self.check_domain, domain): (country, domain) 
+                for country, domain in tasks
+            }
+            
+            for future in concurrent.futures.as_completed(future_to_domain):
+                country, domain = future_to_domain[future]
+                try:
+                    data = future.result()
+                    data['country'] = country  # Add country metadata
+                    data['sector'] = 'government'  # Add sector metadata
+                    results[country].append(data)
+                except Exception as exc:
+                    logging.error(f'{domain} generated an exception: {exc}')
+                    # Append a failed result so we account for it
+                    results[country].append({
+                        "domain": domain,
+                        "country": country,
+                        "sector": "government",
+                        "ipv6_dns": False,
+                        "ipv6_web": False,
+                        "dnssec": False,
+                        "dual_stack": False,
+                        "checked_at": datetime.now().isoformat(),
+                        "timestamp": datetime.now().isoformat(),
+                        "status": "error",
+                        "error": "Scan Failed"
+                    })
+        
+        # Save results to MongoDB using bulk write for performance
+        if self.use_mongodb:
+            try:
+                from pymongo import UpdateOne
+                
+                # Prepare bulk operations
+                bulk_operations = []
+                for country, scans in results.items():
+                    for scan in scans:
+                        # Calculate status
+                        if scan.get('ipv6_web') and scan.get('ipv6_dns'):
+                            scan['status'] = 'ready'
+                        elif scan.get('ipv6_dns'):
+                            scan['status'] = 'partial'
+                        else:
+                            scan['status'] = 'missing'
+                        
+                        scan['timestamp'] = scan.get('checked_at', datetime.now().isoformat())
+                        
+                        # Insert scan result (not upsert, we want historical records)
+                        bulk_operations.append(scan)
+                
+                # Bulk insert
+                if bulk_operations:
+                    db_service._db[db_service.COLLECTION_REGISTRY["GOV_SCANS"]].insert_many(bulk_operations)
+                    logging.info(f"Saved {len(bulk_operations)} scan results to MongoDB")
+                
+                # Record in Ledger
+                ledger_service.record_operation(
+                    op_type="scan",
+                    target="gov_scans",
+                    params={"mode": "full_batch", "parallel_workers": 20},
+                    result_summary={"scans_completed": len(bulk_operations), "status": "success"}
+                )
+                
+            except Exception as e:
+                logging.error(f"MongoDB bulk write failed, falling back to JSON: {e}")
+                self.use_mongodb = False
+        
+        # Always save to JSON as backup
+        # Safety: Ensure no datetime or ObjectId objects are in the results for JSON serialization
+        def json_safe(obj):
+            if isinstance(obj, datetime):
+                return obj.isoformat()
+            if hasattr(obj, '__class__') and obj.__class__.__name__ == 'ObjectId':
+                return str(obj)
+            raise TypeError(f"Type {type(obj)} not serializable")
+
+        with open(self.results_file, 'w') as f:
+            json.dump(results, f, indent=2, default=json_safe)
+            
+        # Save History
+        self.save_history(results)
+        
+        logging.info("Scan completed")
+        return results
+
+    def get_detailed_stats(self):
+        """Calculate detailed statistics, scores, and rankings."""
+        results = self.get_results()
+        if not results:
+            return {}
+
+        country_stats = []
+        
+        # Calculate score for each country
+        for country_code, domains_data in results.items():
+            score, breakdown = self._calculate_country_score(domains_data)
+            
+            # Determine Readiness Level
+            if score >= 80: level = "High"
+            elif score >= 50: level = "Moderate"
+            else: level = "Low"
+
+            country_stats.append({
+                "country": country_code,
+                "score": score,
+                "level": level,
+                "total_domains": len(domains_data),
+                "breakdown": breakdown
+            })
+        
+        # Sort by Score (Desc) for Rank
+        country_stats.sort(key=lambda x: x['score'], reverse=True)
+        
+        # Assign Rank
+        for idx, item in enumerate(country_stats):
+            item['rank'] = idx + 1
+            
+        return {
+            "generated_at": datetime.now().isoformat(),
+            "ranking": country_stats
+        }
+
+    def _calculate_country_score(self, domain_list):
+        """
+        Score Formula:
+        - IPv6 DNS: 40%
+        - IPv6 Web: 40%
+        - DNSSEC:   20%
+        """
+        total = len(domain_list)
+        if total == 0:
+            return 0, {}
+            
+        dns_count = sum(1 for d in domain_list if d.get('ipv6_dns'))
+        web_count = sum(1 for d in domain_list if d.get('ipv6_web'))
+        sec_count = sum(1 for d in domain_list if d.get('dnssec'))
+        
+        p_dns = (dns_count / total) * 100
+        p_web = (web_count / total) * 100
+        p_sec = (sec_count / total) * 100
+        
+        # Weighted Score
+        score = (p_dns * 0.4) + (p_web * 0.4) + (p_sec * 0.2)
+        
+        # Failure Analysis (Percentages for UI)
+        failures = {
+            "missing_dns_pct": round(((total - dns_count) / total) * 100),
+            "web_unreachable_pct": round(((total - web_count) / total) * 100),
+            "missing_dnssec_pct": round(((total - sec_count) / total) * 100)
+        }
+        
+        return round(score, 1), failures
+
+    def check_domain(self, domain):
+        """Check a single domain for IPv6 compliance."""
+        result = {
+            "domain": domain,
+            "ipv6_dns": False,
+            "ipv6_web": False,
+            "ipv6_smtp": False,
+            "ipv6_dns_service": False,
+            "dnssec": False,
+            "dual_stack": False,
+            "ipv4_rtt_ms": None,
+            "ipv6_rtt_ms": None,
+            "checked_at": datetime.now().isoformat(),
+            "asn": None,
+            "isp": "Unknown",
+            "service_matrix": "Unknown",
+            "cert_sans": []
+        }
+
+        import time
+
+        # 1. Resolve Addresses
+        ipv6_addr = None
+        ipv4_addr = None
+        try:
+            # IPv6 resolution
+            answers_v6 = dns.resolver.resolve(domain, 'AAAA', lifetime=2)
+            if answers_v6:
+                result['ipv6_dns'] = True
+                ipv6_addr = answers_v6[0].to_text()
+        except: pass
+
+        try:
+            # IPv4 resolution
+            answers_v4 = dns.resolver.resolve(domain, 'A', lifetime=2)
+            if answers_v4:
+                ipv4_addr = answers_v4[0].to_text()
+        except: pass
+
+        # 2. Performance Probe: IPv4
+        if ipv4_addr:
+            try:
+                start_time = time.perf_counter()
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sock.settimeout(2)
+                sock.connect((ipv4_addr, 443))
+                end_time = time.perf_counter()
+                result['ipv4_rtt_ms'] = round((end_time - start_time) * 1000, 2)
+                sock.close()
+            except: 
+                result['ipv4_rtt_ms'] = None
+
+        # 3. Performance Probe: IPv6
+        if ipv6_addr:
+            try:
+                start_time = time.perf_counter()
+                sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+                sock.settimeout(2)
+                context = ssl.create_default_context()
+                # Use real handshake to verify ipv6_web
+                with context.wrap_socket(sock, server_hostname=domain) as ssock:
+                    ssock.connect((ipv6_addr, 443))
+                    end_time = time.perf_counter()
+                    result['ipv6_rtt_ms'] = round((end_time - start_time) * 1000, 2)
+                    result['ipv6_web'] = True
+                    
+                    # Extract Subject Alternative Names from certificate
+                    try:
+                        cert = ssock.getpeercert()
+                        if cert and 'subjectAltName' in cert:
+                            sans = []
+                            for san_type, san_value in cert['subjectAltName']:
+                                if san_type == 'DNS':
+                                    sans.append(san_value)
+                            result['cert_sans'] = sans
+                    except:
+                        pass
+            except: 
+                result['ipv6_rtt_ms'] = None
+                result['ipv6_web'] = False
+
+        # 4. DNSSEC Check
+        try:
+            try:
+               dns.resolver.resolve(domain, 'DNSKEY', lifetime=2)
+               result['dnssec'] = True 
+            except:
+               pass
+        except Exception:
+            pass
+
+        # 5. Dual Stack Check (IPv4 also exists)
+        try:
+            answers_a = dns.resolver.resolve(domain, 'A', lifetime=2)
+            if answers_a:
+                ipv4_address = answers_a[0].to_text()
+                if result['ipv6_dns']:
+                    result['dual_stack'] = True
+                
+                # 6. ASN/ISP Lookup (Registry-Grade via internal MongoDB)
+                if ipv4_address:
+                    try:
+                        # Step A: Perform BGP IP-to-ASN resolution via Cymru DNS (lightweight)
+                        reversed_ip = ".".join(reversed(ipv4_address.split('.')))
+                        query = f"{reversed_ip}.origin.asn.cymru.com"
+                        txt_answers = dns.resolver.resolve(query, 'TXT')
+                        if txt_answers:
+                            txt_data = txt_answers[0].to_text().strip('"').split('|')
+                            asn_id = int(txt_data[0].strip())
+                            result['asn'] = f"AS{asn_id}"
+                            
+                            # Step B: Unified Registry Lookup (OFFLINE-FIRST)
+                            # Instead of live WHOIS, we check our high-resolution Mongo records
+                            asn_entry = db_service._db[db_service.COLLECTION_REGISTRY["ASN_MASTER"]].find_one({"asn": asn_id})
+                            if asn_entry:
+                                result['isp'] = asn_entry.get('org_name') or asn_entry.get('asn_name') or f"Provider {asn_id}"
+                            else:
+                                # Fallback to live (Optional/Limited)
+                                result['isp'] = "Generic Infrastructure"
+                    except Exception as e:
+                        logging.debug(f"ASN Resolution failed: {e}")
+        except Exception:
+            pass
+
+        # 7. SMTP Service Test (Port 25)
+        if ipv6_addr:
+            try:
+                sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+                sock.settimeout(2)
+                sock.connect((ipv6_addr, 25))
+                result['ipv6_smtp'] = True
+                sock.close()
+            except:
+                result['ipv6_smtp'] = False
+
+        # 8. DNS Service Test (Port 53)
+        if ipv6_addr:
+            try:
+                sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+                sock.settimeout(2)
+                sock.connect((ipv6_addr, 53))
+                result['ipv6_dns_service'] = True
+                sock.close()
+            except:
+                result['ipv6_dns_service'] = False
+
+        # 9. Calculate Service Matrix
+        services = []
+        if result['ipv6_web']: services.append("Web")
+        if result['ipv6_dns_service']: services.append("DNS")
+        if result['ipv6_smtp']: services.append("Mail")
+        
+        if not result['ipv6_dns']:
+            result['service_matrix'] = "No-IPv6"
+        elif len(services) == 0:
+            result['service_matrix'] = "Shadow-IPv6"  # AAAA exists but no services reachable
+        elif len(services) == 3:
+            result['service_matrix'] = "Full-Stack"
+        elif len(services) == 1:
+            result['service_matrix'] = f"{services[0]}-Only"
+        else:
+            result['service_matrix'] = "+".join(services)
+
+        return result

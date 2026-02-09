@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - APAC IPv6{% endblock %}
+{% block header_title %}System Dashboard{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Welcome Card -->
+    <div
+        class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
+        <div class="relative z-10">
+            <h2 class="text-3xl font-bold mb-2">Welcome to APAC IPv6</h2>
+            <p class="text-blue-100 max-w-2xl">Advanced diagnostic and strategic resource portal for the Asia-Pacific
+                networking community. Monitor connectivity, analyze domains, and refine your IPv6-Mostly transition
+                strategy.</p>
+        </div>
+        <svg class="absolute -right-20 -bottom-20 w-80 h-80 text-blue-500 opacity-20" fill="currentColor"
+            viewBox="0 0 20 20">
+            <path
+                d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 015.25-2.906z" />
+        </svg>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Regional Adoption</p>
+            <div class="flex items-end justify-between">
+                <p id="dash-adoption-rate" class="text-3xl font-bold text-gray-800">{{ (india_adoption or 0)|round(1)
+                    }}%</p>
+                <div class="flex flex-col items-end">
+                    <span id="dash-country-label"
+                        class="text-green-500 text-[10px] font-black bg-green-50 px-2 py-0.5 rounded-full uppercase tracking-tighter mb-1">Live:
+                        India</span>
+                    <span class="text-[8px] font-bold text-gray-300 uppercase">via APNIC Labs</span>
+                    <span id="dash-update-time" class="text-[7px] font-bold text-blue-400 uppercase mt-1">Updated {{
+                        updated_mins }}m
+                        ago</span>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">APNIC Docs</p>
+            <div class="flex items-end justify-between">
+                <p class="text-3xl font-bold text-gray-800">Live</p>
+                <span class="text-blue-500 text-xs font-bold bg-blue-50 px-2 py-1 rounded">Registry</span>
+            </div>
+        </div>
+        <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">IETF Strategy</p>
+            <div class="flex items-end justify-between">
+                <p class="text-3xl font-bold text-gray-800">v6-Mostly</p>
+                <span class="text-purple-500 text-xs font-bold bg-purple-50 px-2 py-1 rounded">Draft v04</span>
+            </div>
+        </div>
+        <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">System Status</p>
+            <div class="flex items-end justify-between">
+                <p class="text-3xl font-bold text-gray-800">Online</p>
+                <span class="text-green-500 text-xs font-bold bg-green-50 px-2 py-1 rounded">Active</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Regional Maps/Visualizations -->
+    <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
+        <div class="flex items-center justify-between mb-8">
+            <h3 class="text-xl font-bold text-gray-800">IPv6 Adoption Heatmap</h3>
+            <a href="https://stats.labs.apnic.net/ipv6" target="_blank"
+                class="text-sm font-semibold text-blue-600 hover:underline">Full APNIC Stats &rarr;</a>
+        </div>
+        <div id="visualization-container" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-inner group">
+                <img src="/static/images/dashboard/adoption_map.png" alt="Adoption Map"
+                    class="w-full h-auto group-hover:scale-105 transition duration-500">
+                <div class="p-4 bg-gray-50/50">
+                    <p class="text-xs font-bold text-gray-500 uppercase tracking-widest text-center">Regional IPv6
+                        Adoption Map</p>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-inner group">
+                <img src="/static/images/dashboard/growth_trend.png" alt="Growth Trend"
+                    class="w-full h-auto group-hover:scale-105 transition duration-500">
+                <div class="p-4 bg-gray-50/50">
+                    <p class="text-xs font-bold text-gray-500 uppercase tracking-widest text-center">IPv6 Traffic Growth
+                        Trends</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/dashboard.js"></script>
+{% endblock %}

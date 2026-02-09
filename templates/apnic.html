@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block title %}APNIC Resources - APAC IPv6{% endblock %}
+{% block header_title %}APNIC Technical Resources & Registry{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Tabbed Navigation Center -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="border-b border-gray-100 bg-gray-50/50">
+            <nav class="flex -mb-px px-8 overflow-x-auto" aria-label="Tabs">
+                <button onclick="switchApnicTab('lookup')" id="lookup-tab-btn"
+                    class="apnic-tab-btn whitespace-nowrap py-6 px-8 border-b-2 font-bold text-sm border-blue-600 text-blue-600">
+                    Resource Lookup
+                </button>
+                <button onclick="switchApnicTab('docs')" id="docs-tab-btn"
+                    class="apnic-tab-btn whitespace-nowrap py-6 px-8 border-b-2 font-bold text-sm border-transparent text-gray-400 hover:text-gray-700 hover:border-gray-200">
+                    Documentation
+                </button>
+                <button onclick="switchApnicTab('policies')" id="policies-tab-btn"
+                    class="apnic-tab-btn whitespace-nowrap py-6 px-8 border-b-2 font-bold text-sm border-transparent text-gray-400 hover:text-gray-700 hover:border-gray-200">
+                    Policies
+                </button>
+                <button onclick="switchApnicTab('training')" id="training-tab-btn"
+                    class="apnic-tab-btn whitespace-nowrap py-6 px-8 border-b-2 font-bold text-sm border-transparent text-gray-400 hover:text-gray-700 hover:border-gray-200">
+                    Training
+                </button>
+                <button onclick="switchApnicTab('adoption')" id="adoption-tab-btn"
+                    class="apnic-tab-btn whitespace-nowrap py-6 px-8 border-b-2 font-bold text-sm border-transparent text-gray-400 hover:text-gray-700 hover:border-gray-200">
+                    Adoption Stats
+                </button>
+            </nav>
+        </div>
+
+        <div class="p-8">
+            <!-- Resource Lookup Pane -->
+            <div id="apnic-lookup-content" class="apnic-tab-pane block space-y-6">
+                <div class="max-w-2xl">
+                    <h3 class="text-xl font-bold text-gray-800 mb-2 font-display">WHOIS / RDAP Explorer</h3>
+                    <p class="text-sm text-gray-500 mb-6 font-medium">Directly query the APNIC RDAP database for IP
+                        address assignments or Autonomous System Numbers.</p>
+
+                    <div class="flex space-x-2">
+                        <input type="text" id="apnic-query"
+                            class="flex-1 p-4 border border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-100 transition text-sm font-mono shadow-sm"
+                            placeholder="e.g. 2001:db8::, AS17488, 1.1.1.1">
+                        <button onclick="lookupApnicResource()"
+                            class="bg-blue-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200 active:scale-95">
+                            Search
+                        </button>
+                    </div>
+                </div>
+
+                <div id="apnic-lookup-loading" class="hidden py-12 text-center">
+                    <div class="inline-block relative">
+                        <div class="animate-ping absolute inset-0 rounded-full bg-blue-400 opacity-20"></div>
+                        <svg class="animate-spin h-10 w-10 text-blue-600 mx-auto relative z-10" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"
+                                fill="none"></circle>
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                        </svg>
+                    </div>
+                    <p class="text-gray-500 font-bold mt-4 tracking-tight">Communicating with APNIC RDAP Endpoints...
+                    </p>
+                </div>
+
+                <div id="apnic-lookup-results" class="hidden animate-in fade-in duration-500 slide-in-from-bottom-4">
+                    <!-- Results dynamically injected -->
+                </div>
+            </div>
+
+            <!-- Documentation Pane -->
+            <div id="apnic-docs-content" class="apnic-tab-pane hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="p-6 rounded-2xl border border-blue-50 bg-white hover:border-blue-200 hover:shadow-xl hover:shadow-blue-500/5 transition duration-300 cursor-pointer group"
+                        onclick="showDocDetail('intro')">
+                        <div
+                            class="bg-blue-600 w-12 h-12 rounded-2xl flex items-center justify-center text-white mb-6 transform group-hover:rotate-6 transition">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h4 class="font-bold text-gray-800 text-lg mb-2">IPv6 101</h4>
+                        <p class="text-xs text-gray-500 leading-relaxed font-medium">Fundamental architecture of the
+                            128-bit address space.</p>
+                    </div>
+                    <div class="p-6 rounded-2xl border border-green-50 bg-white hover:border-green-200 hover:shadow-xl hover:shadow-green-500/5 transition duration-300 cursor-pointer group"
+                        onclick="showDocDetail('allocation')">
+                        <div
+                            class="bg-green-600 w-12 h-12 rounded-2xl flex items-center justify-center text-white mb-6 transform group-hover:rotate-6 transition">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                        </div>
+                        <h4 class="font-bold text-gray-800 text-lg mb-2">Allocation</h4>
+                        <p class="text-xs text-gray-500 leading-relaxed font-medium">How blocks are sub-divided across
+                            the hierarchy.</p>
+                    </div>
+                    <div class="p-6 rounded-2xl border border-orange-50 bg-white hover:border-orange-200 hover:shadow-xl hover:shadow-orange-500/5 transition duration-300 cursor-pointer group"
+                        onclick="showDocDetail('policies')">
+                        <div
+                            class="bg-orange-600 w-12 h-12 rounded-2xl flex items-center justify-center text-white mb-6 transform group-hover:rotate-6 transition">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                        </div>
+                        <h4 class="font-bold text-gray-800 text-lg mb-2">Policies</h4>
+                        <p class="text-xs text-gray-500 leading-relaxed font-medium">Core rules governing IP resource
+                            distribution.</p>
+                    </div>
+                    <div class="p-6 rounded-2xl border border-purple-50 bg-white hover:border-purple-200 hover:shadow-xl hover:shadow-purple-500/5 transition duration-300 cursor-pointer group"
+                        onclick="showDocDetail('exhaustion')">
+                        <div
+                            class="bg-purple-600 w-12 h-12 rounded-2xl flex items-center justify-center text-white mb-6 transform group-hover:rotate-6 transition">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h4 class="font-bold text-gray-800 text-lg mb-2">IPv4 Crisis</h4>
+                        <p class="text-xs text-gray-500 leading-relaxed font-medium">Understanding exhaustion and the
+                            move to v6.</p>
+                    </div>
+                </div>
+                <div id="doc-active-detail"
+                    class="hidden mt-12 p-10 bg-gray-50 rounded-3xl border border-gray-100 relative shadow-inner">
+                    <button onclick="closeDocDetail()"
+                        class="absolute top-6 right-6 text-gray-400 hover:text-gray-600 bg-white w-10 h-10 rounded-full flex items-center justify-center shadow-sm">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                    <div id="doc-content-area" class="prose prose-blue max-w-none"></div>
+                </div>
+            </div>
+
+            <!-- Policies Pane -->
+            <div id="apnic-policies-content" class="apnic-tab-pane hidden space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div
+                        class="bg-blue-50/50 p-6 rounded-2xl border border-blue-100 group hover:bg-white transition shadow-sm">
+                        <h4 class="font-bold text-blue-900 mb-2 font-display">Initial Allocation Criteria</h4>
+                        <p class="text-xs text-blue-700/80 font-medium leading-relaxed">Local Internet Registries must
+                            demonstrate a network plan for immediate assignment to end-sites.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                        <h4 class="font-bold text-gray-800 mb-2 font-display">Minimum Privacy</h4>
+                        <p class="text-xs text-gray-500 font-medium leading-relaxed">Guidelines on WHOIS data
+                            suppression for residential assignments.</p>
+                    </div>
+                </div>
+                <div class="p-12 text-center text-gray-300">
+                    <svg class="w-16 h-16 mx-auto mb-4 opacity-20" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <p class="text-sm font-bold text-gray-400">Detailed Community Policy Database Access</p>
+                    <a href="https://www.apnic.net/community/policy/resources" target="_blank"
+                        class="text-blue-600 text-xs font-black uppercase tracking-widest mt-4 inline-block hover:underline">apnic.net/policy</a>
+                </div>
+            </div>
+
+            <!-- Training Pane -->
+            <div id="apnic-training-content" class="apnic-tab-pane hidden">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-gray-900 rounded-3xl p-8 text-white relative overflow-hidden group">
+                        <div class="relative z-10">
+                            <span
+                                class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-400 mb-4 block">Workshop</span>
+                            <h4 class="text-xl font-bold mb-4 font-display leading-tight">IPv6 Deployment and
+                                Architecture</h4>
+                            <p class="text-sm text-gray-400 mb-8 font-medium">Hands-on routing and subnetting labs.</p>
+                            <button
+                                class="bg-white/10 hover:bg-white/20 px-6 py-3 rounded-xl transition text-sm font-bold w-full">Enroll
+                                via Academy</button>
+                        </div>
+                        <div
+                            class="absolute -right-8 -bottom-8 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl group-hover:scale-150 transition duration-700">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Adoption Pane -->
+            <div id="apnic-adoption-content" class="apnic-tab-pane hidden">
+                <div
+                    class="bg-gradient-to-br from-blue-600 to-blue-800 rounded-3xl p-12 text-white text-center shadow-2xl shadow-blue-500/20">
+                    <h3 class="text-3xl font-black mb-4 font-display">Regional IPv6 Heatmap</h3>
+                    <p class="text-blue-100 max-w-xl mx-auto mb-10 font-medium">Analyzing current adoption metrics
+                        across the Asia-Pacific region based on Google connectivity data.</p>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+                        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/10">
+                            <p class="text-[10px] font-black uppercase tracking-widest text-blue-300 mb-1">India</p>
+                            <p class="text-3xl font-black">58.2%</p>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/10">
+                            <p class="text-[10px] font-black uppercase tracking-widest text-blue-300 mb-1">Australia</p>
+                            <p class="text-3xl font-black">32.1%</p>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/10">
+                            <p class="text-[10px] font-black uppercase tracking-widest text-blue-300 mb-1">Japan</p>
+                            <p class="text-3xl font-black">49.4%</p>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/10">
+                            <p class="text-[10px] font-black uppercase tracking-widest text-blue-300 mb-1">Malaysia</p>
+                            <p class="text-3xl font-black">54.7%</p>
+                        </div>
+                    </div>
+
+                    <a href="https://stats.labs.apnic.net/ipv6" target="_blank"
+                        class="bg-white text-blue-600 px-10 py-4 rounded-2xl font-black hover:bg-gray-100 transition shadow-xl active:scale-95">Open
+                        Interactive Labs</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/apnic.js"></script>
+{% endblock %}

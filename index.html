@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APAC IPv6</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 font-sans">
+    <nav class="bg-blue-600 text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <img src="/static/images/logo.png?t=1622222222" alt="Logo" class="h-8 w-auto">
+                <span class="text-xl font-bold">APAC IPv6</span>
+            </div>
+            <div class="space-x-4">
+                <a href="#ip-test" class="hover:underline">IP Test</a>
+                <a href="#apnic-resources" class="hover:underline">APNIC Resources</a>
+                <a href="#ipv6-strategy" class="hover:underline">IPv6 Strategy</a>
+                <a href="#domain-analysis" class="hover:underline">Domain Analysis</a>
+                <a href="#table" class="hover:underline">Table</a>
+                <a href="#visualizations" class="hover:underline">Visualizations</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="bg-white p-6 text-center shadow-sm">
+        <h1 class="text-2xl font-bold text-blue-800">APAC IPv6 Diagnostic & Resource Portal</h1>
+        <p class="text-gray-600">Advanced IPv6 Connectivity Testing, Domain Security Analysis, and APNIC Technical
+            Resources
+    </header>
+
+    <main class="container mx-auto p-6">
+        <section id="ip-test" class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-xl font-semibold mb-4 text-blue-800">IPv6 Connectivity Test (Inspired by test-ipv6.com)</h2>
+            <button onclick="runIPTest()"
+                class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mb-4 transition">Test
+                Your IP</button>
+            <p id="ip-test-status" class="text-gray-600 mb-4 flex items-center hidden">
+                <svg id="spinner" class="animate-spin h-5 w-5 mr-2 text-blue-500 hidden"
+                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+                <span>Running IP connectivity test, please wait...</span>
+            </p>
+
+            <p class="text-sm text-gray-500 mb-4">Note: This test shows your device's public IPv4 and IPv6 addresses and
+                connectivity status.</p>
+
+            <!-- IP Address Information -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-gray-50 p-3 rounded">
+                    <p class="font-semibold text-sm text-gray-700">Your IPv4</p>
+                    <p id="ipv4-result" class="text-gray-900 font-mono text-sm">Not tested</p>
+                </div>
+                <div class="bg-gray-50 p-3 rounded">
+                    <p class="font-semibold text-sm text-gray-700">Your IPv6</p>
+                    <p id="ipv6-result" class="text-gray-900 font-mono text-sm">Not tested</p>
+                </div>
+                <div class="bg-gray-50 p-3 rounded">
+                    <p class="font-semibold text-sm text-gray-700">Your ISP</p>
+                    <p id="isp-result" class="text-gray-900 text-sm">Not tested</p>
+                </div>
+                <div class="bg-gray-50 p-3 rounded">
+                    <p class="font-semibold text-sm text-gray-700">Your Location</p>
+                    <p id="location-result" class="text-gray-900 text-sm">Not tested</p>
+                </div>
+            </div>
+
+            <!-- Connectivity Score -->
+            <div id="connectivity-score" class="mt-6 hidden">
+                <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border border-blue-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold mb-2">IPv6 Readiness Score</h3>
+                            <p class="text-sm text-gray-600">Overall connectivity rating</p>
+                        </div>
+                        <div class="text-center">
+                            <div id="score-value" class="text-5xl font-bold text-blue-600">-</div>
+                            <div class="text-sm text-gray-500">out of 10</div>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div id="score-bar" class="h-3 rounded-full transition-all duration-500" style="width: 0%">
+                            </div>
+                        </div>
+                        <p id="score-label" class="text-sm text-gray-600 mt-2 text-center"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommendations -->
+            <div id="recommendations" class="mt-6 hidden">
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+                    <div class="flex items-start">
+                        <svg class="w-6 h-6 text-yellow-400 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                        <div class="flex-1">
+                            <h3 class="text-lg font-semibold text-yellow-800 mb-2">Recommendations</h3>
+                            <ul id="recommendation-list" class="space-y-2 text-sm text-yellow-700"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Latency Comparison -->
+            <div id="latency-section" class="mt-6 hidden">
+                <h3 class="text-lg font-semibold mb-4">Latency Comparison</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-semibold text-blue-900">IPv4 Latency</p>
+                                <p class="text-sm text-blue-600">Response time</p>
+                            </div>
+                            <div id="ipv4-latency" class="text-3xl font-bold text-blue-600">-</div>
+                        </div>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-semibold text-purple-900">IPv6 Latency</p>
+                                <p class="text-sm text-purple-600">Response time</p>
+                            </div>
+                            <div id="ipv6-latency" class="text-3xl font-bold text-purple-600">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test History -->
+            <div id="test-history-section" class="mt-6 hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold">Test History</h3>
+                    <button onclick="clearHistory()" class="text-sm text-red-500 hover:text-red-700">Clear
+                        History</button>
+                </div>
+                <div id="history-list" class="space-y-2 max-h-64 overflow-y-auto"></div>
+            </div>
+
+            <!-- Connectivity Test Results (test-ipv6.com style) -->
+            <div id="connectivity-tests" class="mt-6 hidden">
+                <div class="flex justify-between items-center mb-4 border-b pb-2">
+                    <h3 class="text-lg font-semibold">Connectivity Test Results</h3>
+                    <button onclick="copyResults()"
+                        class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
+                            </path>
+                        </svg>
+                        Copy Results
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- DNS IPv4 Test -->
+                    <div id="test-dns-ipv4"
+                        class="border rounded-lg p-4 flex items-center justify-between relative group">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2">
+                                <p class="font-semibold">DNS IPv4 Resolution</p>
+                                <button class="info-icon text-gray-400 hover:text-blue-500"
+                                    onclick="showTooltip(event, 'dns-ipv4')">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <p class="text-sm text-gray-600">Can resolve A records</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="retryTest('dns-ipv4')"
+                                class="retry-btn hidden text-gray-400 hover:text-blue-500" title="Retry test">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                    </path>
+                                </svg>
+                            </button>
+                            <div id="status-dns-ipv4" class="text-2xl">⏳</div>
+                        </div>
+                    </div>
+
+                    <!-- DNS IPv6 Test -->
+                    <div id="test-dns-ipv6"
+                        class="border rounded-lg p-4 flex items-center justify-between relative group">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2">
+                                <p class="font-semibold">DNS IPv6 Resolution</p>
+                                <button class="info-icon text-gray-400 hover:text-blue-500"
+                                    onclick="showTooltip(event, 'dns-ipv6')">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <p class="text-sm text-gray-600">Can resolve AAAA records</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="retryTest('dns-ipv6')"
+                                class="retry-btn hidden text-gray-400 hover:text-blue-500" title="Retry test">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                    </path>
+                                </svg>
+                            </button>
+                            <div id="status-dns-ipv6" class="text-2xl">⏳</div>
+                        </div>
+                    </div>
+
+                    <!-- Dual Stack Test -->
+                    <div id="test-dual-stack"
+                        class="border rounded-lg p-4 flex items-center justify-between relative group">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2">
+                                <p class="font-semibold">Dual-Stack Support</p>
+                                <button class="info-icon text-gray-400 hover:text-blue-500"
+                                    onclick="showTooltip(event, 'dual-stack')">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <p class="text-sm text-gray-600">Both IPv4 and IPv6 working</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="retryTest('dual-stack')"
+                                class="retry-btn hidden text-gray-400 hover:text-blue-500" title="Retry test">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                    </path>
+                                </svg>
+                            </button>
+                            <div id="status-dual-stack" class="text-2xl">⏳</div>
+                        </div>
+                    </div>
+
+                    <!-- Large Packet Test -->
+                    <div id="test-large-packet"
+                        class="border rounded-lg p-4 flex items-center justify-between relative group">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2">
+                                <p class="font-semibold">Large Packet (MTU) Support</p>
+                                <button class="info-icon text-gray-400 hover:text-blue-500"
+                                    onclick="showTooltip(event, 'large-packet')">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <p class="text-sm text-gray-600">IPv6 MTU path discovery</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="retryTest('large-packet')"
+                                class="retry-btn hidden text-gray-400 hover:text-blue-500" title="Retry test">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                    </path>
+                                </svg>
+                            </button>
+                            <div id="status-large-packet" class="text-2xl">⏳</div>
+                        </div>
+                    </div>
+
+                    <!-- DNS over IPv6 Test -->
+                    <div id="test-dns-over-ipv6"
+                        class="border rounded-lg p-4 flex items-center justify-between relative group">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2">
+                                <p class="font-semibold">DNS over IPv6</p>
+                                <button class="info-icon text-gray-400 hover:text-blue-500"
+                                    onclick="showTooltip(event, 'dns-over-ipv6')">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <p class="text-sm text-gray-600">DNS queries via IPv6 transport</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="retryTest('dns-over-ipv6')"
+                                class="retry-btn hidden text-gray-400 hover:text-blue-500" title="Retry test">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                    </path>
+                                </svg>
+                            </button>
+                            <div id="status-dns-over-ipv6" class="text-2xl">⏳</div>
+                        </div>
+                    </div>
+
+                    <!-- WebRTC IPv6 Test (Phase 3) -->
+                    <div id="test-webrtc"
+                        class="border rounded-lg p-4 flex items-center justify-between relative group">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2">
+                                <p class="font-semibold">WebRTC IPv6 Support</p>
+                                <button class="info-icon text-gray-400 hover:text-blue-500"
+                                    onclick="showTooltip(event, 'webrtc')">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <p class="text-sm text-gray-600">Peer-to-peer IPv6 connectivity</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="retryTest('webrtc')"
+                                class="retry-btn hidden text-gray-400 hover:text-blue-500" title="Retry test">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                    </path>
+                                </svg>
+                            </button>
+                            <div id="status-webrtc" class="text-2xl">⏳</div>
+                        </div>
+                    </div>
+
+                    <!-- ASN Information -->
+                    <div id="test-asn" class="border rounded-lg p-4 flex items-center justify-between md:col-span-2">
+                        <div>
+                            <p class="font-semibold">ISP / ASN Information</p>
+                            <p id="asn-info" class="text-sm text-gray-600">Detecting...</p>
+                        </div>
+                        <div class="text-2xl">ℹ️</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- APNIC-Style IPv6 Resources & Guidance Section -->
+        <section id="apnic-resources" class="bg-white p-6 rounded-lg shadow-md mb-6 border-t-4 border-blue-600">
+            <div class="flex items-center mb-6">
+                <div class="bg-blue-600 p-2 rounded mr-4">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18 18.246 18.477 16.5 18c-1.746 0-3.332.477-4.5 1.253">
+                        </path>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-blue-900">APNIC-Style IPv6 Resources & Guidance</h2>
+                    <p class="text-gray-600 text-sm">Educational resources, policy guidelines, and resource management
+                        tools.</p>
+                </div>
+            </div>
+
+            <!-- APNIC Module Tabs -->
+            <div class="border-b border-gray-200 mb-6">
+                <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="apnic-tabs" role="tablist">
+                    <li class="mr-2" role="presentation">
+                        <button
+                            class="inline-block p-4 border-b-2 rounded-t-lg border-blue-600 text-blue-600 apnic-tab-btn"
+                            id="lookup-tab-btn" onclick="switchApnicTab('lookup')" type="button">Resource
+                            Lookup</button>
+                    </li>
+                    <li class="mr-2" role="presentation">
+                        <button
+                            class="inline-block p-4 border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 apnic-tab-btn"
+                            id="docs-tab-btn" onclick="switchApnicTab('docs')" type="button">Documentation</button>
+                    </li>
+                    <li class="mr-2" role="presentation">
+                        <button
+                            class="inline-block p-4 border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 apnic-tab-btn"
+                            id="policies-tab-btn" onclick="switchApnicTab('policies')" type="button">Policies &
+                            Guidelines</button>
+                    </li>
+                    <li class="mr-2" role="presentation">
+                        <button
+                            class="inline-block p-4 border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 apnic-tab-btn"
+                            id="training-tab-btn" onclick="switchApnicTab('training')" type="button">Training &
+                            Tutorials</button>
+                    </li>
+                    <li role="presentation">
+                        <button
+                            class="inline-block p-4 border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 apnic-tab-btn"
+                            id="adoption-tab-btn" onclick="switchApnicTab('adoption')" type="button">IPv6
+                            Adoption</button>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Tab Content: Resource Lookup -->
+            <div id="apnic-lookup-content" class="apnic-tab-pane block">
+                <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                    <h3 class="font-bold text-lg mb-4 flex items-center">
+                        WHOIS / RDAP Resource Lookup
+                        <button class="ml-2 text-gray-400 hover:text-blue-500"
+                            title="Query the APNIC RDAP database for IP or ASN info">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+                    </h3>
+                    <div class="flex space-x-2 mb-6">
+                        <input type="text" id="apnic-query"
+                            class="flex-1 p-3 border rounded shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            placeholder="Enter IP (v4/v6) or ASN (e.g., AS17488)">
+                        <button onclick="lookupApnicResource()"
+                            class="bg-blue-600 text-white px-6 py-3 rounded-md font-semibold hover:bg-blue-700 transition flex items-center">
+                            Search RDAP
+                        </button>
+                    </div>
+
+                    <div id="apnic-lookup-results" class="hidden space-y-4">
+                        <!-- Result cards will be injected here -->
+                    </div>
+                    <div id="apnic-lookup-loading" class="hidden text-center py-8">
+                        <svg class="animate-spin h-8 w-8 text-blue-600 mx-auto mb-2" xmlns="http://www.w3.org/2000/svg"
+                            fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                            </circle>
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                        </svg>
+                        <p class="text-gray-600">Querying APNIC RDAP Database...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Documentation -->
+            <div id="apnic-docs-content" class="apnic-tab-pane hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="p-6 border rounded-lg hover:shadow-md transition bg-blue-50 border-blue-100">
+                        <h4 class="font-bold text-blue-800 text-lg mb-2">What is IPv6?</h4>
+                        <p class="text-sm text-gray-700 mb-4">The next-generation Internet Protocol with a significantly
+                            larger address space (128-bit).</p>
+                        <button onclick="showDocDetail('intro')"
+                            class="text-blue-600 font-semibold text-sm hover:underline">Read More &rarr;</button>
+                    </div>
+                    <div class="p-6 border rounded-lg hover:shadow-md transition bg-green-50 border-green-100">
+                        <h4 class="font-bold text-green-800 text-lg mb-2">Address Allocation</h4>
+                        <p class="text-sm text-gray-700 mb-4">How IANA, RIRs, and NIRs distribute blocks to LIRs and
+                            end-users.</p>
+                        <button onclick="showDocDetail('allocation')"
+                            class="text-green-600 font-semibold text-sm hover:underline">Learn the Process
+                            &rarr;</button>
+                    </div>
+                    <div class="p-6 border rounded-lg hover:shadow-md transition bg-orange-50 border-orange-100">
+                        <h4 class="font-bold text-orange-800 text-lg mb-2">Policy Highlights</h4>
+                        <p class="text-sm text-gray-700 mb-4">Criteria for obtaining IPv6 initial allocations:
+                            multi-homing vs. single-homing plans.</p>
+                        <button onclick="showDocDetail('policies')"
+                            class="text-orange-600 font-semibold text-sm hover:underline">View Policy Summary
+                            &rarr;</button>
+                    </div>
+                    <div class="p-6 border rounded-lg hover:shadow-md transition bg-purple-50 border-purple-100">
+                        <h4 class="font-bold text-purple-800 text-lg mb-2">IPv4 Exhaustion</h4>
+                        <p class="text-sm text-gray-700 mb-4">Why we ran out of IPv4 and how IPv6 ensures future-ready
+                            connectivity.</p>
+                        <button onclick="showDocDetail('exhaustion')"
+                            class="text-purple-600 font-semibold text-sm hover:underline">See Timelines &rarr;</button>
+                    </div>
+                </div>
+
+                <div id="doc-active-detail"
+                    class="mt-8 p-8 border-2 border-dashed border-gray-200 rounded-xl hidden relative">
+                    <button onclick="closeDocDetail()"
+                        class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">✕</button>
+                    <div id="doc-content-area" class="prose prose-blue max-w-none prose-sm sm:prose-base"></div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Policies -->
+            <div id="apnic-policies-content" class="apnic-tab-pane hidden">
+                <div class="space-y-4">
+                    <details class="group bg-gray-50 p-4 rounded-lg border border-gray-200" open>
+                        <summary
+                            class="font-bold text-blue-900 cursor-pointer flex justify-between items-center list-none">
+                            A. Initial IPv6 Allocation Criteria
+                            <span class="text-blue-500 group-open:rotate-180 transition-transform">▼</span>
+                        </summary>
+                        <div class="mt-4 text-sm text-gray-700 space-y-2 pl-4 border-l-2 border-blue-200">
+                            <p>• Must be an LIR (Local Internet Registry).</p>
+                            <p>• Must not be an end-user organization.</p>
+                            <p>• Must have a plan for making sub-allocations within 2 years.</p>
+                        </div>
+                    </details>
+                    <details class="group bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <summary
+                            class="font-bold text-blue-900 cursor-pointer flex justify-between items-center list-none">
+                            B. Minimum Allocation Size
+                            <span class="text-blue-500 group-open:rotate-180 transition-transform">▼</span>
+                        </summary>
+                        <div class="mt-4 text-sm text-gray-700 pl-4 border-l-2 border-blue-200">
+                            The minimum allocation size for IPv6 is a /32, which allows for 65,536 sub-allocations of
+                            /48 to customer sites.
+                        </div>
+                    </details>
+                    <div class="text-center mt-6">
+                        <a href="https://www.apnic.net/community/policy/resources" target="_blank"
+                            class="text-blue-600 font-semibold hover:underline inline-flex items-center">
+                            Visit Official APNIC Policy Document
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
+                                </path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Training -->
+            <div id="apnic-training-content" class="apnic-tab-pane hidden">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white border rounded shadow-sm overflow-hidden flex flex-col">
+                        <div class="aspect-video bg-blue-900 flex items-center justify-center relative">
+                            <span
+                                class="text-white font-bold text-[10px] tracking-widest bg-blue-700 px-3 py-1 rounded opacity-80 uppercase z-20">Workshop</span>
+                            <div class="absolute inset-0 bg-black opacity-40"></div>
+                            <svg class="w-12 h-12 text-white z-10" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div class="p-4 flex-1 flex flex-col">
+                            <h5 class="font-bold mb-1 text-sm">IPv6 Deployment</h5>
+                            <p class="text-[11px] text-gray-500 mb-3 flex-1">Best practices for ISP transition.</p>
+                            <a href="https://academy.apnic.net/en/course/ipv6-deployment/" target="_blank"
+                                class="text-xs font-bold text-blue-600 hover:text-blue-800">Enroll &rarr;</a>
+                        </div>
+                    </div>
+                    <div class="bg-white border rounded shadow-sm overflow-hidden flex flex-col">
+                        <div class="aspect-video bg-blue-900 flex items-center justify-center relative">
+                            <span
+                                class="text-white font-bold text-[10px] tracking-widest bg-blue-700 px-3 py-1 rounded opacity-80 uppercase z-20">Technical</span>
+                            <div class="absolute inset-0 bg-black opacity-40"></div>
+                            <svg class="w-12 h-12 text-white z-10" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div class="p-4 flex-1 flex flex-col">
+                            <h5 class="font-bold mb-1 text-sm">IPv6 Subnetting</h5>
+                            <p class="text-[11px] text-gray-500 mb-3 flex-1">Mastering /48 and /64 planning.</p>
+                            <a href="https://www.youtube.com/user/apnictraining" target="_blank"
+                                class="text-xs font-bold text-blue-600 hover:text-blue-800">Watch &rarr;</a>
+                        </div>
+                    </div>
+                    <div class="bg-white border rounded shadow-sm overflow-hidden flex flex-col">
+                        <div class="aspect-video bg-blue-900 flex items-center justify-center relative">
+                            <span
+                                class="text-white font-bold text-[10px] tracking-widest bg-blue-700 px-3 py-1 rounded opacity-80 uppercase z-20">Security</span>
+                            <div class="absolute inset-0 bg-black opacity-40"></div>
+                            <svg class="w-12 h-12 text-white z-10" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div class="p-4 flex-1 flex flex-col">
+                            <h5 class="font-bold mb-1 text-sm">IPv6 Security</h5>
+                            <p class="text-[11px] text-gray-500 mb-3 flex-1">Threats and mitigation.</p>
+                            <a href="https://blog.apnic.net/ipv6-security/" target="_blank"
+                                class="text-xs font-bold text-blue-600 hover:text-blue-800">Research &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Adoption -->
+            <div id="apnic-adoption-content" class="apnic-tab-pane hidden">
+                <div class="bg-blue-50 p-6 rounded-lg text-center border border-blue-100">
+                    <h4 class="font-bold text-xl mb-4 text-blue-900">Regional IPv6 Adoption Statistics</h4>
+                    <p class="text-gray-700 mb-6 text-sm">Percentage of users accessing Google via IPv6 by economy
+                        (Approximate).</p>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                        <div class="bg-white p-4 rounded border shadow-sm border-blue-200">
+                            <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1">India</p>
+                            <p class="text-2xl font-bold text-blue-600">50.2%</p>
+                        </div>
+                        <div class="bg-white p-4 rounded border shadow-sm border-blue-200">
+                            <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1">Australia</p>
+                            <p class="text-2xl font-bold text-blue-600">25.8%</p>
+                        </div>
+                        <div class="bg-white p-4 rounded border shadow-sm border-blue-200">
+                            <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1">Japan</p>
+                            <p class="text-2xl font-bold text-blue-600">43.1%</p>
+                        </div>
+                        <div class="bg-white p-4 rounded border shadow-sm border-blue-200">
+                            <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1">Malaysia</p>
+                            <p class="text-2xl font-bold text-blue-600">51.9%</p>
+                        </div>
+                    </div>
+
+                    <a href="https://stats.labs.apnic.net/ipv6" target="_blank"
+                        class="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition inline-block shadow-lg">
+                        View Interactive Adoption Heatmap
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- IPv6 Strategy & Operations (IETF IPv6-Mostly) -->
+        <section id="ipv6-strategy" class="bg-white p-6 rounded-lg shadow-md mb-6 border-t-4 border-green-600">
+            <div class="flex items-center mb-6">
+                <div class="bg-green-600 p-2 rounded mr-4">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+                        </path>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-green-900">IPv6 Strategy & Operations</h2>
+                    <p class="text-gray-600 text-sm">Deployment strategy based on <span class="font-bold underline">IETF
+                            IPv6-Mostly Networks</span> draft guidance.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Strategy Recommendation Engine -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div id="strategy-recommendation"
+                        class="bg-gradient-to-br from-green-50 to-blue-50 p-6 rounded-xl border border-green-100 shadow-sm min-h-[200px] flex flex-col justify-center">
+                        <div id="strategy-placeholder" class="text-center py-8">
+                            <p class="text-gray-500 italic">Run the "Test Your IP" diagnostic to receive a custom
+                                deployment strategy recommendation.</p>
+                        </div>
+                        <div id="strategy-result" class="hidden">
+                            <div class="flex items-start gap-4">
+                                <div id="strategy-icon" class="text-4xl">🚀</div>
+                                <div>
+                                    <h3 id="strategy-title" class="text-xl font-bold text-green-900 mb-1">...</h3>
+                                    <p id="strategy-when" class="text-sm font-semibold text-blue-700 mb-2">...</p>
+                                    <p id="strategy-why" class="text-gray-700 leading-relaxed">...</p>
+                                </div>
+                            </div>
+                            <div class="mt-4 pt-4 border-t border-green-100">
+                                <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Rule Evidence
+                                </h4>
+                                <ul id="strategy-evidence" class="text-sm text-gray-600 space-y-1"></ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border rounded-lg p-6">
+                        <h3 class="font-bold text-lg mb-4 text-gray-800">Benefits & Tradeoffs</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div class="space-y-2">
+                                <h4 class="font-bold text-green-700">Advantages (IPv6-Mostly)</h4>
+                                <ul class="list-disc pl-5 space-y-1 text-gray-600">
+                                    <li>Reclaims IPv4 address space immediately</li>
+                                    <li>Reduces DHCPv4 infrastructure dependency</li>
+                                    <li>Exposes hidden IPv6 connectivity issues</li>
+                                    <li>Simplified network segmentation</li>
+                                </ul>
+                            </div>
+                            <div class="space-y-2">
+                                <h4 class="font-bold text-orange-700">Tradeoffs/Constraints</h4>
+                                <ul class="list-disc pl-5 space-y-1 text-gray-600">
+                                    <li>Requires NAT64/DNS64 in the infrastructure</li>
+                                    <li>Legacy static-IP devices may need special care</li>
+                                    <li>Endpoint OS must support DHCPv4 Option 108</li>
+                                    <li>Dependency on CLAT for IPv4-only apps</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Guidance & Concepts -->
+                <div class="space-y-4">
+                    <div class="bg-blue-900 text-white p-6 rounded-lg relative overflow-hidden">
+                        <div class="relative z-10">
+                            <h3 class="font-bold mb-2 text-white">What is IPv6-Mostly?</h3>
+                            <p class="text-sm text-blue-100 leading-relaxed mb-4">
+                                A deployment model defined in <span
+                                    class="font-mono text-xs text-blue-300">draft-ietf-v6ops-6mops</span> where a
+                                network segment provides IPv6-only service to capable hosts (via DHCPv4 Option 108)
+                                while maintaining IPv4 for legacy devices.
+                            </p>
+                            <div class="bg-blue-800 p-3 rounded text-[11px] font-mono border border-blue-700">
+                                Key Mechanism: DHCPv4 Option 108 signals "IPv4 not needed" to capable endpoints.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 border p-4 rounded-lg">
+                        <h4 class="font-bold text-sm mb-3">Incremental Rollout Pathway</h4>
+                        <ul class="text-xs space-y-3 list-none">
+                            <li class="flex gap-2">
+                                <span
+                                    class="bg-blue-600 text-white w-5 h-5 rounded-full flex items-center justify-center shrink-0">1</span>
+                                <div><span class="font-bold">Audit:</span> Identify legacy IPv4-only endpoints that
+                                    cannot migrate.</div>
+                            </li>
+                            <li class="flex gap-2">
+                                <span
+                                    class="bg-blue-600 text-white w-5 h-5 rounded-full flex items-center justify-center shrink-0">2</span>
+                                <div><span class="font-bold">Pilot:</span> Enable NAT64/DNS64 on a test SSID or VLAN.
+                                </div>
+                            </li>
+                            <li class="flex gap-2">
+                                <span
+                                    class="bg-blue-600 text-white w-5 h-5 rounded-full flex items-center justify-center shrink-0">3</span>
+                                <div><span class="font-bold">Option 108:</span> Deploy DHCPv4 Option 108 to signal
+                                    preference.</div>
+                            </li>
+                            <li class="flex gap-2">
+                                <span
+                                    class="bg-blue-600 text-white w-5 h-5 rounded-full flex items-center justify-center shrink-0">4</span>
+                                <div><span class="font-bold">Monitor:</span> Check for CLAT engagement on mobile/desktop
+                                    OS.</div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="text-[10px] text-gray-400 italic text-center px-4 mt-4">
+                        Informational content based on IETF draft. Not a final standard.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="domain-analysis" class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-xl font-semibold mb-4">Enter Domains</h2>
+            <form id="domain-form">
+                <textarea id="domains" name="domains" rows="5" class="w-full p-2 border rounded mb-4"
+                    placeholder="Enter domains (one per line)"></textarea>
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Submit</button>
+            </form>
+            <p id="domain-status" class="text-gray-600 mt-4 hidden">Processing domains, please wait...</p>
+        </section>
+
+        <section id="table" class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-xl font-semibold mb-4">Domain Results</h2>
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="border p-2">Domain</th>
+                        <th class="border p-2">Timestamp</th>
+                        <th class="border p-2">Nameservers</th>
+                        <th class="border p-2">IPv6</th>
+                        <th class="border p-2">IPv4</th>
+                        <th class="border p-2">TLS Issuer</th>
+                        <th class="border p-2">TLS Expiry</th>
+                        <th class="border p-2">Hosting Company</th>
+                        <th class="border p-2">Hosting Location</th>
+                        <th class="border p-2">DNSSEC</th>
+                    </tr>
+                </thead>
+                <tbody id="domain-results">
+                </tbody>
+            </table>
+        </section>
+
+        <section id="visualizations" class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold mb-4">Visualizations</h2>
+            <div id="visualization-results" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white p-4 text-center">
+        <p>© 2025 APAC IPv6. All rights reserved.</p>
+    </footer>
+
+    <!-- Tooltip Container -->
+    <div id="tooltip" class="hidden fixed bg-gray-900 text-white text-sm rounded-lg p-3 shadow-lg z-50 max-w-sm">
+    </div>
+
+    <style>
+        /* Loading skeleton animation */
+        @keyframes skeleton-loading {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+        }
+
+        /* Smooth transitions for test cards */
+        .test-card-enter {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Retry button hover effect */
+        .retry-btn:hover {
+            transform: rotate(180deg);
+            transition: transform 0.3s ease;
+        }
+    </style>
+
+    <script>
+        // Test descriptions for tooltips
+        const testDescriptions = {
+            'dns-ipv4': 'Tests if your DNS can resolve IPv4 addresses (A records). This checks basic DNS functionality for traditional IPv4 internet.',
+            'dns-ipv6': 'Tests if your DNS can resolve IPv6 addresses (AAAA records). This verifies your DNS supports modern IPv6 lookups.',
+            'dual-stack': 'Tests if both IPv4 and IPv6 are working simultaneously. Dual-stack is the ideal configuration for modern internet connectivity.',
+            'large-packet': 'Tests if large packets (>1280 bytes) can be transmitted over IPv6. This validates MTU path discovery and ensures efficient data transfer.',
+            'dns-over-ipv6': 'Tests if DNS queries can be performed using IPv6 transport. This checks if your DNS server is accessible via IPv6.',
+            'webrtc': 'Tests if WebRTC peer-to-peer connections can use IPv6. This is important for video calls, gaming, and real-time communication.'
+        };
+
+        // Test WebRTC IPv6 support
+        async function testWebRTC() {
+            return new Promise((resolve) => {
+                try {
+                    const pc = new RTCPeerConnection({
+                        iceServers: [
+                            { urls: 'stun:stun.l.google.com:19302' },
+                            { urls: 'stun:stun1.l.google.com:19302' }
+                        ]
+                    });
+
+                    let hasIPv6 = false;
+                    let hasIPv4 = false;
+                    const timeout = setTimeout(() => {
+                        pc.close();
+                        resolve({ ipv6: hasIPv6, ipv4: hasIPv4 });
+                    }, 5000);
+
+                    pc.onicecandidate = (event) => {
+                        if (event.candidate) {
+                            const candidate = event.candidate.candidate;
+                            console.log('WebRTC ICE candidate:', candidate);
+
+                            // Check for IPv6 address pattern
+                            if (candidate.match(/[0-9a-f]{1,4}:[0-9a-f]{1,4}:[0-9a-f]{1,4}/i)) {
+                                hasIPv6 = true;
+                                console.log('WebRTC IPv6 candidate found');
+                            }
+
+                            // Check for IPv4 address pattern
+                            if (candidate.match(/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/)) {
+                                hasIPv4 = true;
+                                console.log('WebRTC IPv4 candidate found');
+                            }
+                        } else {
+                            // ICE gathering complete
+                            clearTimeout(timeout);
+                            pc.close();
+                            resolve({ ipv6: hasIPv6, ipv4: hasIPv4 });
+                        }
+                    };
+
+                    // Create offer to trigger ICE gathering
+                    pc.createDataChannel('test');
+                    pc.createOffer()
+                        .then(offer => pc.setLocalDescription(offer))
+                        .catch(err => {
+                            console.error('WebRTC offer error:', err);
+                            clearTimeout(timeout);
+                            pc.close();
+                            resolve({ ipv6: false, ipv4: false });
+                        });
+                } catch (error) {
+                    console.error('WebRTC test error:', error);
+                    resolve({ ipv6: false, ipv4: false });
+                }
+            });
+        }
+
+        // Show tooltip
+        function showTooltip(event, testId) {
+            event.stopPropagation();
+            const tooltip = document.getElementById('tooltip');
+            const description = testDescriptions[testId];
+
+            if (description) {
+                tooltip.textContent = description;
+                tooltip.classList.remove('hidden');
+
+                // Position tooltip near the info icon
+                const rect = event.target.getBoundingClientRect();
+                tooltip.style.left = `${rect.left}px`;
+                tooltip.style.top = `${rect.bottom + 10}px`;
+
+                // Hide tooltip after 5 seconds or on click
+                setTimeout(() => tooltip.classList.add('hidden'), 5000);
+                document.addEventListener('click', () => tooltip.classList.add('hidden'), { once: true });
+            }
+        }
+
+        // Retry individual test
+        async function retryTest(testId) {
+            console.log(`Retrying test: ${testId}`);
+            const statusElement = document.getElementById(`status-${testId}`);
+            const testCard = document.getElementById(`test-${testId}`);
+
+            // Show loading state
+            statusElement.textContent = '⏳';
+            testCard.classList.remove('border-green-200', 'bg-green-50', 'border-red-200', 'bg-red-50');
+
+            // Re-run the full test (simpler than individual test endpoints)
+            await runIPTest();
+        }
+
+        // Copy results to clipboard
+        function copyResults() {
+            const ipv4 = document.getElementById('ipv4-result').textContent;
+            const ipv6 = document.getElementById('ipv6-result').textContent;
+            const isp = document.getElementById('isp-result').textContent;
+            const location = document.getElementById('location-result').textContent;
+
+            // Get test results
+            const tests = ['dns-ipv4', 'dns-ipv6', 'dual-stack', 'large-packet', 'dns-over-ipv6'];
+            const testResults = tests.map(testId => {
+                const statusEl = document.getElementById(`status-${testId}`);
+                const status = statusEl.textContent === '✅' ? 'PASS' : statusEl.textContent === '❌' ? 'FAIL' : 'PENDING';
+                const testCard = document.getElementById(`test-${testId}`);
+                const testName = testCard.querySelector('.font-semibold').textContent;
+                return `${testName}: ${status}`;
+            }).join('\n');
+
+            const resultText = `IPv6 Connectivity Test Results
+=====================================
+IPv4: ${ipv4}
+IPv6: ${ipv6}
+ISP: ${isp}
+Location: ${location}
+
+Test Results:
+${testResults}
+
+Generated: ${new Date().toLocaleString()}`;
+
+            // Copy to clipboard
+            navigator.clipboard.writeText(resultText).then(() => {
+                // Show success feedback
+                const btn = event.target.closest('button');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Copied!';
+                btn.classList.add('bg-green-500');
+                btn.classList.remove('bg-blue-500');
+
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('bg-green-500');
+                    btn.classList.add('bg-blue-500');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy results. Please try again.');
+            });
+        }
+
+        // PHASE 2 FEATURES
+
+        // Calculate connectivity score (0-10)
+        function calculateConnectivityScore(data) {
+            let score = 0;
+
+            // Base score for having IPv4
+            if (data.has_ipv4) score += 3;
+
+            // DNS resolution tests
+            if (data.dns_ipv4) score += 1;
+            if (data.dns_ipv6) score += 1;
+
+            // IPv6 availability
+            if (data.has_ipv6) score += 2;
+
+            // Dual-stack support
+            if (data.dual_stack) score += 2;
+
+            // Advanced tests
+            if (data.large_packet) score += 0.5;
+            if (data.dns_over_ipv6) score += 0.5;
+
+            return Math.min(10, score);
+        }
+
+        // Display connectivity score
+        function displayScore(score) {
+            const scoreValue = document.getElementById('score-value');
+            const scoreBar = document.getElementById('score-bar');
+            const scoreLabel = document.getElementById('score-label');
+            const scoreSection = document.getElementById('connectivity-score');
+
+            scoreSection.classList.remove('hidden');
+            scoreValue.textContent = score.toFixed(1);
+            scoreBar.style.width = `${(score / 10) * 100}%`;
+
+            // Color coding
+            if (score >= 8) {
+                scoreBar.className = 'h-3 rounded-full transition-all duration-500 bg-green-500';
+                scoreLabel.textContent = 'Excellent - Full IPv6 support!';
+                scoreValue.className = 'text-5xl font-bold text-green-600';
+            } else if (score >= 6) {
+                scoreBar.className = 'h-3 rounded-full transition-all duration-500 bg-blue-500';
+                scoreLabel.textContent = 'Good - IPv6 partially supported';
+                scoreValue.className = 'text-5xl font-bold text-blue-600';
+            } else if (score >= 4) {
+                scoreBar.className = 'h-3 rounded-full transition-all duration-500 bg-yellow-500';
+                scoreLabel.textContent = 'Fair - Limited IPv6 support';
+                scoreValue.className = 'text-5xl font-bold text-yellow-600';
+            } else {
+                scoreBar.className = 'h-3 rounded-full transition-all duration-500 bg-red-500';
+                scoreLabel.textContent = 'Poor - IPv6 not available';
+                scoreValue.className = 'text-5xl font-bold text-red-600';
+            }
+        }
+
+        // Generate recommendations
+        function generateRecommendations(data) {
+            const recommendations = [];
+
+            if (!data.has_ipv6) {
+                recommendations.push('Contact your ISP to enable IPv6 connectivity. Most modern ISPs offer IPv6 support.');
+            }
+
+            if (!data.dns_ipv6 && data.has_ipv4) {
+                recommendations.push('Your DNS server may not support IPv6 lookups. Consider using Google DNS (8.8.8.8) or Cloudflare DNS (1.1.1.1).');
+            }
+
+            if (!data.dual_stack && data.has_ipv4) {
+                recommendations.push('Enable dual-stack networking to use both IPv4 and IPv6 simultaneously for better compatibility.');
+            }
+
+            if (!data.large_packet && data.has_ipv6) {
+                recommendations.push('Check your router MTU settings. Large packet support improves IPv6 performance.');
+            }
+
+            if (!data.dns_over_ipv6 && data.has_ipv6) {
+                recommendations.push('Configure your DNS server to be accessible via IPv6 for full IPv6 functionality.');
+            }
+
+            if (recommendations.length === 0) {
+                recommendations.push('Great! Your IPv6 connectivity is excellent. No action needed.');
+            }
+
+            return recommendations;
+        }
+
+        // Display recommendations
+        function displayRecommendations(recommendations) {
+            const recSection = document.getElementById('recommendations');
+            const recList = document.getElementById('recommendation-list');
+
+            if (recommendations.length > 0) {
+                recSection.classList.remove('hidden');
+                recList.innerHTML = recommendations.map(rec =>
+                    `<li class="flex items-start"><span class="mr-2">•</span><span>${rec}</span></li>`
+                ).join('');
+            }
+        }
+
+        // Measure latency
+        async function measureLatency() {
+            const latencySection = document.getElementById('latency-section');
+            const ipv4Latency = document.getElementById('ipv4-latency');
+            const ipv6Latency = document.getElementById('ipv6-latency');
+
+            latencySection.classList.remove('hidden');
+            ipv4Latency.textContent = '...';
+            ipv6Latency.textContent = '...';
+
+            // Measure IPv4 latency
+            try {
+                const start4 = performance.now();
+                await fetch('https://www.google.com/favicon.ico', { mode: 'no-cors' });
+                const end4 = performance.now();
+                const latency4 = Math.round(end4 - start4);
+                ipv4Latency.textContent = `${latency4}ms`;
+            } catch (e) {
+                ipv4Latency.textContent = 'N/A';
+            }
+
+            // Measure IPv6 latency (using IPv6-only endpoint)
+            try {
+                const start6 = performance.now();
+                await fetch('https://ipv6.google.com/favicon.ico', { mode: 'no-cors' });
+                const end6 = performance.now();
+                const latency6 = Math.round(end6 - start6);
+                ipv6Latency.textContent = `${latency6}ms`;
+            } catch (e) {
+                ipv6Latency.textContent = 'N/A';
+            }
+        }
+
+        // Save test to history
+        function saveToHistory(data) {
+            const history = JSON.parse(localStorage.getItem('ipv6TestHistory') || '[]');
+            const testResult = {
+                timestamp: new Date().toISOString(),
+                ipv4: data.ipv4,
+                ipv6: data.ipv6,
+                score: calculateConnectivityScore(data),
+                tests: {
+                    dns_ipv4: data.dns_ipv4,
+                    dns_ipv6: data.dns_ipv6,
+                    dual_stack: data.dual_stack,
+                    large_packet: data.large_packet,
+                    dns_over_ipv6: data.dns_over_ipv6
+                }
+            };
+
+            history.unshift(testResult);
+            // Keep only last 10 tests
+            if (history.length > 10) history.pop();
+
+            localStorage.setItem('ipv6TestHistory', JSON.stringify(history));
+            displayHistory();
+        }
+
+        // Display test history
+        function displayHistory() {
+            const historySection = document.getElementById('test-history-section');
+            const historyList = document.getElementById('history-list');
+            const history = JSON.parse(localStorage.getItem('ipv6TestHistory') || '[]');
+
+            if (history.length > 0) {
+                historySection.classList.remove('hidden');
+                historyList.innerHTML = history.map((test, index) => `
+                    <div class="bg-gray-50 p-3 rounded border border-gray-200">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="font-semibold text-sm">${new Date(test.timestamp).toLocaleString()}</p>
+                                <p class="text-xs text-gray-600">IPv4: ${test.ipv4 || 'N/A'} | IPv6: ${test.ipv6 || 'N/A'}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-2xl font-bold ${test.score >= 7 ? 'text-green-600' : test.score >= 5 ? 'text-yellow-600' : 'text-red-600'}">${test.score.toFixed(1)}</p>
+                                <p class="text-xs text-gray-500">score</p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Clear history
+        function clearHistory() {
+            if (confirm('Are you sure you want to clear all test history?')) {
+                localStorage.removeItem('ipv6TestHistory');
+                document.getElementById('test-history-section').classList.add('hidden');
+            }
+        }
+
+        // IETF IPv6-MOSTLY STRATEGY FEATURES
+
+        function getStrategyRecommendation(data) {
+            const score = calculateConnectivityScore(data);
+            const evidence = [];
+
+            if (!data.has_ipv6) {
+                evidence.push('No IPv6 address detected on current interface');
+                evidence.push('IPv6-only resolution failed');
+                return {
+                    id: 'v4-only',
+                    title: 'IPv4-Only Network – Not ready for IPv6',
+                    when: 'Use when infrastructure lacks IPv6 routing support.',
+                    why: 'No IPv6 connectivity was detected. Strategic focus should be on enabling dual-stack at the ISP and core router level before considering migration.',
+                    icon: '⚠️',
+                    evidence: evidence
+                };
+            }
+
+            if (score < 8 || !data.dns_ipv6) {
+                if (score < 8) evidence.push(`Connectivity score (${score.toFixed(1)}/10) is below threshold for IPv6-Mostly`);
+                if (!data.dns_ipv6) evidence.push('DNS IPv6 resolution is missing or unreliable');
+                return {
+                    id: 'dual-stack',
+                    title: 'Dual-Stack Recommended',
+                    when: 'Best for General-purpose enterprise and residential networks.',
+                    why: 'IPv6 is available but not fully robust or lacking DNS readiness. Maintaining both stacks ensures zero-interruption service while you address routing or MTU issues.',
+                    icon: '⚖️',
+                    evidence: evidence
+                };
+            }
+
+            if (score >= 8 && data.dns_ipv6 && score < 10) {
+                evidence.push(`High connectivity score: ${score.toFixed(1)}/10`);
+                evidence.push('DNS fully supports AAAA records');
+                if (!data.large_packet) evidence.push('Note: Fragmented/Large packet support could be improved for better NAT64 performance');
+                return {
+                    id: 'v6-mostly',
+                    title: 'IPv6-Mostly Recommended',
+                    when: 'Ideal for modern mobile networks, public Wi-Fi, and data centers.',
+                    why: 'Your network shows strong IPv6 capabilities. Using a "Mostly" model (DHCP Option 108) signals to capable clients to drop IPv4, reclaiming addresses while NAT64 supports legacy hosts.',
+                    icon: '🌟',
+                    evidence: evidence
+                };
+            }
+
+            // Perfect score
+            evidence.push('Perfect 10/10 connectivity and DNS transport');
+            evidence.push('WebRTC peer-to-peer IPv6 confirmed');
+            return {
+                id: 'v6-only',
+                title: 'IPv6-Only for Advanced Deployments',
+                when: 'Future-state networks with no strict legacy-app dependencies.',
+                why: 'Connectivity is perfect. You are a candidate for pure IPv6-only environments (with NAT64/DNS64 gateway). This eliminates the cost and complexity of IPv4 management entirely.',
+                icon: '🚀',
+                evidence: evidence
+            };
+        }
+
+        function displayStrategy(data) {
+            const rec = getStrategyRecommendation(data);
+            const placeholder = document.getElementById('strategy-placeholder');
+            const result = document.getElementById('strategy-result');
+            const title = document.getElementById('strategy-title');
+            const when = document.getElementById('strategy-when');
+            const why = document.getElementById('strategy-why');
+            const icon = document.getElementById('strategy-icon');
+            const evidenceList = document.getElementById('strategy-evidence');
+
+            placeholder.classList.add('hidden');
+            result.classList.remove('hidden');
+
+            title.textContent = rec.title;
+            when.textContent = `Scenario: ${rec.when}`;
+            why.textContent = rec.why;
+            icon.textContent = rec.icon;
+
+            evidenceList.innerHTML = rec.evidence.map(e => `<li>• ${e}</li>`).join('');
+
+            // Scroll to strategy if it was a full test
+            document.getElementById('ipv6-strategy').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Show retry buttons on failed tests and update status
+        function updateTestStatus(testId, passed) {
+            const statusElement = document.getElementById(`status-${testId}`);
+            const testCard = document.getElementById(`test-${testId}`);
+            const retryBtn = testCard.querySelector('.retry-btn');
+
+            if (!statusElement || !testCard) return;
+
+            if (passed) {
+                statusElement.textContent = '✅';
+                testCard.classList.remove('border-red-200', 'bg-red-50');
+                testCard.classList.add('border-green-200', 'bg-green-50');
+                if (retryBtn) retryBtn.classList.add('hidden');
+            } else {
+                statusElement.textContent = '❌';
+                testCard.classList.remove('border-green-200', 'bg-green-50');
+                testCard.classList.add('border-red-200', 'bg-red-50');
+                if (retryBtn) retryBtn.classList.remove('hidden');
+            }
+        }
+
+        async function runIPTest() {
+            const statusElement = document.getElementById('ip-test-status');
+            const spinner = document.getElementById('spinner');
+
+            // Show the status message and spinner
+            statusElement.classList.remove('hidden');
+            spinner.classList.remove('hidden');
+
+            try {
+                // Step 1: Fetch client's public IPs from ipinfo.io
+                let clientIPv4 = 'None';
+                let clientIPv6 = 'None';
+                let isp = 'Unknown';
+                let location = 'Unknown';
+
+                try {
+                    const ipInfoResponse = await fetch('https://ipinfo.io/json');
+                    const ipInfoData = await ipInfoResponse.json();
+                    console.log('Client-side ipinfo.io response:', ipInfoData);
+
+                    const detectedIp = ipInfoData.ip || 'Unknown';
+                    if (detectedIp !== 'Unknown') {
+                        if (detectedIp.includes(':')) {
+                            clientIPv6 = detectedIp;
+                            console.log('Detected IPv6 from ipinfo.io:', clientIPv6);
+                        } else {
+                            clientIPv4 = detectedIp;
+                            console.log('Detected IPv4 from ipinfo.io:', clientIPv4);
+                        }
+                    }
+
+                    isp = ipInfoData.org || 'Unknown';
+                    location = ipInfoData.country || 'Unknown';
+                    if (ipInfoData.city) {
+                        location = `${ipInfoData.city}, ${location}`;
+                    }
+                    console.log('ISP:', isp, 'Location:', location);
+                } catch (e) {
+                    console.error('Error fetching IPs from ipinfo.io:', e);
+                }
+
+                // Step 2: If IPv6 is not detected, try multiple IPv6-only endpoints
+                if (clientIPv6 === 'None') {
+                    const ipv6Endpoints = [
+                        {
+                            url: 'https://ipv6.test-ipv6.com/ip/?callback=?', type: 'jsonp', parse: (text) => {
+                                const match = text.match(/"ip":"([^"]+)"/);
+                                return match && match[1].includes(':') ? match[1] : null;
+                            }
+                        },
+                        {
+                            url: 'https://v6.ident.me/', type: 'text', parse: (text) => {
+                                return text.includes(':') ? text.trim() : null;
+                            }
+                        },
+                        {
+                            url: 'https://api64.ipify.org?format=json', type: 'json', parse: (data) => {
+                                const ip = data.ip;
+                                return ip && ip.includes(':') ? ip : null;
+                            }
+                        }
+                    ];
+
+                    for (const endpoint of ipv6Endpoints) {
+                        try {
+                            console.log(`Attempting IPv6 detection with ${endpoint.url}`);
+                            let response;
+                            if (endpoint.type === 'jsonp') {
+                                // JSONP handling
+                                const script = document.createElement('script');
+                                const callbackName = 'jsonpCallback' + Math.round(100000 * Math.random());
+                                window[callbackName] = (data) => {
+                                    window[callbackName].data = data;
+                                };
+                                script.src = endpoint.url.replace('callback=?', `callback=${callbackName}`);
+                                document.body.appendChild(script);
+                                // Wait for the script to load
+                                await new Promise(resolve => setTimeout(resolve, 2000));
+                                response = window[callbackName].data;
+                                delete window[callbackName];
+                                document.body.removeChild(script);
+                            } else if (endpoint.type === 'json') {
+                                response = await fetch(endpoint.url);
+                                response = await response.json();
+                            } else {
+                                response = await fetch(endpoint.url);
+                                response = await response.text();
+                            }
+
+                            const ipv6 = endpoint.parse(response);
+                            if (ipv6) {
+                                clientIPv6 = ipv6;
+                                console.log(`IPv6 detected from ${endpoint.url}: ${clientIPv6}`);
+                                break;
+                            } else {
+                                console.log(`No IPv6 detected from ${endpoint.url}`);
+                            }
+                        } catch (e) {
+                            console.error(`Error fetching IPv6 from ${endpoint.url}:`, e);
+                        }
+                    }
+                }
+
+                if (clientIPv6 === 'None') {
+                    console.log('All IPv6 detection attempts failed. IPv6 may not be available.');
+                }
+
+                // Step 3: Send the client IPs to the backend for connectivity tests
+                const response = await fetch('/ipv6-test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        client_ipv4: clientIPv4,
+                        client_ipv6: clientIPv6,
+                        isp: isp,
+                        location: location
+                    })
+                });
+                const data = await response.json();
+
+                console.log('API Response:', data);
+
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                // Update basic IP information
+                document.getElementById('ipv4-result').textContent = data.ipv4 || 'Not Available';
+                document.getElementById('ipv6-result').textContent = data.ipv6 || 'Not Available';
+                document.getElementById('isp-result').textContent = data.isp || 'Not Available';
+                document.getElementById('location-result').textContent = data.location || 'Not Available';
+
+                // Show connectivity tests section
+                const connectivityTests = document.getElementById('connectivity-tests');
+                connectivityTests.classList.remove('hidden');
+
+
+
+                // Update test results with test-ipv6.com style indicators
+                updateTestStatus('dns-ipv4', data.dns_ipv4);
+                updateTestStatus('dns-ipv6', data.dns_ipv6);
+                updateTestStatus('dual-stack', data.dual_stack);
+                updateTestStatus('large-packet', data.large_packet);
+                updateTestStatus('dns-over-ipv6', data.dns_over_ipv6);
+
+                // PHASE 3: Run WebRTC test
+                const webrtcResult = await testWebRTC();
+                updateTestStatus('webrtc', webrtcResult.ipv6);
+                console.log('WebRTC test result:', webrtcResult);
+
+                // Update ASN information
+                const asnInfo = document.getElementById('asn-info');
+                if (data.asn && data.asn !== 'Unknown') {
+                    asnInfo.textContent = `ASN ${data.asn} - ${data.isp}`;
+                } else {
+                    asnInfo.textContent = data.isp || 'Unknown';
+                }
+
+                // PHASE 2: Calculate and display score
+                const score = calculateConnectivityScore(data);
+                displayScore(score);
+
+                // PHASE 2: Generate and display recommendations
+                const recommendations = generateRecommendations(data);
+                displayRecommendations(recommendations);
+
+                // PHASE 2: Measure latency
+                measureLatency();
+
+                // PHASE 2: Save to history
+                saveToHistory(data);
+
+                // IETF STRATEGY: Display recommendation
+                displayStrategy(data);
+
+                // Update status message
+                statusElement.querySelector('span') ?
+                    statusElement.querySelector('span').textContent = 'IP connectivity test completed.' :
+                    statusElement.textContent = 'IP connectivity test completed.';
+                spinner.classList.add('hidden');
+            } catch (error) {
+                console.error('Error in runIPTest:', error);
+                statusElement.querySelector('span') ?
+                    statusElement.querySelector('span').textContent = `Error: ${error.message}` :
+                    statusElement.textContent = `Error: ${error.message}`;
+                spinner.classList.add('hidden');
+                document.getElementById('ipv4-result').textContent = 'Not Available';
+                document.getElementById('ipv6-result').textContent = 'Not Available';
+                document.getElementById('isp-result').textContent = 'Not Available';
+                document.getElementById('location-result').textContent = 'Not Available';
+
+            }
+        }
+
+        document.getElementById('domain-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const domains = document.getElementById('domains').value;
+            const statusElement = document.getElementById('domain-status');
+
+            // Show the status message
+            statusElement.classList.remove('hidden');
+            statusElement.textContent = 'Processing domains, please wait...';
+
+            try {
+                const response = await fetch('/submit_domains', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ domains })
+                });
+                const data = await response.json();
+
+                console.log('Submit domains response:', data);
+
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                const tbody = document.getElementById('domain-results');
+                tbody.innerHTML = '';
+                data.domain_data.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="border p-2">${row.domain}</td>
+                        <td class="border p-2">${row.timestamp}</td>
+                        <td class="border p-2">${row.ns}</td>
+                        <td class="border p-2">${row.ipv6}</td>
+                        <td class="border p-2">${row.ipv4}</td>
+                        <td class="border p-2">${row.tls_issuer}</td>
+                        <td class="border p-2">${row.tls_expiry}</td>
+                        <td class="border p-2">${row.hosting_company}</td>
+                        <td class="border p-2">${row.hosting_location}</td>
+                        <td class="border p-2">${row.dnssec}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                const vizDiv = document.getElementById('visualization-results');
+                vizDiv.innerHTML = '';
+                if (data.graphs && data.graphs.length > 0) {
+                    console.log('Loading visualization URLs:', data.graphs);
+                    data.graphs.forEach(url => {
+                        const img = document.createElement('img');
+                        // Ensure cache-busting parameter is present
+                        const finalUrl = url.includes('?') ? url : `${url}?t=${new Date().getTime()}`;
+                        img.src = finalUrl;
+                        // Adjust image styling for two-column layout
+                        img.className = 'w-full h-auto';
+                        img.onerror = () => console.error(`Failed to load image: ${finalUrl}`);
+                        img.onload = () => console.log(`Successfully loaded image: ${finalUrl}`);
+                        vizDiv.appendChild(img);
+                    });
+                } else {
+                    vizDiv.innerHTML = '<p class="text-gray-600">No visualizations available.</p>';
+                }
+
+                statusElement.textContent = 'Domain processing completed.';
+            } catch (error) {
+                console.error('Error in submit_domains:', error);
+                statusElement.textContent = `Error: ${error.message}`;
+            }
+        });
+
+        // APNIC Resource Functions
+        function switchApnicTab(tabId) {
+            // Hide all tab content
+            document.querySelectorAll('.apnic-tab-pane').forEach(tab => tab.classList.add('hidden'));
+            document.querySelectorAll('.apnic-tab-pane').forEach(tab => tab.classList.remove('block'));
+
+            // Show selected tab content
+            document.getElementById(`apnic-${tabId}-content`).classList.remove('hidden');
+            document.getElementById(`apnic-${tabId}-content`).classList.add('block');
+
+            // Update tab button styles
+            document.querySelectorAll('.apnic-tab-btn').forEach(btn => {
+                btn.classList.remove('border-blue-600', 'text-blue-600');
+                btn.classList.add('border-transparent');
+            });
+            document.getElementById(`${tabId}-tab-btn`).classList.add('border-blue-600', 'text-blue-600');
+            document.getElementById(`${tabId}-tab-btn`).classList.remove('border-transparent');
+        }
+
+        async function lookupApnicResource() {
+            const query = document.getElementById('apnic-query').value.trim();
+            if (!query) return;
+
+            const resultsDiv = document.getElementById('apnic-lookup-results');
+            const loadingDiv = document.getElementById('apnic-lookup-loading');
+
+            resultsDiv.classList.add('hidden');
+            loadingDiv.classList.remove('hidden');
+
+            try {
+                const response = await fetch('/apnic-lookup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query })
+                });
+                const data = await response.json();
+
+                if (data.error) throw new Error(data.error);
+
+                resultsDiv.innerHTML = `
+                    <div class="bg-white p-4 rounded border-l-4 border-blue-600 shadow-sm animate-fade-in">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Resource</p>
+                                <p class="text-lg font-mono text-blue-800">${data.resource || data.query}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Organization</p>
+                                <p class="text-lg font-bold text-gray-900">${data.organization || 'N/A'}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Country</p>
+                                <p class="text-gray-900">${data.country || 'N/A'}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Status</p>
+                                <p class="text-gray-900 capitalize">${data.status || 'N/A'}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Registration Date</p>
+                                <p class="text-gray-900">${data.registration_date || 'N/A'}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Last Updated</p>
+                                <p class="text-gray-900">${data.last_updated || 'N/A'}</p>
+                            </div>
+                        </div>
+                        ${data.description ? `
+                        <div class="mt-4 pt-4 border-t border-gray-100">
+                            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Remarks</p>
+                            <p class="text-sm text-gray-600 italic mt-1 leading-relaxed">${data.description}</p>
+                        </div>` : ''}
+                    </div>
+                `;
+                resultsDiv.classList.remove('hidden');
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="bg-red-50 text-red-700 p-4 rounded border border-red-200">Lookup Error: ${error.message}</div>`;
+                resultsDiv.classList.remove('hidden');
+            } finally {
+                loadingDiv.classList.add('hidden');
+            }
+        }
+
+        const docDetails = {
+            'intro': `
+                <h3 class="text-xl font-bold mb-4 text-blue-900">What is IPv6?</h3>
+                <p>IPv6 (Internet Protocol version 6) is the most recent version of the Internet Protocol (IP), the communications protocol that provides an identification and location system for computers on networks and routes traffic across the Internet.</p>
+                <div class="my-6 bg-blue-50 p-4 rounded-lg">
+                    <h4 class="font-bold mb-2">Key Differences:</h4>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li><strong>Address Size:</strong> IPv4 uses 32-bit (4.3 billion addresses), IPv6 uses 128-bit (340 undecillion).</li>
+                        <li><strong>Format:</strong> IPv4 uses decimal (e.g., 192.168.1.1), IPv6 uses hexadecimal (e.g., 2001:0db8:85a3:0000:0000:8a2e:0370:7334).</li>
+                        <li><strong>Header:</strong> Simplified in IPv6 for faster routing.</li>
+                        <li><strong>Security:</strong> IPv6 was designed with IPsec in mind.</li>
+                    </ul>
+                </div>
+            `,
+            'allocation': `
+                <h3 class="text-xl font-bold mb-4 text-green-900">How IPv6 Address Allocation Works</h3>
+                <p>The distribution of IPv6 addresses follows a hierarchical structure to ensure efficient routing and equitable access:</p>
+                <ol class="list-decimal pl-5 my-4 space-y-4">
+                    <li><strong>IANA to RIRs:</strong> IANA (Internet Assigned Numbers Authority) allocates large blocks of IPv6 addresses to the five Regional Internet Registries (RIRs) like APNIC.</li>
+                    <li><strong>RIR to NIR/LIR:</strong> APNIC allocates blocks to National Internet Registries (NIRs) or directly to Local Internet Registries (LIRs) which are typically ISPs.</li>
+                    <li><strong>LIR to End User:</strong> ISPs then assign or sub-allocate small blocks (like /48 or /64) to their customers or internal networks.</li>
+                </ol>
+            `,
+            'policies': `
+                <h3 class="text-xl font-bold mb-4 text-orange-900">APNIC IPv6 Allocation Policies</h3>
+                <p>APNIC policies are developed by the community to managing the distribution of resources. Key goals include:</p>
+                <ul class="list-disc pl-5 my-4 space-y-2">
+                    <li><strong>Conservation:</strong> Ensuring resources are used efficiently.</li>
+                    <li><strong>Aggregation:</strong> Keeping the global routing table to a manageable size.</li>
+                    <li><strong>Registration:</strong> Maintaining an accurate database of who is using what resource.</li>
+                </ul>
+                <p class="mt-4">LIRs are encouraged to use <strong>Sparse Allocation</strong>, which leaves space between assignments to allow for future expansion of the same block.</p>
+            `,
+            'exhaustion': `
+                <h3 class="text-xl font-bold mb-4 text-purple-900">IPv4 Exhaustion & IPv6 Future</h3>
+                <p>The central pool of IPv4 addresses reached "exhaustion" in 2011. Since then, RIRs have been managing their remaining small pools with strict policies.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+                    <div class="bg-purple-50 p-4 rounded border border-purple-100">
+                        <h5 class="font-bold text-purple-800">The Problem</h5>
+                        <p class="text-sm">Natural growth of devices (IoT, mobile, cloud) exceeded the 4.3 billion IPv4 limit.</p>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded border border-green-100">
+                        <h5 class="font-bold text-green-800">The Solution</h5>
+                        <p class="text-sm">IPv6 provides virtually unlimited space and supports the massive scaling required by the modern Internet.</p>
+                    </div>
+                </div>
+            `
+        };
+
+        function showDocDetail(docId) {
+            const contentArea = document.getElementById('doc-content-area');
+            const detailSection = document.getElementById('doc-active-detail');
+
+            contentArea.innerHTML = docDetails[docId] || '<p>Content not found.</p>';
+            detailSection.classList.remove('hidden');
+
+            // Scroll to the detail section
+            detailSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function closeDocDetail() {
+            document.getElementById('doc-active-detail').classList.add('hidden');
+        }
+    </script>
+</body>
+
+</html>

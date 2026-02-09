@@ -1,0 +1,342 @@
+{% extends "base.html" %}
+
+{% block title %}Connectivity Test - APAC IPv6{% endblock %}
+{% block header_title %}Universal IPv6 Connectivity Suite{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto space-y-10 pb-20">
+    <!-- Test Control Hero -->
+    <div
+        class="bg-gradient-to-br from-blue-600 to-blue-800 rounded-[2.5rem] p-12 text-white shadow-2xl relative overflow-hidden group">
+        <div class="relative z-10 flex flex-col items-center text-center space-y-8">
+            <h2 class="text-4xl font-black tracking-tight font-display">Is your network future-ready?</h2>
+            <p class="text-blue-100 max-w-xl font-medium text-lg leading-relaxed">Perform a comprehensive analysis of
+                your NAT64, DNS64, and dual-stack capabilities using our industry-standard diagnostic engine.</p>
+
+            <button onclick="runIPTest()"
+                class="bg-white text-blue-600 px-12 py-5 rounded-2xl font-black hover:bg-blue-50 transition shadow-2xl shadow-blue-500/40 active:scale-95 flex items-center gap-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Initialize Full Stack Test</span>
+            </button>
+        </div>
+
+        <!-- Animated Background Elements -->
+        <div class="absolute top-0 right-0 p-10 opacity-10 animate-pulse">
+            <svg class="w-40 h-40" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                    d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM5.884 4.47a1 1 0 10-1.415 1.414l.707.707a1 1 0 001.415-1.414l-.707-.707zM14.116 4.47l-.707.707a1 1 0 101.415 1.414l.707-.707a1 1 0 00-1.415-1.414zM3 11a1 1 0 100-2H2a1 1 0 100 2h1zM18 11a1 1 0 100-2h-1a1 1 0 100 2h1zM5.884 15.53a1 1 0 101.415-1.414l-.707-.707a1 1 0 00-1.415 1.414l.707.707zM14.116 15.53l.707-.707a1 1 0 00-1.415-1.414l-.707.707a1 1 0 101.415 1.414zM11 17a1 1 0 10-2 0v1a1 1 0 102 0v-1z" />
+            </svg>
+        </div>
+        <div
+            class="absolute inset-0 bg-blue-500 rounded-[2.5rem] opacity-0 group-hover:opacity-5 transition-opacity pointer-events-none">
+        </div>
+    </div>
+
+    <!-- [NEW] IPv6 Guide & Controls -->
+    <div class="space-y-6">
+        <!-- Collapsible Guide -->
+        <div class="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
+            <button onclick="document.getElementById('ipv6-guide').classList.toggle('hidden')"
+                class="w-full p-6 flex justify-between items-center bg-slate-50 hover:bg-slate-100 transition ">
+                <div class="flex items-center space-x-4">
+                    <span class="p-2 bg-blue-100 text-blue-600 rounded-lg"><svg class="w-5 h-5" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg></span>
+                    <span class="font-bold text-slate-700">What do these tests mean?</span>
+                </div>
+                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+            <div id="ipv6-guide" class="hidden p-6 text-sm text-slate-600 leading-relaxed grid gap-4 bg-white">
+                <p><strong class="text-slate-900">IPv6:</strong> The next-generation protocol for the internet,
+                    providing infinite addresses compared to the older IPv4.</p>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div>
+                        <strong class="text-slate-900 block mb-1">Dual-Stack</strong>
+                        Using both IPv4 and IPv6 simultaneously. The ideal transition state for maximum compatibility.
+                    </div>
+                    <div>
+                        <strong class="text-slate-900 block mb-1">DNS64/NAT64</strong>
+                        Tech used by mobile networks to allow IPv6-only devices to talk to IPv4 websites.
+                    </div>
+                    <div>
+                        <strong class="text-slate-900 block mb-1">Path MTU</strong>
+                        Checks if large data packets can pass through your network without getting fragmented.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mode Toggle & Offline Status -->
+        <div class="flex justify-between items-center px-4">
+            <!-- Offline Indicator -->
+            <div id="offline-indicator"
+                class="hidden flex items-center space-x-2 text-xs font-bold text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-100">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Showing Last Known Result (Offline View)</span>
+            </div>
+
+            <!-- Beginner/Advanced Switch -->
+            <div class="flex items-center space-x-3 ml-auto">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Mode:</span>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="mode-toggle" class="sr-only peer" onchange="toggleDiagnosticsMode()">
+                    <div
+                        class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
+                    </div>
+                    <span class="ml-2 text-sm font-bold text-slate-700" id="mode-label">Beginner</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div id="ip-test-status" class="hidden animate-in fade-in slide-in-from-top-4 duration-300">
+        <div class="bg-blue-50 border border-blue-100 p-6 rounded-3xl flex items-center justify-center space-x-6">
+            <div class="relative">
+                <div class="w-8 h-8 rounded-full border-4 border-blue-200"></div>
+                <div
+                    class="absolute inset-0 w-8 h-8 rounded-full border-4 border-blue-600 border-t-transparent animate-spin">
+                </div>
+            </div>
+            <p class="text-blue-800 font-bold tracking-tight">Synchronizing with global IPv6 endpoints...</p>
+        </div>
+    </div>
+
+    <!-- Results Overview -->
+    <div id="test-results-container" class="hidden space-y-10 animate-in fade-in duration-700">
+        <!-- Main Score & IP Discovery -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            <!-- Score Card -->
+            <div
+                class="lg:col-span-5 bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-xl shadow-blue-500/5 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-xl font-black text-gray-900 mb-2 font-display">Readiness Certificate</h3>
+                    <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">Connectivity Audit Rating</p>
+                </div>
+
+                <div class="py-12 flex items-center justify-center">
+                    <div class="relative">
+                        <svg class="w-48 h-48 transform -rotate-90">
+                            <circle class="text-gray-100" stroke-width="12" stroke="currentColor" fill="transparent"
+                                r="80" cx="96" cy="96" />
+                            <circle id="score-circle" class="text-blue-600 transition-all duration-1000"
+                                stroke-width="12" stroke-dasharray="502.6" stroke-dashoffset="502.6"
+                                stroke-linecap="round" stroke="currentColor" fill="transparent" r="80" cx="96"
+                                cy="96" />
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                            <span id="score-value" class="text-6xl font-black text-slate-900 tracking-tighter">-</span>
+                            <span
+                                class="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mt-1">Status</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-2xl p-4 text-center">
+                    <p id="score-label" class="text-sm font-bold text-gray-600">Calculating profile...</p>
+                </div>
+            </div>
+
+            <!-- IP Details -->
+            <div class="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-blue-50/50 p-8 rounded-3xl border border-blue-100">
+                    <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2">Public IPv4 Address
+                    </p>
+                    <p id="ipv4-result" class="text-xl font-mono font-bold text-blue-900 break-all">Not detected</p>
+                </div>
+                <div class="bg-purple-50/50 p-8 rounded-3xl border border-purple-100">
+                    <p class="text-[10px] font-black text-purple-400 uppercase tracking-widest mb-2">Public IPv6 Address
+                    </p>
+                    <p id="ipv6-result" class="text-xl font-mono font-bold text-purple-900 break-all">Not detected</p>
+                </div>
+                <div class="bg-white p-8 rounded-3xl border border-gray-100 col-span-1 md:col-span-2 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Network
+                                Identity (ASN)</p>
+                            <p id="asn-info" class="text-lg font-bold text-gray-800">Identifying...</p>
+                        </div>
+                        <div class="bg-gray-100 p-3 rounded-xl"><svg class="w-6 h-6 text-gray-400" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg></div>
+                    </div>
+                </div>
+                <div
+                    class="bg-emerald-50/50 p-8 rounded-3xl border border-emerald-100 col-span-1 md:col-span-2 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-1">Geographic
+                                Location</p>
+                            <p id="location-info" class="text-lg font-bold text-emerald-800">Detecting...</p>
+                        </div>
+                        <div class="bg-emerald-100 p-3 rounded-xl"><svg class="w-6 h-6 text-emerald-400" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- [NEW] Latency Comparison Section -->
+        <div id="latency-section" class="hidden space-y-6">
+            <div class="flex items-center justify-between mt-20 mb-6">
+                <h3 class="text-2xl font-black text-gray-900 font-display">Latency Comparison</h3>
+                <div id="experience-score-badge"
+                    class="hidden bg-slate-900 text-white px-4 py-2 rounded-xl flex items-center gap-3">
+                    <span class="text-[9px] font-black uppercase tracking-widest text-slate-400">Experience Score</span>
+                    <span id="experience-score-val" class="text-lg font-black text-blue-400">--</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- IPv4 Card -->
+                <div class="bg-blue-50 border border-blue-100 p-8 rounded-3xl flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">IPv4 Latency</p>
+                        <p id="ipv4-latency" class="text-4xl font-black text-blue-800 tracking-tighter">-- ms</p>
+                    </div>
+                </div>
+
+                <!-- IPv6 Card -->
+                <div class="bg-purple-50 border border-purple-100 p-8 rounded-3xl flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] font-black text-purple-400 uppercase tracking-widest mb-1">IPv6 Latency
+                        </p>
+                        <p id="ipv6-latency" class="text-4xl font-black text-purple-800 tracking-tighter">-- ms</p>
+                    </div>
+                </div>
+
+                <!-- Happy Eyeballs Card -->
+                <div class="bg-slate-50 border border-slate-200 p-8 rounded-3xl flex flex-col justify-between">
+                    <div>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">RFC 8305
+                            Compliance</p>
+                        <p id="happy-eyeballs-status" class="text-lg font-black text-slate-600">Pending Test</p>
+                    </div>
+                    <p class="text-[9px] font-bold text-slate-400 mt-2">v6 preference with < 50ms penalty</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- [NEW] Test History Section -->
+        <div id="history-section" class="hidden space-y-6">
+            <div class="flex items-center justify-between mt-20 mb-6">
+                <h3 class="text-2xl font-black text-gray-900 font-display">Test History</h3>
+                <button onclick="clearDiagnosticsHistory()"
+                    class="text-xs font-bold text-red-500 hover:text-red-700 transition">Clear History</button>
+            </div>
+            <div id="history-list" class="space-y-4">
+                <!-- History items will be injected here -->
+            </div>
+        </div>
+
+        <!-- [NEW] Autonomous Discovery Section -->
+        <div id="discovery-section" class="space-y-6">
+            <div class="flex items-center justify-between mt-20 mb-6">
+                <div>
+                    <h3 class="text-2xl font-black text-gray-900 font-display">Autonomous Discovery</h3>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Surfacing Hidden
+                        Infrastructure via Certificate SANs</p>
+                </div>
+                <button onclick="runDiscovery()" id="discovery-btn"
+                    class="bg-slate-900 text-white px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-800 transition active:scale-95 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    Start Discovery
+                </button>
+            </div>
+
+            <div id="discovery-results" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Discovered domains injected here -->
+            </div>
+
+            <div id="discovery-empty" class="bg-slate-50 border border-slate-100 p-12 rounded-[2rem] text-center">
+                <div
+                    class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                    </svg>
+                </div>
+                <p class="text-slate-400 font-bold text-sm tracking-tight uppercase">Ready for Tactical Discovery</p>
+            </div>
+        </div>
+
+        <!-- [RESTORED] Advanced Technical Log Section -->
+        <div id="advanced-log-section" class="hidden space-y-6">
+            <h3 class="text-2xl font-black text-gray-900 font-display mt-20 mb-6">Technical Audit Log</h3>
+            <div class="bg-slate-900 rounded-[2rem] p-8 border border-slate-800 shadow-2xl relative overflow-hidden">
+                <div class="absolute top-0 right-10 w-32 h-32 bg-blue-500/10 blur-[100px] rounded-full"></div>
+                <div
+                    class="relative z-10 font-mono text-[11px] leading-relaxed max-h-[400px] overflow-y-auto custom-scrollbar">
+                    <div id="technical-log-content" class="text-blue-300 space-y-2">
+                        <p class="text-slate-500 italic">// Initialize Full Stack Test to begin technical event
+                            capturing...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technical Breakdown Grid -->
+        <div class="flex items-center justify-between mt-20 mb-10">
+            <h3 class="text-2xl font-black text-gray-900 font-display m-0">Technical Breakdown</h3>
+            <button id="copy-results-btn" onclick="copyDiagnosticsToClipboard()"
+                class="hidden bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                </svg>
+                Copy Results
+            </button>
+        </div>
+        <div id="connectivity-tests" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Test cards will be polished in diagnostics.js -->
+        </div>
+
+        <!-- Recommendation Section -->
+        <div id="recommendations" class="hidden">
+            <div class="bg-amber-900 text-white p-12 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
+                <div class="relative z-10">
+                    <h3 class="text-2xl font-black mb-6 flex items-center gap-3">
+                        <svg class="w-8 h-8 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        Strategic Recommendations
+                    </h3>
+                    <ul id="recommendation-list" class="space-y-4 text-amber-100 font-medium"></ul>
+                </div>
+                <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-amber-800 rounded-full opacity-30 blur-3xl"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tooltip Template -->
+<div id="tooltip"
+    class="hidden fixed bg-slate-900 text-white text-xs font-bold rounded-xl p-4 shadow-2xl z-50 max-w-xs border border-white/10 backdrop-blur-md">
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/diagnostics.js"></script>
+{% endblock %}

@@ -1,0 +1,341 @@
+{% extends "base.html" %}
+
+{% block title %}Government Monitor - APAC IPv6{% endblock %}
+{% block header_title %}APAC Government IPv6 Monitor{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto space-y-10 pb-20 animate-in fade-in duration-700">
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Hero / Control Section -->
+    <div
+        class="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-xl shadow-slate-200/50 relative overflow-hidden">
+        <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+            <div class="lg:col-span-8">
+                <div class="flex items-center space-x-3 mb-4">
+                    <span
+                        class="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-black uppercase tracking-widest">v1.0
+                        Beta</span>
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Independent Analysis</span>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-4xl font-black text-slate-900 mb-4 font-display">Government Digital Readiness
+                        </h2>
+                        <p class="text-slate-500 text-lg leading-relaxed max-w-2xl font-medium">
+                            Monitoring the adoption of IPv6, DNSSEC, and modern standards across Asia-Pacific government
+                            infrastructure.
+                        </p>
+                    </div>
+                    <!-- [NEW] PDF Button -->
+                    <button onclick="generatePDFReport()"
+                        class="hidden md:flex flex-col items-center justify-center bg-slate-900 hover:bg-slate-800 text-white w-24 h-24 rounded-2xl shadow-xl shadow-slate-900/20 transition-all active:scale-95 group">
+                        <svg class="w-8 h-8 mb-2 group-hover:-translate-y-1 transition" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <span
+                            class="text-[9px] font-black uppercase tracking-widest text-slate-400 group-hover:text-white transition">Briefing</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="lg:col-span-4 bg-slate-50 rounded-2xl p-6 border border-gray-100">
+                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 block">Filter by
+                    Territory</label>
+                <div class="relative">
+                    <select id="gov-country-select" onchange="renderGovMonitor()"
+                        class="appearance-none w-full bg-white text-slate-900 border border-gray-200 rounded-xl p-4 pr-10 text-sm font-bold shadow-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition cursor-pointer">
+                        <option value="ALL">All APAC Regions</option>
+                        <!-- Options populated via JS -->
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="mt-4 flex justify-between text-xs font-bold text-slate-500">
+                    <span>Total Domains Tracked:</span>
+                    <span id="total-domains-count" class="text-slate-900">--</span>
+                </div>
+
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Data
+                        Authority Source</label>
+                    <select id="gov-data-source" onchange="handleGovSourceChange()"
+                        class="w-full bg-slate-100 border-none rounded-xl p-3 text-[10px] font-black uppercase tracking-widest text-slate-600 cursor-pointer">
+                        <option value="INTERNAL">Internal Metrics (Live)</option>
+                        <option value="APNIC">APNIC Registry Stats</option>
+                        <option value="Google">Google User Traffic</option>
+                        <option value="Cloudflare">Cloudflare Radar CDN</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Decorative bg -->
+        <div
+            class="absolute -right-20 -bottom-20 w-96 h-96 bg-blue-50 rounded-full blur-3xl opacity-50 pointer-events-none">
+        </div>
+    </div>
+
+    <!-- [NEW] Interactive Map Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div
+            class="lg:col-span-2 bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden h-[400px] relative z-0">
+            <div id="gov-map" class="h-full w-full z-0 bg-slate-50"></div>
+            <div
+                class="absolute bottom-4 left-4 bg-white/90 backdrop-blur px-4 py-2 rounded-xl text-[10px] font-bold text-slate-600 shadow-sm z-[1000]">
+                Regional Readiness Intensity
+            </div>
+        </div>
+
+        <!-- [NEW] Trend Chart Section -->
+        <div class="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm p-6 flex flex-col justify-between">
+            <div>
+                <h3 class="text-lg font-black text-slate-900 mb-1">Adoption Trend</h3>
+                <p class="text-xs text-slate-400 font-bold mb-4">IPv6 Readiness Over Time</p>
+                <div class="h-48">
+                    <canvas id="govHistoryChart"></canvas>
+                </div>
+            </div>
+            <div class="mt-4 p-4 bg-green-50 rounded-2xl">
+                <div class="flex items-center space-x-2 text-green-700 font-bold text-xs mb-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                    <span>Positive Growth</span>
+                </div>
+                <p class="text-[10px] text-green-600">Government adoption is tracking upwards across the region.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">IPv6 Web Reachable</p>
+                <h3 class="text-3xl font-black text-slate-900" id="stat-v6-web">--%</h3>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                </svg>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">IPv6 DNS Ready</p>
+                <h3 class="text-3xl font-black text-slate-900" id="stat-v6-dns">--%</h3>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Secure (DNSSEC)</p>
+                <h3 class="text-3xl font-black text-slate-900" id="stat-dnssec">--%</h3>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+            </div>
+        </div>
+
+        <!-- [NEW] ISP Intelligence Card -->
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm col-span-1 md:col-span-3">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-sm font-black text-slate-900">ISP Infrastructure Distribution</h3>
+                    <p class="text-[10px] text-slate-400 font-bold tracking-widest uppercase">Observed ASN Indicators
+                    </p>
+                </div>
+                <div class="text-blue-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                </div>
+            </div>
+            <div class="h-24 flex items-center gap-4 overflow-x-auto pb-2" id="isp-distribution-container">
+                <!-- Injected via JS -->
+                <div class="text-slate-300 text-xs font-bold italic">Awaiting tactical scan for ISP mapping...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- [NEW] Intelligence Section: Leaderboard & Failure Analysis -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        <!-- Feature 1: Readiness Leaderboard -->
+        <div class="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-slate-200/50 p-8">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="text-xl font-black text-slate-900 font-display">Regional Leaderboard</h3>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Top Performing Governments</p>
+                </div>
+                <div class="p-3 bg-blue-50 rounded-xl text-blue-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="overflow-hidden">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr
+                            class="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-gray-100">
+                            <th class="pb-4 pl-4">Rank</th>
+                            <th class="pb-4">Country</th>
+                            <th class="pb-4 text-right">Readiness Score</th>
+                            <th class="pb-4 text-right pr-4">Level</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body" class="text-sm font-bold text-slate-700">
+                        <!-- Injected via JS -->
+                        <tr>
+                            <td colspan="4" class="py-4 text-center text-slate-400">Loading rankings...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Feature 2: Failure Analysis Panel -->
+        <div
+            class="bg-slate-900 rounded-[2.5rem] border border-slate-800 shadow-2xl p-8 text-white relative overflow-hidden">
+            <!-- Background Texture -->
+            <div
+                class="absolute top-0 right-0 w-64 h-64 bg-blue-500 rounded-full blur-[100px] opacity-20 pointer-events-none">
+            </div>
+
+            <div class="relative z-10">
+                <div class="mb-8">
+                    <h3 class="text-xl font-black text-white font-display">Failure Intelligence</h3>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest" id="failure-country-label">
+                        Global Analysis</p>
+                </div>
+
+                <div class="space-y-6" id="failure-stats-container">
+                    <!-- Dynamic Bars -->
+                    <div class="group">
+                        <div class="flex justify-between text-xs font-bold mb-2">
+                            <span class="text-slate-300 group-hover:text-white transition">Missing IPv6 DNS
+                                (AAAA)</span>
+                            <span class="text-red-400" id="fail-dns-pct">--%</span>
+                        </div>
+                        <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
+                            <div id="bar-fail-dns"
+                                class="h-full bg-red-500 rounded-full w-0 transition-all duration-1000"></div>
+                        </div>
+                    </div>
+
+                    <div class="group">
+                        <div class="flex justify-between text-xs font-bold mb-2">
+                            <span class="text-slate-300 group-hover:text-white transition">IPv6 Web Unreachable</span>
+                            <span class="text-amber-400" id="fail-web-pct">--%</span>
+                        </div>
+                        <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
+                            <div id="bar-fail-web"
+                                class="h-full bg-amber-500 rounded-full w-0 transition-all duration-1000"></div>
+                        </div>
+                    </div>
+
+                    <div class="group">
+                        <div class="flex justify-between text-xs font-bold mb-2">
+                            <span class="text-slate-300 group-hover:text-white transition">Missing DNSSEC</span>
+                            <span class="text-purple-400" id="fail-sec-pct">--%</span>
+                        </div>
+                        <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
+                            <div id="bar-fail-sec"
+                                class="h-full bg-purple-500 rounded-full w-0 transition-all duration-1000"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 p-4 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm">
+                    <p class="text-[10px] leading-relaxed text-slate-300">
+                        <strong>Insight:</strong> <span id="failure-insight-text">Select a country to see specific
+                            infrastructure gaps.</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Results Table -->
+    <div class="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-slate-200/50 overflow-hidden">
+        <div
+            class="p-8 border-b border-gray-100 bg-gray-50/50 flex flex-col md:flex-row justify-between items-center gap-4">
+            <h3 class="text-xl font-black text-slate-900 font-display">Compliance Matrix</h3>
+
+            <!-- Legend -->
+            <div class="flex items-center space-x-4 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                <span class="flex items-center"><span
+                        class="w-2 h-2 bg-green-500 rounded-full mr-1.5"></span>Ready</span>
+                <span class="flex items-center"><span
+                        class="w-2 h-2 bg-amber-400 rounded-full mr-1.5"></span>Partial</span>
+                <span class="flex items-center"><span
+                        class="w-2 h-2 bg-slate-300 rounded-full mr-1.5"></span>Missing</span>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr
+                        class="bg-white border-b border-gray-100 text-xs font-black text-slate-400 uppercase tracking-wider">
+                        <th class="p-6">Domain</th>
+                        <th class="p-6">IPv6 DNS</th>
+                        <th class="p-6">IPv6 Web</th>
+                        <th class="p-6">Service Matrix</th>
+                        <th class="p-6">Efficiency (v4 vs v6)</th>
+                        <th class="p-6">DNSSEC</th>
+                        <th class="p-6 text-right">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="gov-results-body" class="text-sm font-medium text-slate-600 divide-y divide-gray-50">
+                    <!-- Rows injected via JS -->
+                    <tr>
+                        <td colspan="5" class="p-10 text-center text-slate-400 animate-pulse">Loading regional data...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="text-center">
+        <button onclick="triggerGovScan()"
+            class="text-xs font-bold text-blue-600 hover:text-blue-800 transition underline decoration-blue-200">
+            Trigger Manual Refresh (Admin)
+        </button>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/gov_monitor.js"></script>
+{% endblock %}

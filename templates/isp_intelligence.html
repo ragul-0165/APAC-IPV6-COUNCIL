@@ -1,0 +1,361 @@
+{% extends "base.html" %}
+
+{% block title %}ISP Intelligence - APAC IPv6{% endblock %}
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+{% endblock %}
+{% block header_title %}ISP & ASN Intelligence Explorer{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto space-y-8 pb-20">
+    <!-- 1. Hero Banner -->
+    <div class="bg-blue-600 rounded-[2.5rem] p-10 text-white relative overflow-hidden shadow-2xl shadow-blue-500/20">
+        <div class="absolute top-0 right-0 w-1/3 h-full opacity-10">
+            <svg class="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                    d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7v2H8v2h8v-2h-2v-2h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H3V4h18v12z" />
+            </svg>
+        </div>
+        <div class="relative z-10 space-y-4">
+            <div
+                class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
+                <span class="w-2 h-2 bg-blue-300 rounded-full animate-pulse"></span>
+                <span class="text-[10px] font-black uppercase tracking-widest text-blue-100">BGP Intelligence
+                    Pilot</span>
+            </div>
+            <h2 class="text-4xl font-black tracking-tight leading-tight">Asia-Pacific <br /><span
+                    class="text-blue-200">Network Topology Explorer</span></h2>
+            <p class="text-blue-100 max-w-xl font-medium leading-relaxed opacity-90">
+                Authoritative registry tracking for Indian and Malaysian network infrastructures using APNIC and CAIDA
+                datasets.
+            </p>
+            <div class="flex gap-6 mt-4">
+                <div>
+                    <p class="text-[10px] font-black uppercase text-blue-300">India Index</p>
+                    <p class="text-2xl font-black" id="stat-count-in">...</p>
+                </div>
+                <div class="w-px h-10 bg-white/20"></div>
+                <div>
+                    <p class="text-[10px] font-black uppercase text-blue-300">Malaysia Index</p>
+                    <p class="text-2xl font-black" id="stat-count-my">...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Dashboard Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+
+        <!-- Left Column: Controls & Analytics -->
+        <div class="lg:col-span-1 space-y-6">
+            <!-- Territory Selection -->
+            <div class="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm">
+                <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest mb-6">Territory Focus</h3>
+                <div class="space-y-3">
+                    <button onclick="switchISPCountry('IN')" id="btn-in"
+                        class="w-full flex items-center justify-between p-4 rounded-2xl border-2 border-transparent bg-slate-50 transition hover:bg-slate-100 group">
+                        <div class="flex items-center gap-4">
+                            <img src="https://flagcdn.com/24x18/in.png" class="w-6 h-4.5 rounded shadow-sm shrink-0">
+                            <span
+                                class="text-[13px] font-black text-slate-600 group-hover:text-slate-900 uppercase tracking-wider">India</span>
+                        </div>
+                        <span class="p-1 px-2 bg-slate-200 text-[10px] font-black rounded-lg text-slate-500 uppercase"
+                            id="badge-count-in">...</span>
+                    </button>
+                    <button onclick="switchISPCountry('MY')" id="btn-my"
+                        class="w-full flex items-center justify-between p-4 rounded-2xl border-2 border-transparent bg-slate-50 transition hover:bg-slate-100 group">
+                        <div class="flex items-center gap-4">
+                            <img src="https://flagcdn.com/24x18/my.png" class="w-6 h-4.5 rounded shadow-sm shrink-0">
+                            <span
+                                class="text-[13px] font-black text-slate-600 group-hover:text-slate-900 uppercase tracking-wider">Malaysia</span>
+                        </div>
+                        <span class="p-1 px-2 bg-slate-200 text-[10px] font-black rounded-lg text-slate-500 uppercase"
+                            id="badge-count-my">...</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Confidence Metric -->
+            <div class="bg-slate-900 rounded-[2rem] p-8 text-white relative overflow-hidden">
+                <div class="relative z-10">
+                    <h4 class="text-xs font-black uppercase tracking-[0.2em] text-blue-400 mb-4">Confidence Metric</h4>
+                    <p class="text-[11px] font-medium text-slate-400 leading-relaxed">
+                        Data is triangulated using **BGP path analysis**, **RIPEstat visibility**, and **APNIC
+                        registries**.
+                    </p>
+                    <div class="mt-6 flex items-center gap-2">
+                        <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                        <span class="text-[10px] font-bold text-slate-200 uppercase tracking-wider">Authenticated
+                            Pulse</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Main Data Panels -->
+        <div class="lg:col-span-3 space-y-8">
+
+            <!-- Peer Benchmarking Widget -->
+            <div class="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-sm overflow-hidden relative">
+                <div class="absolute top-0 right-0 p-8 opacity-5">
+                    <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M5 9.2h3V19H5V9.2zM10.6 5h2.8v14h-2.8V5zm5.6 8H19v6h-2.8v-6z" />
+                    </svg>
+                </div>
+                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div>
+                        <h3 class="text-2xl font-black text-slate-900 tracking-tight">Intelligence Benchmarks</h3>
+                        <p class="text-slate-400 font-bold text-xs uppercase tracking-widest mt-1">Cross-Sector Adoption
+                            Analysis</p>
+                    </div>
+                    <div id="gap-indicator"
+                        class="hidden md:flex items-center gap-3 bg-blue-50 px-4 py-2 rounded-2xl border border-blue-100">
+                        <div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></div>
+                        <span id="gap-text" class="text-[10px] font-black text-blue-700 uppercase tracking-wider">Gap
+                            Index: --%</span>
+                    </div>
+                </div>
+
+                <div class="mt-8 grid grid-cols-1 md:grid-cols-4 gap-8 items-stretch">
+                    <div class="md:col-span-3 bg-slate-50/50 rounded-3xl p-6 border border-slate-100">
+                        <div id="benchmark-chart" class="min-h-[250px]"></div>
+                    </div>
+                    <div class="flex flex-col justify-between space-y-4">
+                        <div class="p-5 bg-white border border-slate-100 rounded-2xl shadow-sm">
+                            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Primary
+                                Leader</p>
+                            <div class="flex items-center gap-2">
+                                <div class="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                                <p class="text-[13px] font-black text-slate-900" id="bench-leader">National Registry</p>
+                            </div>
+                        </div>
+                        <div id="action-recommendation"
+                            class="flex-1 p-5 bg-indigo-600 rounded-3xl text-white shadow-xl shadow-indigo-100 flex flex-col justify-center">
+                            <p class="text-[9px] font-black uppercase tracking-widest opacity-70 mb-2">Strategic Insight
+                            </p>
+                            <p id="bench-insight" class="text-xs font-bold leading-relaxed">Analyzing cross-sector
+                                parity and regional infrastructure gaps...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ISP Registry Explorer -->
+            <div class="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-sm min-h-[600px]">
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-6">
+                    <div>
+                        <h3 class="text-2xl font-black text-slate-900 tracking-tight" id="country-title">India ISP
+                            Registry</h3>
+                        <p class="text-slate-400 font-bold text-xs uppercase tracking-widest mt-1">Autonomous System
+                            Intelligence Hub</p>
+                    </div>
+                    <div
+                        class="bg-slate-50 p-1.5 rounded-2xl border border-slate-100 flex flex-wrap md:flex-nowrap items-center gap-3">
+                        <div
+                            class="flex items-center gap-1 bg-white p-1 rounded-xl border border-slate-200 shadow-sm h-11">
+                            <button onclick="applyASNFilter('all')" id="filter-all"
+                                class="h-full px-4 rounded-lg text-[10px] font-black uppercase tracking-wider transition bg-blue-600 text-white">All</button>
+                            <button onclick="applyASNFilter('top_performers')" id="filter-top"
+                                class="h-full px-4 rounded-lg text-[10px] font-black uppercase tracking-wider transition hover:bg-slate-50 text-slate-500">Top
+                                500</button>
+                        </div>
+                        <div class="hidden md:block h-8 w-px bg-slate-200"></div>
+                        <button onclick="openSubmissionModal()"
+                            class="h-11 bg-blue-600 hover:bg-blue-700 text-white px-5 rounded-xl text-[10px] font-black uppercase tracking-widest transition active:scale-95 flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                    d="M12 4v16m8-8H4" />
+                            </svg>
+                            Contribute
+                        </button>
+                        <div class="relative flex-1 min-w-[200px]">
+                            <svg class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                            <input type="text" id="isp-search" onkeyup="handleISPSearch()"
+                                placeholder="Search Registry..."
+                                class="w-full h-11 bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-1.5 text-xs font-bold focus:ring-2 focus:ring-blue-500/20 outline-none transition shadow-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="text-left border-b border-slate-100">
+                                <th class="pb-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">ASN
+                                </th>
+                                <th class="pb-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                <th class="pb-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                    Organization / ISP</th>
+                                <th class="pb-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">IPv6
+                                    Readiness</th>
+                                <th class="pb-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                    Path Resilience <span class="group/tip relative cursor-help ml-1">ℹ<span
+                                            class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-900 text-[9px] text-white rounded-lg opacity-0 group-hover/tip:opacity-100 transition-opacity pointer-events-none font-bold normal-case tracking-normal z-50 shadow-xl">Diversity
+                                            of upstream transit providers. 3+ is highly resilient.</span></span></th>
+                                <th class="pb-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="isp-table-body" class="divide-y divide-slate-50">
+                            <tr class="animate-pulse">
+                                <td colspan="5"
+                                    class="py-10 text-center text-slate-300 font-bold italic uppercase tracking-widest">
+                                    Inundating Network Identity...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 3. Modals -->
+<!-- ISP Detail -->
+<div id="isp-modal"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
+    <div class="bg-white rounded-[2.5rem] w-full max-w-2xl overflow-hidden shadow-2xl animate-modal-enter">
+        <div class="p-8 border-b border-slate-50 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                </div>
+                <div>
+                    <h4 id="modal-org-name" class="text-xl font-black text-slate-900 leading-none">ISP Name</h4>
+                    <p id="modal-asn" class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-2">
+                        AS55836 • INDIA</p>
+                </div>
+            </div>
+            <button onclick="closeISPModal()"
+                class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-slate-100 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div class="p-8 space-y-8">
+            <div class="grid grid-cols-4 gap-6">
+                <div class="bg-slate-50 p-4 rounded-2xl text-center">
+                    <p class="text-[9px] font-black text-slate-400 uppercase mb-1">IPv6 Score</p>
+                    <p id="modal-readiness" class="text-2xl font-black text-blue-600">--%</p>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-2xl text-center">
+                    <p class="text-[9px] font-black text-slate-400 uppercase mb-1">BGP Resil.</p>
+                    <p id="modal-resilience" class="text-2xl font-black text-indigo-600">--</p>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-2xl text-center">
+                    <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Status</p>
+                    <p class="text-xs font-black text-emerald-600">Verified</p>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-2xl text-center">
+                    <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Registry</p>
+                    <p id="modal-rir" class="text-xs font-black text-slate-700 uppercase">APNIC</p>
+                </div>
+            </div>
+
+            <div id="modal-upstream-list" class="space-y-4">
+                <!-- Populated via JS -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Community Submission -->
+<div id="submission-modal"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
+    <div class="bg-white rounded-[2.5rem] w-full max-w-lg overflow-hidden shadow-2xl animate-modal-enter">
+        <div class="p-8 border-b border-slate-50 flex items-center justify-between">
+            <div>
+                <h4 class="text-xl font-black text-slate-900">Contribute Domain</h4>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Expanding Regional Intel
+                </p>
+            </div>
+            <button onclick="closeSubmissionModal()"
+                class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-slate-100 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <form id="submission-form" onsubmit="handleContribution(event)" class="p-8 space-y-6">
+            <div class="space-y-2">
+                <label class="text-[10px] font-black text-slate-400 uppercase">Target Domain</label>
+                <input type="text" id="sub-domain" required placeholder="e.g. iitd.ac.in"
+                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-blue-500/20 outline-none transition">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-slate-400 uppercase">Sector</label>
+                    <select id="sub-sector"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold">
+                        <option value="Education">Education</option>
+                        <option value="Government">Government</option>
+                    </select>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-slate-400 uppercase">Country</label>
+                    <select id="sub-country"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold">
+                        <option value="IN">India (IN)</option>
+                        <option value="MY">Malaysia (MY)</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit"
+                class="w-full bg-slate-900 text-white p-4 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-800 transition active:scale-95">Verify
+                and Catalog</button>
+        </form>
+        <div id="sub-loading" class="hidden p-12 text-center space-y-4">
+            <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
+            <p class="text-[10px] font-black text-slate-500 uppercase animate-pulse">Audit in Progress...</p>
+        </div>
+        <div id="sub-success" class="hidden p-12 text-center space-y-6">
+            <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+            <p id="sub-result-text" class="text-xs text-slate-500 font-medium">Domain Successfully Indexed.</p>
+            <button onclick="closeSubmissionModal()"
+                class="px-8 py-3 bg-slate-100 rounded-xl text-[10px] font-black uppercase tracking-widest transition">Close</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes modal-enter {
+        from {
+            opacity: 0;
+            transform: scale(0.95) translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+
+    .animate-modal-enter {
+        animation: modal-enter 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    .isp-row {
+        transition: all 0.3s ease;
+    }
+
+    .isp-row:hover {
+        transform: translateX(5px);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/isp_intelligence.js"></script>
+{% endblock %}

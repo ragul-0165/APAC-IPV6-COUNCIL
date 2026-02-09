@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}APAC IPv6{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/index.css">
+    <link rel="stylesheet" href="/static/css/global_selector.css">
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body class="min-h-screen flex">
+    <!-- Global Country Intelligence Switch -->
+    <div class="global-country-switch">
+        <div class="live-indicator">
+            <span class="live-dot"></span>
+            <span class="text-[10px] font-black tracking-widest text-[#10b981]">LIVE</span>
+        </div>
+        <div class="country-selector-wrapper">
+            <span class="switch-label">REGION</span>
+            <select id="global-country-selector">
+                <option value="APAC">🌏 Regional (APAC)</option>
+                <option value="IN">🇮🇳 India</option>
+                <option value="MY">🇲🇾 Malaysia</option>
+                <option value="SG">🇸🇬 Singapore</option>
+                <option value="VN">🇻🇳 Vietnam</option>
+                <option value="TH">🇹🇭 Thailand</option>
+                <option value="ID">🇮🇩 Indonesia</option>
+                <option value="PH">🇵🇭 Philippines</option>
+                <option value="AU">🇦🇺 Australia</option>
+                <option value="JP">🇯🇵 Japan</option>
+                <option value="CN">🇨🇳 China</option>
+                <option value="KR">🇰🇷 South Korea</option>
+                <option value="TW">🇹🇼 Taiwan</option>
+                <option value="NZ">🇳🇿 New Zealand</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar h-screen sticky top-0 flex flex-col p-6 z-50">
+        <div class="flex items-center space-x-4 mb-10 px-2">
+            <div
+                class="w-10 h-10 rounded-xl shadow-lg shadow-blue-500/20 overflow-hidden bg-white flex items-center justify-center border border-gray-100">
+                <img src="/static/images/logo.png" alt="Logo" class="w-8 h-8 object-contain">
+            </div>
+            <span class="text-xl font-black tracking-tighter text-slate-800 uppercase">APAC IPv6</span>
+        </div>
+
+        <nav class="flex-1 space-y-2">
+            <a href="/"
+                class="nav-link flex items-center space-x-3 px-4 py-3.5 rounded-2xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 group {% if request.path == '/' %}active{% endif %}">
+                <svg class="w-5 h-5 opacity-70 group-hover:opacity-100" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                <span class="text-sm font-bold">Dashboard</span>
+            </a>
+            <a href="/diagnostics"
+                class="nav-link flex items-center space-x-3 px-4 py-3.5 rounded-2xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 group {% if request.path == '/diagnostics/' %}active{% endif %}">
+                <svg class="w-5 h-5 opacity-70 group-hover:opacity-100" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                </svg>
+                <span class="text-sm font-bold">Diagnostics</span>
+            </a>
+            <a href="/domains"
+                class="nav-link flex items-center space-x-3 px-4 py-3.5 rounded-2xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 group {% if request.path == '/domains/' %}active{% endif %}">
+                <svg class="w-5 h-5 opacity-70 group-hover:opacity-100" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                </svg>
+                <span class="text-sm font-bold">Domain Analysis</span>
+            </a>
+            <a href="/lab"
+                class="nav-link flex items-center space-x-3 px-4 py-3.5 rounded-2xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 group {% if request.path == '/lab/' %}active{% endif %}">
+                <svg class="w-5 h-5 opacity-70 group-hover:opacity-100" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.691.346a6 6 0 01-3.86.517l-2.387-.477a2 2 0 00-1.022.547V6.031a2 2 0 011.022-.547l2.387-.477a6 6 0 013.86-.517l.691-.346a6 6 0 003.86-.517l2.387.477a2 2 0 011.022.547V15.428z" />
+                </svg>
+                <span class="text-sm font-bold">Intelligence Lab</span>
+            </a>
+
+            <a href="/gov-monitor"
+                class="nav-link flex items-center space-x-3 px-4 py-3.5 rounded-2xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 group {% if request.path == '/gov-monitor/' %}active{% endif %}">
+                <svg class="w-5 h-5 opacity-70 group-hover:opacity-100" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+                </svg>
+                <span class="text-sm font-bold">Government Monitor</span>
+            </a>
+            <a href="/gov-monitor/benchmark"
+                class="nav-link flex items-center space-x-3 px-4 py-3.5 rounded-2xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 group {% if request.path == '/gov-monitor/benchmark' %}active{% endif %}">
+                <svg class="w-5 h-5 opacity-70 group-hover:opacity-100" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                <span class="text-sm font-bold">Peer Benchmark</span>
+            </a>
+            <a href="/edu-monitor"
+                class="nav-link flex items-center space-x-3 px-4 py-3.5 rounded-2xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 group {% if request.path == '/edu-monitor/' %}active{% endif %}">
+                <svg class="w-5 h-5 opacity-70 group-hover:opacity-100" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
+                </svg>
+                <span class="text-sm font-bold">Academic Hub</span>
+            </a>
+            <a href="/strategy"
+                class="nav-link flex items-center space-x-3 px-4 py-3.5 rounded-2xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 group {% if request.path == '/strategy/' %}active{% endif %}">
+                <svg class="w-5 h-5 opacity-70 group-hover:opacity-100" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <span class="text-sm font-bold">IPv6 Strategy</span>
+            </a>
+            <a href="/isp-explorer"
+                class="nav-link flex items-center space-x-3 px-4 py-3.5 rounded-2xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 group {% if request.path == '/isp-explorer' %}active{% endif %}">
+                <svg class="w-5 h-5 opacity-70 group-hover:opacity-100" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+                <span class="text-sm font-bold">ISP Intelligence</span>
+            </a>
+        </nav>
+
+        <!-- Footer Info -->
+        <div
+            class="mt-auto p-4 bg-slate-900 rounded-3xl text-white relative overflow-hidden shadow-xl shadow-slate-200">
+            <div class="relative z-10">
+                <p class="text-[10px] uppercase font-black tracking-widest text-slate-400 mb-1">Status</p>
+                <p class="text-xs font-bold flex items-center">
+                    <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
+                    Operational
+                </p>
+            </div>
+            <div class="absolute -right-4 -bottom-4 w-16 h-16 bg-blue-600/20 rounded-full blur-xl"></div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 relative overflow-auto">
+        <!-- Top Toolbar -->
+        <header
+            class="sticky top-0 bg-white/60 backdrop-blur-md border-b border-gray-100 z-40 px-10 py-6 flex justify-between items-center">
+            <h1 class="text-xl font-black text-slate-900 tracking-tight">{% block header_title %}Overview{% endblock %}
+            </h1>
+            <div class="flex items-center space-x-4">
+                <div class="bg-gray-100 px-4 py-2 rounded-xl text-xs font-bold text-gray-500 border border-gray-200">
+                    APAC 2025 Edition
+                </div>
+            </div>
+        </header>
+
+        <div class="p-10">
+            {% block content %}{% endblock %}
+        </div>
+
+        <footer
+            class="p-10 text-center text-slate-400 text-xs font-bold uppercase tracking-[0.2em] border-t border-gray-50">
+            &copy; 2025 APAC IPv6 Intelligence Portal v2.0 • Secure & Scalable
+        </footer>
+    </main>
+
+    <!-- AI Consultation Hub -->
+    <div id="ai-hub-fab" class="ai-hub-fab" onclick="toggleAIChat()">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+        </svg>
+    </div>
+
+    <div id="ai-chat-window" class="ai-chat-window hidden">
+        <div class="ai-chat-header flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-white font-black text-sm tracking-tight">AI Analyst</h3>
+                    <p class="text-blue-400 text-[10px] font-bold uppercase tracking-widest">Online • Groq LPU</p>
+                </div>
+            </div>
+            <button onclick="toggleAIChat()" class="text-gray-500 hover:text-white transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l18 18" />
+                </svg>
+            </button>
+        </div>
+
+        <div id="ai-chat-messages" class="ai-chat-messages">
+            <div class="ai-message assistant">
+                Hello! I am your Senior IPv6 Intelligence Analyst. How can I assist you with your deployment strategy or
+                laboratory analysis today?
+            </div>
+        </div>
+
+        <div class="ai-chat-input-area">
+            <div class="ai-chat-input-container">
+                <input type="text" id="ai-chat-input" placeholder="Ask about IPv6 strategy..."
+                    onkeypress="if(event.key === 'Enter') sendAIMessage()">
+                <button onclick="sendAIMessage()" class="ai-chat-send">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { CountryState } from '/static/js/global_state.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const selector = document.getElementById('global-country-selector');
+            const currentCountry = CountryState.get();
+
+            // Set initial value
+            selector.value = currentCountry;
+
+            // Handle changes
+            selector.addEventListener('change', (e) => {
+                CountryState.set(e.target.value);
+            });
+
+            // Listen for changes from other sources (local selectors)
+            window.addEventListener('countryChanged', (e) => {
+                if (selector.value !== e.detail.country) {
+                    selector.value = e.detail.country;
+                }
+            });
+        });
+    </script>
+    <script src="/static/js/ai_hub.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>
