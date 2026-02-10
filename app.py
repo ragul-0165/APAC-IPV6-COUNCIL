@@ -84,4 +84,5 @@ def health_check():
 
 if __name__ == '__main__':
     # Support both IPv4 and IPv6
-    app.run() 
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="::", port=port, debug=True)

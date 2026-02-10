@@ -241,12 +241,21 @@ async function runIPTest() {
             const v6Data = await v6Res.json();
             if (v6Data.ip.includes(':')) {
                 discoveredIPv6 = v6Data.ip;
-                addLog(`Public IPv6 Discovered: ${discoveredIPv6}`, 'success');
-            } else {
-                addLog("IPv6 Discovery returned IPv4 address. Native v6 unavailable.", 'warn');
+                addLog(`Public IPv6 Discovered (Primary): ${discoveredIPv6}`, 'success');
             }
         } catch (e) {
-            addLog("IPv6 Discovery failed. Network is likely IPv4-only.", 'warn');
+            addLog("Primary IPv6 Discovery failed. Trying Mirror 1 (icanhazip)...", 'info');
+            try {
+                // Secondary fallback mirror
+                const v6Res = await fetch('https://ipv6.icanhazip.com');
+                const v6Text = await v6Res.text();
+                if (v6Text.trim().includes(':')) {
+                    discoveredIPv6 = v6Text.trim();
+                    addLog(`Public IPv6 Discovered (Mirror 1): ${discoveredIPv6}`, 'success');
+                }
+            } catch (e2) {
+                addLog("Mirror discovery failed. Network may be IPv4-only or detection is strictly blocked.", 'warn');
+            }
         }
 
         addLog("Syncing with backend for connectivity audit...", 'info');
