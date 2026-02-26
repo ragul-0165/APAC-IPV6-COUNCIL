@@ -40,3 +40,5 @@ data/
 datasets/
 datasets/bgp/
 datasets/documents/
+static/output/
+static/reports/
