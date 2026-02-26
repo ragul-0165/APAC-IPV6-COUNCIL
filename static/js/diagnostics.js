@@ -81,21 +81,43 @@ async function measureLatency(url, type) {
     }
 }
 
-// [NEW] WebRTC Assessment
+// [NEW] WebRTC Assessment - extracts real IPv6 from ICE candidate
 async function checkWebRTC() {
     return new Promise((resolve) => {
         const rtc = new RTCPeerConnection({ iceServers: [] });
         rtc.createDataChannel('');
         rtc.createOffer().then(offer => rtc.setLocalDescription(offer));
+        let resolved = false;
         rtc.onicecandidate = (ice) => {
+            if (resolved) return;
             if (!ice || !ice.candidate || !ice.candidate.candidate) {
-                resolve(false);
+                resolved = true;
+                resolve({ found: false, ip: null });
                 return;
             }
             const cand = ice.candidate.candidate;
-            if (cand.includes(':')) resolve(true);
+            // ICE candidate format: "... <ip> <port> ..."
+            // Extract IPv6 address (contains ':', no '.') from candidate string
+            const parts = cand.split(' ');
+            for (const part of parts) {
+                if (part.includes(':') && !part.includes('.')) {
+                    // Validate it looks like an IPv6 (not a port or other token)
+                    if (/^[0-9a-f:]+$/i.test(part) && part.split(':').length >= 4) {
+                        resolved = true;
+                        rtc.close();
+                        resolve({ found: true, ip: part });
+                        return;
+                    }
+                }
+            }
         };
-        setTimeout(() => resolve(false), 1000);
+        setTimeout(() => {
+            if (!resolved) {
+                resolved = true;
+                rtc.close();
+                resolve({ found: false, ip: null });
+            }
+        }, 1500);
     });
 }
 
@@ -123,8 +145,8 @@ function renderDiagnostics(data) {
 
     // Latency
     document.getElementById('latency-section').classList.remove('hidden');
-    document.getElementById('ipv4-latency').innerText = data.latency?.ipv4 ? data.latency.ipv4 + ' ms' : '242 ms';
-    document.getElementById('ipv6-latency').innerText = data.latency?.ipv6 ? data.latency.ipv6 + ' ms' : '207 ms';
+    document.getElementById('ipv4-latency').innerText = data.latency?.ipv4 ? data.latency.ipv4 + ' ms' : 'N/A';
+    document.getElementById('ipv6-latency').innerText = data.latency?.ipv6 ? data.latency.ipv6 + ' ms' : 'N/A';
 
     // Score
     const score = data.score || 0;
@@ -258,6 +280,40 @@ async function runIPTest() {
             }
         }
 
+        // ------------------------
+        // CLIENT-SIDE DNS AAAA TEST
+        // ------------------------
+        addLog("Testing client-side DNS resolution (AAAA)...", 'info');
+
+        let dnsV6 = false;
+
+        try {
+            const dnsResponse = await fetch(
+                "https://dns.google/resolve?name=google.com&type=AAAA",
+                { cache: "no-store" }
+            );
+
+            const dnsData = await dnsResponse.json();
+
+            if (dnsData && dnsData.Answer && dnsData.Answer.length > 0) {
+                dnsV6 = true;
+                addLog("Client AAAA resolution successful.", 'success');
+            } else {
+                addLog("AAAA response empty.", 'warn');
+            }
+
+        } catch (err) {
+            addLog("Client AAAA resolution failed.", 'error');
+        }
+
+        // Attach to backend payload
+
+        addLog("Syncing with backend for connectivity audit...", 'info');
+
+        // Define 'real' flags for backend scoring logic
+        const realIPv4 = discoveredIPv4 !== 'None';
+        const realIPv6 = discoveredIPv6 !== 'None';
+
         addLog("Syncing with backend for connectivity audit...", 'info');
 
         const response = await fetch('/diagnostics/run', {
@@ -265,18 +321,62 @@ async function runIPTest() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 client_ipv4: discoveredIPv4,
-                client_ipv6: discoveredIPv6
+                client_ipv6: discoveredIPv6,
+                real_ipv4: realIPv4,
+                real_ipv6: realIPv6,
+                client_dns_v4: true,        // Almost always true
+                client_dns_v6: dnsV6
             })
         });
         const data = await response.json();
 
-        addLog("Backend audit complete. Measuring latencies...", 'info');
+        addLog("Backend audit complete. Performing protocol-enforced latency tests...", 'info');
 
-        // 1. Client-Side Latency
-        data.latency.ipv4 = await measureLatency('https://ipv4.google.com/generate_204');
-        data.latency.ipv6 = await measureLatency('https://ipv6.google.com/generate_204');
-        addLog(`IPv4 Latency: ${data.latency.ipv4 || 'failed'}ms | IPv6 Latency: ${data.latency.ipv6 || 'failed'}ms`, 'info');
+        // Ensure latency object exists
+        data.latency = { ipv4: null, ipv6: null };
 
+        // ------------------------
+        // IPv4 ENFORCED LATENCY
+        // ------------------------
+        try {
+            addLog("Measuring IPv4 latency via secure IPv4 endpoint...", 'info');
+
+            const start4 = performance.now();
+            // Use 1.1.1.1 via HTTPS to avoid mixed-content/HTTP-only browser blocks
+            await fetch("https://1.1.1.1", { mode: "no-cors", cache: "no-store" });
+            const end4 = performance.now();
+
+            data.latency.ipv4 = Math.round(end4 - start4);
+            addLog(`IPv4 Latency Confirmed: ${data.latency.ipv4} ms`, 'success');
+
+        } catch (e) {
+            data.latency.ipv4 = null;
+            addLog("IPv4 latency measurement failed (transport or security block).", 'error');
+        }
+
+        // ------------------------
+        // IPv6 ENFORCED LATENCY
+        // ------------------------
+        try {
+            addLog("Measuring IPv6 latency via secure IPv6 literal...", 'info');
+
+            const start6 = performance.now();
+            await fetch("https://[2606:4700:4700::1111]", { mode: "no-cors", cache: "no-store" });
+            const end6 = performance.now();
+
+            data.latency.ipv6 = Math.round(end6 - start6);
+            addLog(`IPv6 Latency Confirmed: ${data.latency.ipv6} ms`, 'success');
+
+        } catch (e) {
+            data.latency.ipv6 = null;
+            addLog("IPv6 latency measurement failed (no native IPv6 transport).", 'warn');
+        }
+
+        // Final latency summary log
+        addLog(
+            `Latency Summary → IPv4: ${data.latency.ipv4 ?? 'N/A'} ms | IPv6: ${data.latency.ipv6 ?? 'N/A'} ms`,
+            'info'
+        );
         // [NEW] Fetch Experience Score (Feature 9)
         if (data.latency.ipv4 && data.latency.ipv6) {
             const expRes = await fetch('/diagnostics/api/experience-score', {
@@ -299,10 +399,20 @@ async function runIPTest() {
             }
         }
 
-        // 2. Client-Side WebRTC
+        // 2. Client-Side WebRTC - also extracts real IPv6 if APIs missed it
         addLog("Testing WebRTC ICE candidate gathering...", 'info');
-        const webrtcPassed = await checkWebRTC();
+        const webrtcResult = await checkWebRTC();
+        const webrtcPassed = webrtcResult.found;
         addLog(`WebRTC IPv6 Candidate Found: ${webrtcPassed ? 'YES' : 'NO'}`, webrtcPassed ? 'success' : 'warn');
+
+        // If external APIs didn't find an IPv6 but WebRTC did, use the real address
+        if (webrtcPassed && webrtcResult.ip && discoveredIPv6 === 'None') {
+            discoveredIPv6 = webrtcResult.ip;
+            data.ipv6 = webrtcResult.ip;
+            addLog(`Real IPv6 recovered via WebRTC ICE: ${webrtcResult.ip}`, 'success');
+            // Update the displayed IPv6 immediately
+            document.getElementById('ipv6-result').innerText = webrtcResult.ip;
+        }
 
         data.tests.push({ name: 'WebRTC IPv6', description: 'Peer-to-peer IPv6 connectivity', passed: webrtcPassed });
         if (webrtcPassed) data.score = Math.min(data.score + 10, 100);
