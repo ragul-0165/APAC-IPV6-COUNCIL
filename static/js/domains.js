@@ -41,7 +41,7 @@ document.getElementById('domain-form').addEventListener('submit', async (e) => {
                             <div class="w-8 h-8 rounded-xl flex items-center justify-center ${item.ipv4 !== 'None' ? 'bg-blue-50 text-blue-600' : 'bg-slate-50 text-slate-300'} mb-1 border ${item.ipv4 !== 'None' ? 'border-blue-100' : 'border-slate-100'}">
                                 <span class="text-[10px] font-black">v4</span>
                             </div>
-                            <span class="text-[8px] font-black uppercase text-gray-400">Legacy</span>
+                            <span class="text-[8px] font-black uppercase text-gray-400">Active</span>
                         </div>
                     </div>
                 </td>
@@ -64,9 +64,20 @@ document.getElementById('domain-form').addEventListener('submit', async (e) => {
                     </div>
                 </td>
                 <td class="px-8 py-6 text-right">
-                    <span class="inline-flex items-center px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-[0.1em] ${item.dnssec === 'signed' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-slate-100 text-slate-400'}">
-                        ${item.dnssec === 'signed' ? 'DNSSEC' : 'Insecure'}
-                    </span>
+                    ${(() => {
+                    const hasTls = item.tls_issuer !== 'Unknown' && item.tls_issuer !== 'N/A';
+                    const isSigned = item.dnssec === 'signed';
+
+                    if (hasTls && isSigned) {
+                        return `<span class="inline-flex items-center px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-[0.1em] bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">SECURE</span>`;
+                    } else if (hasTls || isSigned) {
+                        return `<span class="inline-flex items-center px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-[0.1em] bg-amber-400 text-white shadow-lg shadow-amber-400/20">PARTIAL</span>`;
+                    } else if (item.dnssec === 'unknown' || item.dnssec === 'N/A') {
+                        return `<span class="inline-flex items-center px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-[0.1em] bg-slate-100 text-slate-400">UNKNOWN</span>`;
+                    } else {
+                        return `<span class="inline-flex items-center px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-[0.1em] bg-rose-500 text-white shadow-lg shadow-rose-500/20">INSECURE</span>`;
+                    }
+                })()}
                 </td>
             `;
             resultsTable.appendChild(row);
@@ -78,7 +89,7 @@ document.getElementById('domain-form').addEventListener('submit', async (e) => {
 
         const reconMeta = {
             'relationship_map': {
-                title: 'Infrastructure Relationship Map',
+                title: 'Infrastructure Topology Reconstruction',
                 desc: 'Derived host-to-endpoint structure based on scan observations.',
                 finding: 'Analyzes the multi-layered connection between scan nodes and resolved protocol endpoints. High density indicates a robust hosting backbone.'
             },
@@ -93,7 +104,7 @@ document.getElementById('domain-form').addEventListener('submit', async (e) => {
                 finding: 'Evaluates global resilience. Gaps in the hexagon reveal specific weaknesses in geo-diversity or protocol implementation across the fleet.'
             },
             'infrastructure_density': {
-                title: 'Global Infrastructure Density',
+                title: 'Geographic Density Visualization',
                 desc: 'Stylized geographic concentration of hosting endpoints.',
                 finding: 'Visualizes geopolitical infrastructure concentrations. High density in single regions increases risk of regional technical blackouts.'
             }
@@ -153,6 +164,7 @@ function openIntelligenceModal(url, meta) {
     modal.classList.add('flex');
     document.body.style.overflow = 'hidden'; // Prevent scroll
 }
+
 
 function closeIntelligenceModal() {
     const modal = document.getElementById('intelligence-modal');

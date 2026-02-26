@@ -89,6 +89,12 @@ def get_performance_tax():
     """Returns latency penalty metrics for IPv6 transition."""
     from services.performance_service import performance_service
     sector = request.args.get('sector', 'gov')
+    location = (request.args.get('location') or request.args.get('country') or '').upper()
+    
+    if location == 'APAC':
+        result = performance_service.get_regional_aggregate(sector)
+        return jsonify([result] if result else [])
+    
     return jsonify(performance_service.get_country_aggregates(sector))
 
 @lab_bp.route('/api/equality-index')

@@ -234,19 +234,43 @@
     <script type="module">
         import { CountryState } from '/static/js/global_state.js';
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             const selector = document.getElementById('global-country-selector');
-            const currentCountry = CountryState.get();
+            if (!selector) return;
 
-            // Set initial value
+            // 1. Populate Selector Dynamically
+            try {
+                const response = await fetch('/lab/api/countries');
+                const data = await response.json();
+
+                if (data.apac_codes) {
+                    // Clear existing hardcoded options except APAC if we want to rebuild
+                    selector.innerHTML = '<option value="APAC">🌏 Regional (APAC)</option>';
+
+                    // Sort countries by name
+                    const sorted = data.apac_codes.sort((a, b) => a.name.localeCompare(b.name));
+
+                    sorted.forEach(country => {
+                        const option = document.createElement('option');
+                        option.value = country.code;
+                        option.textContent = `${country.code} ${country.name}`;
+                        selector.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Failed to populate region selector:', error);
+            }
+
+            // 2. Set Initial State
+            const currentCountry = CountryState.get();
             selector.value = currentCountry;
 
-            // Handle changes
+            // 3. Handle Changes
             selector.addEventListener('change', (e) => {
                 CountryState.set(e.target.value);
             });
 
-            // Listen for changes from other sources (local selectors)
+            // 4. Listen for External Changes
             window.addEventListener('countryChanged', (e) => {
                 if (selector.value !== e.detail.country) {
                     selector.value = e.detail.country;

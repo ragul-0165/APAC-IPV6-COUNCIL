@@ -7,7 +7,7 @@ class PerformanceService:
         
     def calculate_performance_tax(self, ipv4_rtt, ipv6_rtt):
         """
-        Calculate performance tax percentage.
+        Calculate translation latency overhead percentage.
         Positive = IPv6 slower, Negative = IPv6 faster
         """
         if not ipv4_rtt or not ipv6_rtt or ipv4_rtt == 0:
@@ -17,21 +17,21 @@ class PerformanceService:
         return round(tax, 2)
     
     def categorize_tax(self, tax):
-        """Categorize performance tax severity."""
+        """Categorize translation overhead severity."""
         if tax is None:
             return "Unknown"
-        elif tax < 0:
-            return "IPv6-Faster"
-        elif tax <= 20:
-            return "Acceptable"
-        elif tax <= 50:
-            return "Moderate-Penalty"
+        elif tax < 10:
+            return "Optimal"
+        elif tax <= 40:
+            return "Moderate"
+        elif tax <= 100:
+            return "Significant"
         else:
-            return "Severe-Penalty"
+            return "Severe"
     
     def get_performance_report(self, sector="gov"):
         """
-        Generate performance tax report for a sector.
+        Generate latency overhead report for a sector.
         sector: 'gov' or 'edu'
         """
         if not self.db_connected:
@@ -44,12 +44,13 @@ class PerformanceService:
             else:
                 coll_name = db_service.COLLECTION_REGISTRY["EDU_SCANS"]
             
-            # Query domains with both RTT measurements
+            # Query domains with both RTT measurements and filter outliers
+            # Rules: IPv4 < 5ms (Ignore), IPv6 > 2000ms (Ignore)
             pipeline = [
                 {
                     "$match": {
-                        "ipv4_rtt_ms": {"$exists": True, "$ne": None},
-                        "ipv6_rtt_ms": {"$exists": True, "$ne": None}
+                        "ipv4_rtt_ms": {"$exists": True, "$ne": None, "$gte": 5},
+                        "ipv6_rtt_ms": {"$exists": True, "$ne": None, "$lte": 2000}
                     }
                 },
                 {
@@ -77,8 +78,8 @@ class PerformanceService:
                     report.append({
                         "domain": item.get('domain'),
                         "country": item.get('country'),
-                        "ipv4_rtt_ms": item.get('ipv4_rtt_ms'),
-                        "ipv6_rtt_ms": item.get('ipv6_rtt_ms'),
+                        "ipv4_rtt_ms": round(item.get('ipv4_rtt_ms')),
+                        "ipv6_rtt_ms": round(item.get('ipv6_rtt_ms')),
                         "performance_tax_pct": tax,
                         "category": self.categorize_tax(tax)
                     })
@@ -88,12 +89,13 @@ class PerformanceService:
             return report
             
         except Exception as e:
-            logging.error(f"Performance report generation failed: {e}")
+            logging.error(f"Latency report generation failed: {e}")
             return []
     
     def get_country_aggregates(self, sector="gov"):
         """
-        Aggregate performance tax by country.
+        Aggregate translation overhead by country.
+        Enforces min 1 sample for basic visibility.
         """
         if not self.db_connected:
             return []
@@ -107,8 +109,8 @@ class PerformanceService:
             pipeline = [
                 {
                     "$match": {
-                        "ipv4_rtt_ms": {"$exists": True, "$ne": None},
-                        "ipv6_rtt_ms": {"$exists": True, "$ne": None}
+                        "ipv4_rtt_ms": {"$exists": True, "$ne": None, "$gte": 5},
+                        "ipv6_rtt_ms": {"$exists": True, "$ne": None, "$lte": 2000}
                     }
                 },
                 {
@@ -118,12 +120,16 @@ class PerformanceService:
                         "avg_ipv6_rtt": {"$avg": "$ipv6_rtt_ms"},
                         "sample_count": {"$sum": 1}
                     }
+                },
+                {
+                    "$match": {
+                        "sample_count": {"$gte": 1}
+                    }
                 }
             ]
             
             results = list(db_service._db[coll_name].aggregate(pipeline))
             
-            # Calculate average tax per country
             country_report = []
             for item in results:
                 tax = self.calculate_performance_tax(
@@ -137,17 +143,55 @@ class PerformanceService:
                         "avg_performance_tax_pct": tax,
                         "category": self.categorize_tax(tax),
                         "sample_count": item.get('sample_count'),
-                        "avg_ipv4_rtt_ms": round(item.get('avg_ipv4_rtt'), 2),
-                        "avg_ipv6_rtt_ms": round(item.get('avg_ipv6_rtt'), 2)
+                        "avg_ipv4_rtt_ms": round(item.get('avg_ipv4_rtt')),
+                        "avg_ipv6_rtt_ms": round(item.get('avg_ipv6_rtt'))
                     })
             
-            # Sort by tax
             country_report.sort(key=lambda x: x['avg_performance_tax_pct'], reverse=True)
             return country_report
             
         except Exception as e:
-            logging.error(f"Country aggregation failed: {e}")
+            logging.error(f"Country Latency aggregation failed: {e}")
             return []
+
+    def get_regional_aggregate(self, sector="gov"):
+        """
+        Calculates a synthetic regional (APAC) average by aggregating 
+        stable country-level measurements.
+        """
+        try:
+            # Get individual country stats
+            countries = self.get_country_aggregates(sector)
+            
+            # Filter for "High Quality" contributors (min 5 samples)
+            stable_benchmarks = [c for c in countries if c['sample_count'] >= 5]
+            
+            # Requirement: Minimum 3 stable countries to form a regional average
+            if len(stable_benchmarks) < 3:
+                return None
+            
+            total_samples = sum(c['sample_count'] for c in stable_benchmarks)
+            
+            # Weighted averages
+            weighted_ipv4 = sum(c['avg_ipv4_rtt_ms'] * c['sample_count'] for c in stable_benchmarks) / total_samples
+            weighted_ipv6 = sum(c['avg_ipv6_rtt_ms'] * c['sample_count'] for c in stable_benchmarks) / total_samples
+            
+            regional_tax = self.calculate_performance_tax(weighted_ipv4, weighted_ipv6)
+            
+            return {
+                "country": "APAC",
+                "region": "APAC",
+                "avg_ipv4_rtt_ms": round(weighted_ipv4),
+                "avg_ipv6_rtt_ms": round(weighted_ipv6),
+                "avg_performance_tax_pct": regional_tax,
+                "category": self.categorize_tax(regional_tax),
+                "sample_count": total_samples,
+                "contributing_countries": len(stable_benchmarks),
+                "confidence": "High" if len(stable_benchmarks) >= 5 else "Medium"
+            }
+        except Exception as e:
+            logging.error(f"Regional aggregation failed: {e}")
+            return None
 
 # Singleton
 performance_service = PerformanceService()

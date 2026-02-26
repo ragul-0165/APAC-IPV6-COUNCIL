@@ -69,7 +69,7 @@ def ipv6_test():
         try:
             dns.resolver.resolve(test_domain, 'A')
             results.append({'name': 'DNS IPv4', 'description': 'Resolves A records', 'passed': True})
-            score += 3
+            score += 30
         except:
             results.append({'name': 'DNS IPv4', 'description': 'Resolves A records', 'passed': False})
 
@@ -77,7 +77,7 @@ def ipv6_test():
         try:
             dns.resolver.resolve(test_domain, 'AAAA')
             results.append({'name': 'DNS IPv6', 'description': 'Resolves AAAA records', 'passed': True})
-            score += 3
+            score += 30
         except:
             results.append({'name': 'DNS IPv6', 'description': 'Resolves AAAA records', 'passed': False})
 
@@ -90,7 +90,7 @@ def ipv6_test():
         has_ipv6 = ipv6 not in ['None', 'Unknown', None, '::1'] or is_request_v6
         if has_ipv6:
             results.append({'name': 'IPv6 Connect', 'description': 'Native IPv6 link', 'passed': True})
-            score += 4 # Restore 10-point path via Core tests
+            score += 40 # Restore 100-point path via Core tests
         else:
             results.append({'name': 'IPv6 Connect', 'description': 'Native IPv6 link', 'passed': False})
 
@@ -132,7 +132,7 @@ def ipv6_test():
             'ipv6': ipv6 if has_ipv6 else (remote_ip if is_request_v6 else 'None'),
             'isp_info': {'org': isp},
             'location': location,
-            'score': min(score, 10), # Perfect 10 Achieved via DNS+Connect
+            'score': min(score, 100), # Perfect 100 Achieved via DNS+Connect
             'tests': results,
             'latency': latency_info,
             'recommendations': recommendations,

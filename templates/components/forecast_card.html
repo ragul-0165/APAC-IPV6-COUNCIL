@@ -1,0 +1,38 @@
+<div class="card-premium p-7">
+    <p class="text-[10px] font-black text-slate-400 uppercase tracking-executive mb-8">Future Outlook</p>
+
+    <div class="space-y-6">
+        <!-- Pace -->
+        <div class="group">
+            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Current Growth
+                Rate</p>
+            <div class="flex items-baseline space-x-2">
+                <p class="text-4xl font-black text-slate-900 tracking-tight tabular-nums">+{{ forecast.current_pace }}%
+                </p>
+                <span
+                    class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic group-hover:text-blue-500 transition-colors">/
+                    annual</span>
+            </div>
+        </div>
+
+        <!-- Milestones -->
+        <div class="grid grid-cols-1 gap-2.5">
+            <div
+                class="bg-slate-50/80 p-3 rounded-xl border border-slate-100/50 flex justify-between items-center group/item hover:bg-blue-50 hover:border-blue-100 transition-all">
+                <span
+                    class="text-[9px] font-black text-slate-500 uppercase tracking-wider group-hover/item:text-blue-600">80%
+                    Target Year</span>
+                <span class="text-sm font-black text-slate-900 tabular-nums">{{ forecast.target_80_date }}</span>
+            </div>
+            <div
+                class="bg-indigo-50/50 p-3 rounded-xl border border-indigo-100/30 flex justify-between items-center group/item hover:bg-indigo-100/50 hover:border-indigo-200 transition-all">
+                <span
+                    class="text-[9px] font-black text-indigo-500 uppercase tracking-wider group-hover/item:text-indigo-700">95%
+                    Adoption Year</span>
+                <span class="text-sm font-black text-indigo-800 tabular-nums">{{ forecast.target_95_date }}</span>
+            </div>
+        </div>
+
+
+    </div>
+</div>

@@ -18,29 +18,45 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     async function refreshDashboardData(country) {
         try {
-            // Use the standardized Lab API which already supports ?country=
-            const response = await fetch(`/lab/api/apac/ipv6?country=${country}`);
-            if (!response.ok) throw new Error('Failed to fetch country stats');
+            let rate = 0;
+            let label = `Live: ${country}`;
 
-            const data = await response.json();
+            if (country === 'APAC') {
+                // Fetch all stats and calculate average
+                const response = await fetch('/lab/api/apac/all_stats');
+                if (!response.ok) throw new Error('Failed to fetch aggregate stats');
+                const allStats = await response.json();
+
+                const statsArray = Object.values(allStats);
+                if (statsArray.length > 0) {
+                    const totalAdoption = statsArray.reduce((acc, s) => acc + (s.ipv6_adoption || 0), 0);
+                    rate = totalAdoption / statsArray.length;
+                }
+                label = "Live: APAC Region";
+            } else {
+                // Fetch specific country stats
+                const response = await fetch(`/lab/api/apac/ipv6?country=${country}`);
+                if (!response.ok) throw new Error('Failed to fetch country stats');
+                const data = await response.json();
+                rate = data.ipv6_adoption || 0;
+                label = `Live: ${data.country || country}`;
+            }
 
             // Update Adoption Rate
             const rateEl = document.getElementById('dash-adoption-rate');
             if (rateEl) {
-                const rate = data.ipv6_adoption || 0;
                 rateEl.textContent = `${rate.toFixed(1)}%`;
             }
 
             // Update Country Label
             const labelEl = document.getElementById('dash-country-label');
             if (labelEl) {
-                labelEl.textContent = `Live: ${data.country || country}`;
+                labelEl.textContent = label;
             }
 
-            // Update Time if available (otherwise just say 'Just Now')
+            // Update Time
             const timeEl = document.getElementById('dash-update-time');
             if (timeEl) {
-                // If it's a fresh fetch, we can assume it's current
                 timeEl.textContent = 'Updated Just Now';
                 timeEl.classList.remove('text-blue-400');
                 timeEl.classList.add('text-green-400');

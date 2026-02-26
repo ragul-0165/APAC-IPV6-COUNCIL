@@ -486,6 +486,24 @@
                 </div>
             </div>
         </div>
+
+        <!-- Transparency Ledger Widget -->
+        <div id="ledger-widget"
+            class="bg-white rounded-[2.5rem] p-10 border border-dashed border-slate-200 shadow-sm flex flex-col items-center justify-center text-center group hover:border-slate-300 transition-all min-h-[200px] relative overflow-hidden">
+            <div
+                class="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center mb-4 text-slate-300 shadow-sm border border-slate-100 group-hover:bg-slate-900 group-hover:text-white transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+            </div>
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Transparency Ledger</p>
+            <p class="text-[9px] font-bold text-slate-400 mt-1 italic">Tactical Verification Layer Incoming</p>
+
+            <div id="ledger-content" class="hidden mt-4 text-left w-full space-y-2">
+                <!-- Provisional Ledger entries populated via JS -->
+            </div>
+        </div>
     </div>
 </div>
 </div>

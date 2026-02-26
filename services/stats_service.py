@@ -122,7 +122,8 @@ class StatsService:
                     return {
                         "country": record["country_code"],
                         "ipv6_adoption": record["ipv6_adoption"],
-                        "source": record.get("source", "APNIC Labs")
+                        "source": record.get("source", "APNIC Labs"),
+                        "last_updated": record.get("last_updated")
                     }
             except Exception as e:
                 logging.warning(f"MongoDB read failed for APAC stats, falling back to JSON: {e}")

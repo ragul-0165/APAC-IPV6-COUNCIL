@@ -131,6 +131,9 @@ async function initMap() {
 
         addLegend(mapInstance);
 
+        // Remove loading indicator
+        document.getElementById('map-loader')?.remove();
+
     } catch (e) {
         console.error("Map data load failed", e);
         mapContainer.innerHTML = `<div class="flex items-center justify-center h-full text-red-400 font-bold">Map Data Unavailable (${e.message})</div>`;
@@ -258,8 +261,12 @@ async function loadCountries() {
         const selector = document.getElementById('lab-country-select');
 
         if (data.apac_codes && selector) {
-            selector.innerHTML = '';
-            data.apac_codes.forEach(country => {
+            selector.innerHTML = '<option value="APAC">🌏 Regional (APAC)</option>';
+
+            // Sort by name
+            const sorted = data.apac_codes.sort((a, b) => a.name.localeCompare(b.name));
+
+            sorted.forEach(country => {
                 const option = document.createElement('option');
                 option.value = country.code;
                 option.textContent = country.name;
@@ -281,22 +288,37 @@ async function updateLabStats() {
 
     // [NEW] Auto-Navigate on Map
     if (geoJsonLayer && mapInstance) {
-        geoJsonLayer.eachLayer(layer => {
-            const code = layer.feature.properties.ISO_A2 || iso3to2[layer.feature.id] || iso3to2[layer.feature.properties.ISO_A3];
-            if (code === location) {
-                mapInstance.fitBounds(layer.getBounds(), { padding: [50, 50], maxZoom: 5 });
-                layer.setStyle({ weight: 3, color: '#3b82f6' });
-                setTimeout(() => geoJsonLayer.resetStyle(layer), 2000);
-            }
-        });
+        if (location === 'APAC') {
+            // Reset to full view
+            mapInstance.setView([15, 105], 3);
+            geoJsonLayer.eachLayer(layer => geoJsonLayer.resetStyle(layer));
+        } else {
+            geoJsonLayer.eachLayer(layer => {
+                const code = layer.feature.properties.ISO_A2 || iso3to2[layer.feature.id] || iso3to2[layer.feature.properties.ISO_A3];
+                if (code === location) {
+                    mapInstance.fitBounds(layer.getBounds(), { padding: [50, 50], maxZoom: 5 });
+                    layer.setStyle({ weight: 3, color: '#3b82f6' });
+                    setTimeout(() => geoJsonLayer.resetStyle(layer), 2000);
+                }
+            });
+        }
     }
 
     try {
-        const response = await fetch(`/lab/api/apac/ipv6?location=${location}`);
-        const data = await response.json();
+        let statsData;
+        if (location === 'APAC') {
+            const response = await fetch('/lab/api/apac/all_stats');
+            const allStats = await response.json();
+            const statsArray = Object.values(allStats);
+            const total = statsArray.reduce((acc, s) => acc + (s.ipv6_adoption || 0), 0);
+            statsData = { ipv6_adoption: total / statsArray.length };
+        } else {
+            const response = await fetch(`/lab/api/apac/ipv6?location=${location}`);
+            statsData = await response.json();
+        }
 
-        if (data.ipv6_adoption !== undefined) {
-            const rate = data.ipv6_adoption.toFixed(1);
+        if (statsData.ipv6_adoption !== undefined) {
+            const rate = statsData.ipv6_adoption.toFixed(1);
             rateDisplay.textContent = `${rate}%`;
             progressBar.style.width = `${rate}%`;
 
@@ -499,28 +521,57 @@ async function loadAuthorityDelta(country = null) {
 }
 
 async function loadPerformanceTax(country = null) {
+    const moduleContainer = document.getElementById('performance-tax-module');
     const pctEl = document.getElementById('tax-pct');
     const msEl = document.getElementById('tax-ms');
     const verdictEl = document.getElementById('tax-verdict');
 
-    if (!pctEl) return;
+    if (!moduleContainer || !pctEl) return;
 
     try {
-        const response = await fetch('/lab/api/performance-tax?sector=gov');
+        const loc = country || (typeof CountryState !== 'undefined' ? CountryState.get() : 'APAC');
+        const response = await fetch(`/lab/api/performance-tax?sector=gov&location=${loc}`);
         const data = await response.json();
 
-        let target = country ? data.find(d => d.country === country) : data[0];
+        // The API returns an array (standard countries or 1 synthetic item for APAC)
+        let target = (loc === 'APAC') ? data[0] : data.find(d => d.country === loc);
 
-        if (target) {
-            pctEl.innerText = `${target.avg_performance_tax_pct}%`;
+        // Show if at least 1 sample is found
+        if (target && target.sample_count >= 1) {
+            moduleContainer.classList.remove('hidden');
+
+            // Percentage Capping Logic
+            let displayPct = `${target.avg_performance_tax_pct}%`;
+            if (target.avg_performance_tax_pct > 300) {
+                displayPct = ">300%";
+            }
+
+            pctEl.innerText = displayPct;
             msEl.innerText = `${target.avg_ipv6_rtt_ms - target.avg_ipv4_rtt_ms}ms`;
-            verdictEl.innerText = `${target.category} (${target.sample_count} samples)`;
 
-            const isSlower = target.avg_performance_tax_pct > 0;
-            pctEl.className = `text-3xl font-black ${isSlower ? 'text-rose-400' : 'text-emerald-400'}`;
+            // For APAC, show contributing countries
+            let verdictText = `${target.category}`;
+            if (target.region === 'APAC') {
+                verdictText += ` (${target.contributing_countries} Stable Countries)`;
+            } else {
+                verdictText += ` (${target.sample_count} samples)`;
+            }
+            verdictEl.innerText = verdictText;
+
+            // Severity Mapping
+            let colorClass = 'text-rose-400'; // Default Severe
+            if (target.category === 'Optimal') colorClass = 'text-emerald-400';
+            else if (target.category === 'Moderate') colorClass = 'text-blue-400';
+            else if (target.category === 'Significant') colorClass = 'text-amber-400';
+
+            pctEl.className = `text-3xl font-black ${colorClass}`;
+        } else {
+            // Hide if data is unstable or insufficient
+            moduleContainer.classList.add('hidden');
         }
     } catch (e) {
         console.error("Tax load failed", e);
+        moduleContainer.classList.add('hidden');
     }
 }
 

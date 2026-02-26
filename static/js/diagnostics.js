@@ -129,14 +129,14 @@ function renderDiagnostics(data) {
     // Score
     const score = data.score || 0;
     document.getElementById('score-value').innerText = score;
-    const offset = 502.6 - (502.6 * score) / 10;
+    const offset = 502.6 - (502.6 * score) / 100;
     document.getElementById('score-circle').style.strokeDashoffset = offset;
 
     const scoreLabel = document.getElementById('score-label');
-    if (score >= 9) {
+    if (score >= 90) {
         scoreLabel.innerText = "Excellent: Full IPv6 Readiness";
         scoreLabel.className = "text-sm font-bold text-green-600";
-    } else if (score >= 5) {
+    } else if (score >= 50) {
         scoreLabel.innerText = "Good: Partial IPv6 Capabilities";
         scoreLabel.className = "text-sm font-bold text-amber-600";
     } else {
@@ -305,7 +305,7 @@ async function runIPTest() {
         addLog(`WebRTC IPv6 Candidate Found: ${webrtcPassed ? 'YES' : 'NO'}`, webrtcPassed ? 'success' : 'warn');
 
         data.tests.push({ name: 'WebRTC IPv6', description: 'Peer-to-peer IPv6 connectivity', passed: webrtcPassed });
-        if (webrtcPassed) data.score = Math.min(data.score + 1, 10);
+        if (webrtcPassed) data.score = Math.min(data.score + 10, 100);
 
         addLog("Finalizing session results.", 'success');
         saveDiagnosticsToHistory(data);
@@ -324,7 +324,7 @@ function copyDiagnosticsToClipboard() {
     const score = document.getElementById('score-value').innerText;
     const location = document.getElementById('location-info').innerText;
 
-    const text = `APAC IPv6 Diagnostic Results\n---------------------------\nScore: ${score}/10\nIPv4: ${ipv4}\nIPv6: ${ipv6}\nLocation: ${location}\nGenerated on: ${new Date().toLocaleString()}`;
+    const text = `APAC IPv6 Diagnostic Results\n---------------------------\nScore: ${score}/100\nIPv4: ${ipv4}\nIPv6: ${ipv6}\nLocation: ${location}\nGenerated on: ${new Date().toLocaleString()}`;
 
     navigator.clipboard.writeText(text).then(() => {
         const btn = document.getElementById('copy-results-btn');

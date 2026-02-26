@@ -73,7 +73,7 @@ def generate_visualizations(domain_data):
             ax.set_yticklabels([])
             ax.set_xticklabels([])
             ax.grid(False)
-            plt.title('Derived Infrastructure Relationships', fontsize=14, fontweight='black', pad=30, color='#f8fafc')
+            plt.title('Infrastructure Topology Reconstruction', fontsize=14, fontweight='black', pad=30, color='#f8fafc')
             plt.savefig(os.path.join(output_dir, "relationship_map.png"), bbox_inches='tight', dpi=150)
             plt.close()
         except Exception as e:
@@ -159,7 +159,7 @@ def generate_visualizations(domain_data):
 
             plt.scatter(x, y, s=s, c=s, cmap='magma', alpha=0.3, edgecolors='#f43f5e', linewidth=2)
             plt.axis('off')
-            plt.title('Global Infrastructure Density', fontsize=14, fontweight='black', pad=20)
+            plt.title('Geographic Density Visualization', fontsize=14, fontweight='black', pad=20)
             plt.savefig(os.path.join(output_dir, "infrastructure_density.png"), bbox_inches='tight', dpi=150)
             plt.close()
         except Exception as e:

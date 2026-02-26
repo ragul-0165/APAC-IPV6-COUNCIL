@@ -21,7 +21,7 @@
                 <!-- Left: Controls & Context -->
                 <div
                     class="p-10 md:col-span-5 flex flex-col justify-center border-b md:border-b-0 md:border-r border-white/10 bg-white/5 backdrop-blur-sm">
-                    <div class="flex items-center space-x-3 mb-6">
+                    <div class="flex flex-wrap items-center gap-3 mb-6">
                         <span
                             class="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/50">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -31,12 +31,15 @@
                         </span>
                         <span class="text-xs font-black uppercase tracking-[0.25em] text-blue-300">Market
                             Intelligence</span>
+                        <span
+                            class="px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[10px] font-black uppercase tracking-widest text-cyan-300 backdrop-blur-sm">IPv6-Mostly
+                            · IETF Strategy</span>
                     </div>
 
                     <h2 class="text-4xl font-black font-display mb-2 text-white tracking-tight">Economy Insight</h2>
                     <p class="text-slate-400 text-sm font-medium mb-10 leading-relaxed">
-                        Analyze real-time IPv6 capability rates across Asia-Pacific economies sourced directly from
-                        APNIC Labs.
+                        Analyze IPv6 adoption across Asia-Pacific economies using aggregated multi-source telemetry from
+                        APNIC Labs, Google IPv6 Statistics, and Cloudflare Radar.
                     </p>
 
                     <div>
@@ -103,44 +106,72 @@
 </div>
 </section>
 
-<!-- [NEW] AI Prediction Engine -->
-<section class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- [REFACTORED] AI Prediction Engine (Full Width Integration) -->
+<section>
     <div
         class="card-premium bg-white border border-gray-100 p-8 shadow-xl shadow-purple-900/5 relative overflow-hidden">
         <div class="relative z-10">
-            <div class="flex items-center justify-between mb-6">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center space-x-4">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center shadow-sm">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M13 10V3L4 14h7v7l9-11h-7z" />
                         </svg>
                     </div>
                     <div>
-                        <h3 class="text-lg font-black text-slate-900">AI Prediction Engine</h3>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Linear Trend Forecast
+                        <div class="flex items-center space-x-2">
+                            <h3 class="text-xl font-black text-slate-900">AI Prediction Engine</h3>
+                            <span class="group/tip relative cursor-help">
+                                <span class="text-xs text-slate-400">ℹ</span>
+                                <span
+                                    class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 text-[10px] text-white rounded-lg opacity-0 group-hover/tip:opacity-100 transition-opacity pointer-events-none font-bold z-50 shadow-2xl">
+                                    This forecast uses linear regression on your accumulated historical scan data to
+                                    project when the government sector will reach total IPv6 saturation.
+                                </span>
+                            </span>
+                        </div>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Linear Trend Forecast
                         </p>
                     </div>
                 </div>
-                <span id="forecast-confidence"
-                    class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-100 text-slate-400">Low
-                    Confidence</span>
+                <div class="flex items-center space-x-3">
+                    <div
+                        class="flex items-center space-x-4 text-[10px] font-black uppercase tracking-wider text-slate-400 mr-4 border-r border-slate-100 pr-4">
+                        <span class="flex items-center"><span
+                                class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>Historical Basis</span>
+                        <span class="flex items-center"><span
+                                class="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>Algorithmic Projection</span>
+                    </div>
+                    <span id="forecast-confidence"
+                        class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-100 text-slate-400">Low
+                        Confidence</span>
+                </div>
             </div>
 
-            <div class="space-y-6">
-                <div>
-                    <p class="text-xs font-bold text-slate-400 mb-1">Estimated 100% Saturation Window</p>
-                    <h4 id="forecast-date" class="text-3xl font-black text-slate-900 tracking-tight">Calculating...</h4>
-                    <p id="forecast-days" class="text-xs font-medium text-purple-600 mt-1">-- days remaining</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div class="space-y-2">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Estimated 100% Saturation
+                        Window</p>
+                    <div class="flex items-baseline space-x-3">
+                        <h4 id="forecast-date" class="text-5xl font-black text-slate-900 tracking-tighter tabular-nums">
+                            Calculating...</h4>
+                        <p id="forecast-days" class="text-sm font-bold text-purple-600">-- days remaining</p>
+                    </div>
                 </div>
 
-                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <div class="flex justify-between items-center text-xs mb-2">
-                        <span class="font-bold text-slate-500">Growth Velocity</span>
-                        <span id="forecast-rate" class="font-black text-slate-900">--% / day</span>
-                    </div>
-                    <div class="h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                        <div id="forecast-bar" class="h-full bg-purple-500 w-0 transition-all duration-1000"></div>
+                <div class="flex flex-col justify-end">
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-100">
+                        <div class="flex justify-between items-center text-xs mb-3">
+                            <span class="font-black text-slate-500 uppercase tracking-widest">Growth Velocity</span>
+                            <span id="forecast-rate" class="font-black text-slate-900 tabular-nums">--% / day</span>
+                        </div>
+                        <div class="h-2 bg-slate-200 rounded-full overflow-hidden">
+                            <div id="forecast-bar"
+                                class="h-full bg-gradient-to-r from-purple-500 to-indigo-500 w-0 transition-all duration-1000 shadow-[0_0_10px_rgba(168,85,247,0.4)]">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -148,34 +179,13 @@
 
         <!-- Bg Decor -->
         <div
-            class="absolute -right-10 -bottom-10 w-40 h-40 bg-purple-50 rounded-full blur-2xl opacity-50 pointer-events-none">
-        </div>
-    </div>
-
-    <!-- Metric Context Card -->
-    <div
-        class="card-premium bg-slate-900 text-white p-8 border border-slate-800 shadow-xl relative overflow-hidden flex flex-col justify-center">
-        <div class="relative z-10">
-            <h3 class="text-lg font-black font-display mb-2">Strategic Insight</h3>
-            <p class="text-slate-400 text-sm leading-relaxed mb-6">
-                This forecast uses linear regression on your accumulated historical scan data to project when the
-                government sector will reach total IPv6 saturation.
-            </p>
-            <div class="flex items-center space-x-4 text-xs font-bold text-slate-500">
-                <span class="flex items-center"><span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>Historical
-                    Basis</span>
-                <span class="flex items-center"><span class="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>Algorithmic
-                    Projection</span>
-            </div>
-        </div>
-        <div
-            class="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none">
+            class="absolute -right-10 -bottom-10 w-64 h-64 bg-purple-50 rounded-full blur-3xl opacity-50 pointer-events-none">
         </div>
     </div>
 </section>
 
-<!-- 5. Equality & Transparency Widgets -->
-<section class="grid grid-cols-1 md:grid-cols-2 gap-8" data-level="advanced">
+<!-- 5. Equality Widget -->
+<section class="grid grid-cols-1 gap-8" data-level="advanced">
     <div
         class="card-premium bg-gradient-to-br from-indigo-50 to-white border border-indigo-100 p-8 shadow-xl shadow-indigo-900/5 relative overflow-hidden">
         <div class="flex items-center justify-between mb-6">
@@ -219,24 +229,6 @@
             <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
                 <div id="equality-bar" class="h-full bg-indigo-500 rounded-full w-0 transition-all duration-1000"></div>
             </div>
-        </div>
-    </div>
-
-    <!-- 6. Transparency Ledger Widget -->
-    <div id="ledger-widget"
-        class="card-premium bg-slate-50 border border-slate-200 p-8 border-dashed flex flex-col items-center justify-center text-center group hover:border-slate-300 transition-all min-h-[200px]">
-        <div
-            class="w-12 h-12 rounded-full bg-white flex items-center justify-center mb-4 text-slate-300 shadow-sm border border-slate-100 group-hover:bg-slate-900 group-hover:text-white transition">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-            </svg>
-        </div>
-        <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Transparency Ledger</p>
-        <p class="text-[9px] font-bold text-slate-400 mt-1 italic">Tactical Verification Layer Incoming</p>
-
-        <div id="ledger-content" class="hidden mt-4 text-left w-full space-y-2">
-            <!-- Provisional Ledger entries populated via JS -->
         </div>
     </div>
 </section>
@@ -286,7 +278,8 @@
         </div>
     </div>
 
-    <div class="card-premium bg-slate-900 text-white p-8 border border-slate-800 shadow-xl relative overflow-hidden">
+    <div id="performance-tax-module"
+        class="card-premium bg-slate-900 text-white p-8 border border-slate-800 shadow-xl relative overflow-hidden hidden">
         <div class="flex items-center justify-between mb-6">
             <div class="flex items-center space-x-3 text-white">
                 <div class="w-10 h-10 rounded-xl bg-white/10 text-white flex items-center justify-center">
@@ -296,17 +289,17 @@
                     </svg>
                 </div>
                 <div>
-                    <h3 class="text-lg font-black">NAT64 Performance Tax</h3>
-                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Translation Latency
-                        Overhead</p>
+                    <h3 class="text-lg font-black">Translation Latency Overhead</h3>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Protocol Transition
+                        Penalty</p>
                 </div>
             </div>
             <span class="group/tip relative cursor-help">
                 <span class="text-xs text-slate-500">ℹ</span>
                 <span
                     class="absolute bottom-full right-0 mb-2 w-64 p-3 bg-white text-[9px] text-slate-900 rounded-lg opacity-0 group-hover/tip:opacity-100 transition-opacity pointer-events-none font-bold z-50 shadow-2xl">Measures
-                    the millisecond penalty and percentage overhead incurred when using NAT64 translation versus native
-                    IPv6.</span>
+                    the millisecond penalty and percentage overhead incurred when using translation layers versus native
+                    IPv6. Requires minimum 5 verified samples.</span>
             </span>
         </div>
 
@@ -375,21 +368,14 @@
 
         <div class="relative h-[500px] w-full bg-slate-100 z-0" id="apac-map">
             <!-- Map renders here -->
-            <div class="absolute inset-0 flex items-center justify-center text-slate-400 z-0">
+            <div id="map-loader" class="absolute inset-0 flex items-center justify-center text-slate-400 z-0">
                 <span class="animate-pulse">Loading Map Data...</span>
             </div>
         </div>
 
         <div
             class="bg-white p-4 border-t border-gray-100 flex justify-between items-center text-xs text-slate-500 font-medium">
-            <div class="flex items-center space-x-4">
-                <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-red-500 mr-2"></span>
-                    < 5%</span>
-                        <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-yellow-400 mr-2"></span>
-                            5-20%</span>
-                        <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-green-500 mr-2"></span>
-                            > 20%</span>
-            </div>
+            <span>&nbsp;</span>
             <span>Data: APNIC Labs (Normalized)</span>
         </div>
     </div>

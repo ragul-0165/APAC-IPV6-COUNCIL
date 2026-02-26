@@ -150,15 +150,15 @@
 
             <!-- IP Details -->
             <div class="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-blue-50/50 p-8 rounded-3xl border border-blue-100">
-                    <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2">Public IPv4 Address
-                    </p>
-                    <p id="ipv4-result" class="text-xl font-mono font-bold text-blue-900 break-all">Not detected</p>
-                </div>
                 <div class="bg-purple-50/50 p-8 rounded-3xl border border-purple-100">
                     <p class="text-[10px] font-black text-purple-400 uppercase tracking-widest mb-2">Public IPv6 Address
                     </p>
                     <p id="ipv6-result" class="text-xl font-mono font-bold text-purple-900 break-all">Not detected</p>
+                </div>
+                <div class="bg-blue-50/50 p-8 rounded-3xl border border-blue-100">
+                    <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2">Public IPv4 Address
+                    </p>
+                    <p id="ipv4-result" class="text-xl font-mono font-bold text-blue-900 break-all">Not detected</p>
                 </div>
                 <div class="bg-white p-8 rounded-3xl border border-gray-100 col-span-1 md:col-span-2 shadow-sm">
                     <div class="flex items-center justify-between">
@@ -206,20 +206,20 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- IPv4 Card -->
-                <div class="bg-blue-50 border border-blue-100 p-8 rounded-3xl flex items-center justify-between">
-                    <div>
-                        <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">IPv4 Latency</p>
-                        <p id="ipv4-latency" class="text-4xl font-black text-blue-800 tracking-tighter">-- ms</p>
-                    </div>
-                </div>
-
                 <!-- IPv6 Card -->
                 <div class="bg-purple-50 border border-purple-100 p-8 rounded-3xl flex items-center justify-between">
                     <div>
                         <p class="text-[10px] font-black text-purple-400 uppercase tracking-widest mb-1">IPv6 Latency
                         </p>
                         <p id="ipv6-latency" class="text-4xl font-black text-purple-800 tracking-tighter">-- ms</p>
+                    </div>
+                </div>
+
+                <!-- IPv4 Card -->
+                <div class="bg-blue-50 border border-blue-100 p-8 rounded-3xl flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">IPv4 Latency</p>
+                        <p id="ipv4-latency" class="text-4xl font-black text-blue-800 tracking-tighter">-- ms</p>
                     </div>
                 </div>
 

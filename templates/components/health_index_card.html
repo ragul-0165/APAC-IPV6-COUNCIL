@@ -1,0 +1,22 @@
+<div class="card-premium p-7 flex flex-col items-center justify-center text-center relative overflow-hidden group">
+    <!-- Subtle Background Pattern -->
+    <div class="absolute inset-0 opacity-[0.03] pointer-events-none group-hover:opacity-[0.05] transition-opacity">
+        <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path d="M0 100 L100 0" stroke="currentColor" stroke-width="0.5" fill="none" class="text-blue-600" />
+        </svg>
+    </div>
+
+    <p class="text-[10px] font-black text-slate-400 uppercase tracking-executive mb-6 relative z-10">Regional Health
+        Index</p>
+
+    <div class="relative mb-6 z-10">
+        <div class="flex items-baseline justify-center">
+            <span class="text-7xl font-black text-slate-900 tracking-tighter tabular-nums">{{ health.score }}</span>
+            <span class="text-lg font-extrabold text-slate-300 ml-1">/100</span>
+        </div>
+    </div>
+
+    <div class="space-y-2 relative z-10">
+        <p class="text-[12px] font-black tracking-wide text-blue-600 uppercase">{{ health.status }}</p>
+    </div>
+</div>
