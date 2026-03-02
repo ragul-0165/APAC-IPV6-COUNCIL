@@ -16,7 +16,7 @@ my_count = collection.count_documents({"country": "MY"})
 valid_ipv6 = collection.count_documents({"ipv6_capable": {"$gt": 0}})
 zero_ipv6 = collection.count_documents({"ipv6_capable": 0})
 
-print(f"✓ Total Records: {total}")
+print(f"[OK] Total Records: {total}")
 print(f"  - India: {in_count}")
 print(f"  - Malaysia: {my_count}")
 print(f"  - With IPv6 > 0%: {valid_ipv6}")

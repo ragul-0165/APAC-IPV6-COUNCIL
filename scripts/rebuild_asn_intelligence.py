@@ -17,7 +17,7 @@ logging.basicConfig(
 
 def rebuild_asn_db():
     if not db_service.connect():
-        logging.error("❌ Database connection failed")
+        logging.error("[ERROR] Database connection failed")
         return
 
     db = db_service._db
@@ -28,7 +28,7 @@ def rebuild_asn_db():
         "orgs": "asn_organizations_staging"
     }
     
-    logging.info("🧹 STEP 0: Preparing staging collections...")
+    logging.info("[CLEAN] STEP 0: Preparing staging collections...")
     for col in staging.values():
         db[col].drop()
         logging.info(f"   - Cleared {col}")
@@ -36,10 +36,10 @@ def rebuild_asn_db():
     # 2. APNIC INGESTION (INTO STAGING)
     apnic_file = os.path.join("ASN", "delegated-apnic-latest")
     if not os.path.exists(apnic_file):
-        logging.error(f"❌ Critical: {apnic_file} not found!")
+        logging.error(f"[ERROR] Critical: {apnic_file} not found!")
         return
 
-    logging.info("⚙️ STEP 1: Ingesting APNIC Registry (IN & MY) into STAGING...")
+    logging.info("[STEP] STEP 1: Ingesting APNIC Registry (IN & MY) into STAGING...")
     
     asn_docs = []
     asn_set = set() # To track uniqueness
@@ -86,13 +86,13 @@ def rebuild_asn_db():
         db[staging["registry"]].insert_many(asn_docs)
         logging.info(f"   - Staged {len(asn_docs)} ASNs (IN: {count_in}, MY: {count_my})")
     else:
-        logging.error("❌ No ASNs found for IN/MY in APNIC file!")
+        logging.error("[ERROR] No ASNs found for IN/MY in APNIC file!")
         return
 
     # 3. CAIDA ORG MAPPING (INTO STAGING)
     caida_file = os.path.join("ASN", "20260101.as-org2info.jsonl")
     if os.path.exists(caida_file):
-        logging.info("⚙️ STEP 2: Mapping Organizations via CAIDA to STAGING...")
+        logging.info("[STEP] STEP 2: Mapping Organizations via CAIDA to STAGING...")
         org_docs = []
         batch_size = 5000
         matched_count = 0
@@ -130,11 +130,11 @@ def rebuild_asn_db():
         logging.info(f"   - Staged {matched_count} organizations.")
 
     # 4. FINAL ATOMIC SWAP
-    logging.info("⚙️ STEP 3: Performing Atomic Swap to Production...")
+    logging.info("[STEP] STEP 3: Performing Atomic Swap to Production...")
     db_service.swap_collection(staging["registry"], "ASN_REGISTRY")
     db_service.swap_collection(staging["orgs"], "ASN_ORGANIZATIONS")
 
-    logging.info("✅ Database Rebuild Complete (Production Updated Atomically).")
+    logging.info("[SUCCESS] Database Rebuild Complete (Production Updated Atomically).")
 
 if __name__ == "__main__":
     rebuild_asn_db()

@@ -13,8 +13,8 @@
 
     <!-- Hero / Control Section -->
     <div
-        class="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-xl shadow-slate-200/50 relative overflow-hidden">
-        <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        class="bg-white rounded-[1.5rem] lg:rounded-[2.5rem] p-6 lg:p-8 border border-gray-100 shadow-xl shadow-slate-200/50 relative overflow-hidden">
+        <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
             <div class="lg:col-span-8">
                 <div class="flex items-center space-x-3 mb-4">
                     <span
@@ -23,25 +23,26 @@
                     <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Independent Analysis</span>
                 </div>
 
-                <div class="flex items-center justify-between">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div>
-                        <h2 class="text-4xl font-black text-slate-900 mb-4 font-display">Government Digital Readiness
+                        <h2 class="text-2xl lg:text-4xl font-black text-slate-900 mb-4 font-display">Government Digital
+                            Readiness
                         </h2>
-                        <p class="text-slate-500 text-lg leading-relaxed max-w-2xl font-medium">
+                        <p class="text-slate-500 text-sm lg:text-lg leading-relaxed max-w-2xl font-medium">
                             Monitoring the adoption of IPv6, DNSSEC, and modern standards across Asia-Pacific government
                             infrastructure.
                         </p>
                     </div>
                     <!-- [NEW] PDF Button -->
                     <button onclick="generatePDFReport()"
-                        class="hidden md:flex flex-col items-center justify-center bg-slate-900 hover:bg-slate-800 text-white w-24 h-24 rounded-2xl shadow-xl shadow-slate-900/20 transition-all active:scale-95 group">
-                        <svg class="w-8 h-8 mb-2 group-hover:-translate-y-1 transition" fill="none"
+                        class="flex flex-col items-center justify-center bg-slate-900 hover:bg-slate-800 text-white w-20 h-20 lg:w-24 lg:h-24 rounded-2xl shadow-xl shadow-slate-900/20 transition-all active:scale-95 group">
+                        <svg class="w-6 h-6 lg:w-8 lg:h-8 mb-2 group-hover:-translate-y-1 transition" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                         <span
-                            class="text-[9px] font-black uppercase tracking-widest text-slate-400 group-hover:text-white transition">Briefing</span>
+                            class="text-[8px] lg:text-[9px] font-black uppercase tracking-widest text-slate-400 group-hover:text-white transition">Briefing</span>
                     </button>
                 </div>
             </div>

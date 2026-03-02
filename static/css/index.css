@@ -30,6 +30,31 @@ body {
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+@media (max-width: 1024px) {
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 100;
+        box-shadow: 20px 0 50px rgba(0, 0, 0, 0.2);
+        transform: translateX(0);
+        visibility: visible;
+    }
+
+    .sidebar.sidebar-hidden {
+        transform: translateX(-100%);
+        visibility: hidden;
+        box-shadow: none;
+    }
+
+    main {
+        padding-left: 0 !important;
+        width: 100vw;
+        overflow-x: hidden;
+    }
+}
+
 .nav-link {
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
@@ -110,6 +135,17 @@ body {
     background: #cbd5e1;
 }
 
+/* Responsive Table Wrapper */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+table {
+    min-width: 600px;
+}
+
 /* Map Interactivity & Tooltips */
 .map-tooltip {
     background: rgba(15, 23, 42, 0.9) !important;
@@ -173,6 +209,34 @@ body {
     overflow: hidden;
     transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     transform-origin: bottom right;
+}
+
+@media (max-width: 768px) {
+    .ai-chat-window {
+        width: calc(100% - 40px);
+        right: 20px;
+        left: 20px;
+        bottom: 90px;
+        height: 70vh;
+    }
+
+    .ai-hub-fab {
+        right: 20px;
+        bottom: 20px;
+    }
+
+    body {
+        flex-direction: column;
+    }
+
+    header {
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
+    }
+
+    .p-10 {
+        padding: 1.5rem !important;
+    }
 }
 
 .ai-chat-window.hidden {

@@ -179,15 +179,15 @@ class MongoDBService:
             self._create_indexes()
             
             self.is_connected = True
-            logging.info(f"✓ MongoDB Atlas connected: {self.db_name}")
+            logging.info(f"[OK] MongoDB Atlas connected: {self.db_name}")
             return True
             
         except (ConnectionFailure, ServerSelectionTimeoutError) as e:
-            logging.error(f"✗ MongoDB connection failed: {e}")
+            logging.error(f"[ERROR] MongoDB connection failed: {e}")
             self.is_connected = False
             return False
         except Exception as e:
-            logging.error(f"✗ Unexpected MongoDB error: {e}")
+            logging.error(f"[ERROR] Unexpected MongoDB error: {e}")
             self.is_connected = False
             return False
     
@@ -240,7 +240,7 @@ class MongoDBService:
             self._db.bgp_topology.create_index([("downstream_asn", ASCENDING), ("upstream_asn", ASCENDING)], unique=True)
             self._db.bgp_topology.create_index([("upstream_asn", ASCENDING)]) # For finding who relies on this ISP
             
-            logging.info("✓ MongoDB indexes created successfully")
+            logging.info("[OK] MongoDB indexes created successfully")
             
         except Exception as e:
             logging.warning(f"Index creation warning: {e}")
@@ -364,7 +364,7 @@ class MongoDBService:
                     })
                 else:
                     self._db.create_collection(coll_name, validator={"$jsonSchema": schema})
-                logging.info(f"✓ Applied schema validation to {coll_name}")
+                logging.info(f"[OK] Applied schema validation to {coll_name}")
             except Exception as e:
                 logging.warning(f"Could not apply schema to {coll_name}: {e}")
 

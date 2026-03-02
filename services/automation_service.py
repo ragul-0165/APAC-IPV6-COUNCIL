@@ -77,34 +77,34 @@ class AutomationService:
         )
 
         self.scheduler.start()
-        self.logger.info("🚀 Automation Service Started (Pulse Engine Active)")
+        self.logger.info("[START] Automation Service Started (Pulse Engine Active)")
 
         # 5. Startup Check: Record snapshot if missing for today
         self.record_daily_snapshots(startup_check=True)
 
     def sync_ipv6_scores(self):
         """Wrapper for fetch_ipv6_realtime logic."""
-        self.logger.info("📅 Starting Daily IPv6 Score Sync...")
+        self.logger.info("[INFO] Starting Daily IPv6 Score Sync...")
         try:
             fetch_apnic_labs_data()
             self._update_sync_metadata("ipv6_capability")
         except Exception as e:
-            self.logger.error(f"❌ Daily IPv6 Sync Failed: {e}")
+            self.logger.error(f"[ERROR] Daily IPv6 Sync Failed: {e}")
 
     def sync_registry_and_orgs(self):
         """Wrapper for rebuild_asn_intelligence logic."""
-        self.logger.info("📅 Starting Weekly ASN Registry/Org Sync...")
+        self.logger.info("[INFO] Starting Weekly ASN Registry/Org Sync...")
         try:
             rebuild_asn_db()
             self._update_sync_metadata("asn_registry")
             # Also fetch IPv6 scores after a registry rebuild to ensure consistency
             fetch_apnic_labs_data()
         except Exception as e:
-            self.logger.error(f"❌ Weekly ASN Sync Failed: {e}")
+            self.logger.error(f"[ERROR] Weekly ASN Sync Failed: {e}")
 
     def sync_sector_data(self):
         """Refreshes Academic and Government sector databases."""
-        self.logger.info("📅 Starting Weekly Sector Data Sync (Edu/Gov)...")
+        self.logger.info("[INFO] Starting Weekly Sector Data Sync (Edu/Gov)...")
         try:
             sync_authentic_data() # Edu
             sync_authentic_gov_data() # Gov
@@ -112,7 +112,7 @@ class AutomationService:
             # After sync, record snapshot for fresh data
             self.record_daily_snapshots()
         except Exception as e:
-            self.logger.error(f"❌ Weekly Sector Sync Failed: {e}")
+            self.logger.error(f"[ERROR] Weekly Sector Sync Failed: {e}")
 
     def record_daily_snapshots(self, startup_check=False):
         """
@@ -129,14 +129,14 @@ class AutomationService:
                     "sector": "government"
                 })
                 if existing:
-                    self.logger.info("📅 Snapshot for today already exists, skipping startup record.")
+                    self.logger.info("[INFO] Snapshot for today already exists, skipping startup record.")
                     return
 
         # [NEW] Emergency Clean: If a 0% snapshot was already recorded for today, wipe it so math doesn't break
         if db_service.connect():
             db_service._db[db_service.COLLECTION_REGISTRY['HISTORY_LOGS']].delete_many({"date": today, "ready": 0})
 
-        self.logger.info(f"📅 Recording daily adoption snapshots for {today}...")
+        self.logger.info(f"[INFO] Recording daily adoption snapshots for {today}...")
         try:
             gov_service = APACDomainMonitorService()
             edu_service = APACEduMonitorService()
@@ -148,13 +148,13 @@ class AutomationService:
                 ready_count = sum(1 for country in gov_results for domain in gov_results[country] if domain.get('ipv6_web'))
                 if ready_count > 0:
                     gov_service.save_history(gov_results)
-                    self.logger.info(f"✓ Regional Government snapshot recorded.")
+                    self.logger.info(f"[OK] Regional Government snapshot recorded.")
                     
                     # Per-Country Snapshots
                     for country_code, domains in gov_results.items():
                         gov_service.save_country_history(country_code, domains)
                 else:
-                    self.logger.warning("⚠ Skipping Gov snapshot: No 'ready' domains found.")
+                    self.logger.warning("[WARN] Skipping Gov snapshot: No 'ready' domains found.")
                 
             # 2. Education Snapshots
             edu_results = edu_service.get_results()
@@ -163,16 +163,16 @@ class AutomationService:
                 ready_count = sum(1 for country in edu_results for domain in edu_results[country] if domain.get('ipv6_web'))
                 if ready_count > 0:
                     edu_service.save_history(edu_results)
-                    self.logger.info(f"✓ Regional Education snapshot recorded.")
+                    self.logger.info(f"[OK] Regional Education snapshot recorded.")
                     
                     # Per-Country Snapshots
                     for country_code, domains in edu_results.items():
                         edu_service.save_country_history(country_code, domains)
                 else:
-                    self.logger.warning("⚠ Skipping Edu snapshot: No 'ready' domains found.")
+                    self.logger.warning("[WARN] Skipping Edu snapshot: No 'ready' domains found.")
                 
         except Exception as e:
-            self.logger.error(f"❌ Snapshot recording failed: {e}")
+            self.logger.error(f"[ERROR] Snapshot recording failed: {e}")
 
     def _update_sync_metadata(self, layer):
         """Records the success of a sync operation in MongoDB."""

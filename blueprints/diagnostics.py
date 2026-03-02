@@ -85,7 +85,8 @@ def ipv6_test():
         # Fallback: Check if request source is IPv6 if client detection failed
         remote_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
         if remote_ip and ',' in remote_ip: remote_ip = remote_ip.split(',')[0].strip()
-        is_request_v6 = remote_ip and ':' in remote_ip and '.' not in remote_ip
+        # Strictly check for a real external IPv6 request (excludes loopback ::1)
+        is_request_v6 = remote_ip and ':' in remote_ip and '.' not in remote_ip and remote_ip != '::1'
         
         has_ipv6 = ipv6 not in ['None', 'Unknown', None, '::1'] or is_request_v6
         if has_ipv6:

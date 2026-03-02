@@ -43,10 +43,10 @@ class LedgerService:
         
         try:
             self.collection.insert_one(entry)
-            logging.info(f"📜 Ledger: Recorded {op_type} for {target}")
+            logging.info(f"[LEDGER] Ledger: Recorded {op_type} for {target}")
             return entry["checksum"]
         except Exception as e:
-            logging.error(f"❌ Failed to record ledger entry: {e}")
+            logging.error(f"[ERROR] Failed to record ledger entry: {e}")
             return None
 
     def get_provenance(self, target):
@@ -54,7 +54,7 @@ class LedgerService:
         try:
             return list(self.collection.find({"target": target}).sort("timestamp", -1))
         except Exception as e:
-            logging.error(f"❌ Failed to retrieve provenance for {target}: {e}")
+            logging.error(f"[ERROR] Failed to retrieve provenance for {target}: {e}")
             return []
 
     def verify_ledger(self):
@@ -73,7 +73,7 @@ class LedgerService:
                     })
             return invalid_entries
         except Exception as e:
-            logging.error(f"❌ Ledger verification failed: {e}")
+            logging.error(f"[ERROR] Ledger verification failed: {e}")
             return None
 
 # Global Singleton

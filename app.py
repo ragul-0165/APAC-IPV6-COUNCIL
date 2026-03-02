@@ -1,7 +1,18 @@
-from flask import Flask, render_template, redirect, url_for, jsonify
 import os
 import logging
 import atexit
+
+# Configure logging at the very top to ensure it takes effect immediately
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('app.log'),
+        logging.StreamHandler()
+    ]
+)
+
+from flask import Flask, render_template, redirect, url_for, jsonify
 from blueprints.diagnostics import diagnostics_bp
 from blueprints.domains import domains_bp
 from blueprints.ietf import ietf_bp
@@ -21,25 +32,15 @@ app = Flask(__name__, static_folder='static')
 # Ensure output directory exists for visualizations
 os.makedirs('static/output', exist_ok=True)
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('app.log'),
-        logging.StreamHandler()
-    ]
-)
-
 # Initialize MongoDB connection
 logging.info("Initializing MongoDB connection...")
 if db_service.connect():
-    logging.info("✓ MongoDB Atlas connected successfully")
+    logging.info("[OK] MongoDB Atlas connected successfully")
     # Start background automation pulse (only in main process to avoid duplicates in debug mode)
     if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
         automation_service.start()
 else:
-    logging.warning("⚠ MongoDB connection failed - services will use JSON fallback")
+    logging.warning("[WARN] MongoDB connection failed - services will use JSON fallback")
 
 # Register cleanup handler for graceful shutdown
 def cleanup():

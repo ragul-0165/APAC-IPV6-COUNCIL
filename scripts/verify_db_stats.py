@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO)
 def verify_db_backed_stats():
     """Verify that StatsService pulls data from MongoDB."""
     if not db_service.connect():
-        print("❌ MongoDB connection failed.")
+        print("[ERROR] MongoDB connection failed.")
         return
 
     service = StatsService()
@@ -22,20 +22,20 @@ def verify_db_backed_stats():
     print("\n--- Testing Single Country Fetch (India) ---")
     india_stats = service.get_apac_ipv6_stats('IN')
     if india_stats:
-        print(f"✅ Success: {india_stats}")
+        print(f"[SUCCESS] Success: {india_stats}")
     else:
-        print("❌ Failed to fetch stats for 'IN'.")
+        print("[ERROR] Failed to fetch stats for 'IN'.")
 
     print("\n--- Testing Bulk Fetch (All countries) ---")
     all_stats = service.get_all_apac_ipv6_stats()
     if all_stats and len(all_stats) > 0:
-        print(f"✅ Success: Found {len(all_stats)} records.")
+        print(f"[SUCCESS] Success: Found {len(all_stats)} records.")
         # Print a few examples
         samples = list(all_stats.keys())[:5]
         for s in samples:
             print(f"  - {s}: {all_stats[s]['ipv6_adoption']}%")
     else:
-        print("❌ Failed to fetch all stats.")
+        print("[ERROR] Failed to fetch all stats.")
 
 if __name__ == "__main__":
     verify_db_backed_stats()

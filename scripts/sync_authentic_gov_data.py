@@ -82,7 +82,7 @@ def sync_authentic_gov_data():
         print(f"Initializing {len(all_scans)} fresh scan results...")
         gov_scans_col.insert_many(all_scans)
 
-    print("\n✓ Synchronization complete!")
+    print("\n[OK] Synchronization complete!")
     print(f"- {len(data)} Countries synced")
     print(f"- {len(all_domains)} Authentic government infrastructures loaded")
     print("\nNext: Execute a force scan to populate live IPv6 status.")

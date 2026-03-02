@@ -88,7 +88,7 @@ def sync_authentic_data():
         print(f"Initializing {len(unique_scans)} fresh scan results...")
         edu_scans_col.insert_many(unique_scans)
 
-    print("\n✓ Synchronization complete!")
+    print("\n[OK] Synchronization complete!")
     print(f"- {len(data)} Countries synced")
     print(f"- {len(all_domains)} Authentic institutions loaded")
     print("\nNext: Users should click 'Refresh Sector Data' on the dashboard to scan these real sites.")

@@ -23,7 +23,7 @@ def fetch_apnic_labs_data():
     Uses Atomic Swap to prevent dashboard downtime.
     """
     if not db_service.connect():
-        logging.error("❌ Database connection failed")
+        logging.error("[ERROR] Database connection failed")
         return
 
     db = db_service._db
@@ -35,7 +35,7 @@ def fetch_apnic_labs_data():
     # 2. Get list of ASNs we care about from Production Registry
     registry_coll = db_service.COLLECTION_REGISTRY["ASN_REGISTRY"]
     allowed_asns = set(doc['asn'] for doc in db[registry_coll].find({}, {'asn': 1}))
-    logging.info(f"🎯 Targeting {len(allowed_asns)} ASNs for IPv6 scoring...")
+    logging.info(f"[INFO] Targeting {len(allowed_asns)} ASNs for IPv6 scoring...")
 
     # 3. Fetch Data
     urls = [
@@ -46,7 +46,7 @@ def fetch_apnic_labs_data():
     
     response = None
     for url in urls:
-        logging.info(f"⚙️ Fetching from: {url}...")
+        logging.info(f"[FETCH] Fetching from: {url}...")
         try:
             response = requests.get(url, timeout=60)
             response.raise_for_status()
@@ -57,13 +57,13 @@ def fetch_apnic_labs_data():
             
     csv_text = None
     if not response and os.path.exists(local_csv):
-        logging.info(f"📁 Using local data from {local_csv}...")
+        logging.info(f"[LOCAL] Using local data from {local_csv}...")
         with open(local_csv, 'r', encoding='utf-8') as f:
             csv_text = f.read()
     elif response:
         csv_text = response.text
     else:
-        logging.error("❌ FAILED to fetch APNIC Labs CSV. Aborting sync.")
+        logging.error("[ERROR] FAILED to fetch APNIC Labs CSV. Aborting sync.")
         return
     
     # 4. Parse CSV
@@ -104,11 +104,11 @@ def fetch_apnic_labs_data():
         target_key = "ASN_READINESS"
         
         if db_service.swap_collection(staging_coll, target_key):
-            logging.info(f"✅ SUCCESS: IPv6 Scores updated atomically ({matched} ASNs).")
+            logging.info(f"[SUCCESS] IPv6 Scores updated atomically ({matched} ASNs).")
         else:
-            logging.error("❌ FAILED: Atomic swap failed.")
+            logging.error("[ERROR] FAILED: Atomic swap failed.")
     else:
-        logging.warning("⚠️ No matching IPv6 scores found.")
+        logging.warning("[WARN] No matching IPv6 scores found.")
 
 if __name__ == "__main__":
     fetch_apnic_labs_data()

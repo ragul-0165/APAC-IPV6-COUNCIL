@@ -45,13 +45,21 @@
     </div>
 
     <!-- Sidebar Navigation -->
-    <aside class="sidebar h-screen sticky top-0 flex flex-col p-6 z-50">
-        <div class="flex items-center space-x-4 mb-10 px-2">
-            <div
-                class="w-10 h-10 rounded-xl shadow-lg shadow-blue-500/20 overflow-hidden bg-white flex items-center justify-center border border-gray-100">
-                <img src="/static/images/logo.png" alt="Logo" class="w-8 h-8 object-contain">
+    <aside id="main-sidebar" class="sidebar h-screen sticky top-0 flex flex-col p-6 z-50">
+        <div class="flex items-center justify-between mb-10 px-2">
+            <div class="flex items-center space-x-4">
+                <div
+                    class="w-10 h-10 rounded-xl shadow-lg shadow-blue-500/20 overflow-hidden bg-white flex items-center justify-center border border-gray-100">
+                    <img src="/static/images/logo.png" alt="Logo" class="w-8 h-8 object-contain">
+                </div>
+                <span class="text-xl font-black tracking-tighter text-slate-800 uppercase">APAC IPv6</span>
             </div>
-            <span class="text-xl font-black tracking-tighter text-slate-800 uppercase">APAC IPv6</span>
+            <!-- Mobile Close Button -->
+            <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-slate-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
         </div>
 
         <nav class="flex-1 space-y-2">
@@ -160,9 +168,19 @@
     <main class="flex-1 relative overflow-auto">
         <!-- Top Toolbar -->
         <header
-            class="sticky top-0 bg-white/60 backdrop-blur-md border-b border-gray-100 z-40 px-10 py-6 flex justify-between items-center">
-            <h1 class="text-xl font-black text-slate-900 tracking-tight">{% block header_title %}Overview{% endblock %}
-            </h1>
+            class="sticky top-0 bg-white/60 backdrop-blur-md border-b border-gray-100 z-40 px-6 lg:px-10 py-6 flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <!-- Hamburger Menu Button -->
+                <button onclick="toggleSidebar()" class="lg:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-xl">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+                <h1 class="text-xl font-black text-slate-900 tracking-tight">{% block header_title %}Overview{% endblock
+                    %}
+                </h1>
+            </div>
             <div class="flex items-center space-x-4">
                 <div class="bg-gray-100 px-4 py-2 rounded-xl text-xs font-bold text-gray-500 border border-gray-200">
                     APAC 2025 Edition
@@ -230,6 +248,54 @@
             </div>
         </div>
     </div>
+
+    <!-- Mobile Sidebar Overlay -->
+    <div id="sidebar-overlay" onclick="toggleSidebar()"
+        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] hidden opacity-0 transition-opacity duration-300">
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('main-sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+
+            if (window.innerWidth < 1024) {
+                const isHidden = sidebar.classList.contains('sidebar-hidden');
+
+                if (isHidden) {
+                    // Open
+                    sidebar.classList.remove('sidebar-hidden');
+                    overlay.classList.remove('hidden');
+                    setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    // Close
+                    sidebar.classList.add('sidebar-hidden');
+                    overlay.classList.add('opacity-0');
+                    setTimeout(() => {
+                        if (sidebar.classList.contains('sidebar-hidden')) {
+                            overlay.classList.add('hidden');
+                        }
+                    }, 300);
+                    document.body.style.overflow = '';
+                }
+            }
+        }
+
+        // Global initialization
+        function initResponsiveness() {
+            const sidebar = document.getElementById('main-sidebar');
+            if (window.innerWidth < 1024) {
+                sidebar.classList.add('sidebar-hidden');
+            } else {
+                sidebar.classList.remove('sidebar-hidden');
+                document.body.style.overflow = '';
+            }
+        }
+
+        window.addEventListener('resize', initResponsiveness);
+        window.addEventListener('DOMContentLoaded', initResponsiveness);
+    </script>
 
     <script type="module">
         import { CountryState } from '/static/js/global_state.js';
