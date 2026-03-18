@@ -90,18 +90,18 @@
     </div>
 
     <!-- Detailed Institutional Roster -->
-    <div class="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-sm">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+    <div class="card-premium p-0 overflow-hidden">
+        <div class="p-8 border-b border-white/5 bg-white/5 flex flex-col md:flex-row md:items-center justify-between gap-6 overflow-hidden">
             <div>
-                <h3 class="text-2xl font-black text-slate-900 tracking-tight">Campus Compliance Catalog</h3>
+                <h3 class="text-xl font-black text-white font-display">Campus Compliance Catalog</h3>
                 <p class="text-slate-400 font-bold text-xs uppercase tracking-widest mt-1">Real-time Technical Audit</p>
             </div>
 
             <div class="flex items-center gap-3">
-                <div class="flex items-center gap-2 bg-slate-50 border border-slate-100 rounded-xl px-3 py-2">
+                <div class="flex items-center gap-2 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2">
                     <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Authority:</span>
                     <select id="data-source-select" onchange="handleSourceChange()"
-                        class="bg-transparent text-xs font-bold text-slate-700 outline-none cursor-pointer">
+                        class="bg-transparent text-xs font-bold text-slate-300 outline-none cursor-pointer">
                         <option value="INTERNAL">Active Hub Scans</option>
                         <option value="APNIC">APNIC Labs official</option>
                         <option value="Google">Google Traffic data</option>
@@ -109,30 +109,30 @@
                     </select>
                 </div>
                 <select id="country-filter"
-                    class="bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-600 outline-none focus:ring-2 focus:ring-indigo-500/20 transition">
+                    class="bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2 text-xs font-bold outline-none focus:ring-2 focus:ring-indigo-500/20 transition">
                     <option value="ALL">Global Sector View</option>
                 </select>
             </div>
         </div>
 
         <div class="overflow-x-auto">
-            <table class="w-full">
+            <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="text-left border-b border-slate-50">
-                        <th class="pb-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Institution /
+                    <tr class="bg-white/5 border-b border-white/5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                        <th class="p-6">Institution /
                             Domain</th>
-                        <th class="pb-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">IPv6 DNS</th>
-                        <th class="pb-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">IPv6 Web</th>
-                        <th class="pb-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Service Matrix
+                        <th class="p-6">IPv6 DNS</th>
+                        <th class="p-6">IPv6 Web</th>
+                        <th class="p-6">Service Matrix
                         </th>
-                        <th class="pb-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Efficiency (v4
+                        <th class="p-6">Efficiency (v4
                             vs v6)</th>
-                        <th class="pb-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">DNSSEC</th>
-                        <th class="pb-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Last
+                        <th class="p-6">DNSSEC</th>
+                        <th class="p-6 text-right">Last
                             Audit</th>
                     </tr>
                 </thead>
-                <tbody id="edu-table-body" class="divide-y divide-slate-50">
+                <tbody id="edu-table-body" class="text-sm font-bold text-slate-300 divide-y divide-white/5">
                     <!-- Data injected by JS -->
                 </tbody>
             </table>

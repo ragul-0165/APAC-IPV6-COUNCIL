@@ -38,7 +38,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const response = await fetch(`/lab/api/apac/ipv6?country=${country}`);
                 if (!response.ok) throw new Error('Failed to fetch country stats');
                 const data = await response.json();
-                rate = data.ipv6_adoption || 0;
+
+                // NEW: prefer AI optimized adoption if available
+                rate = data.ai_optimized_rate ?? data.ipv6_adoption ?? 0;
+
                 label = `Live: ${data.country || country}`;
             }
 

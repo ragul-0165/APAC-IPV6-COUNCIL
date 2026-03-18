@@ -137,17 +137,17 @@ function updateTable(results, filterCountry = 'ALL') {
 
         domains.forEach(d => {
             const row = `
-                <tr class="hover:bg-slate-50/50 transition">
-                    <td class="py-5">
-                        <p class="text-sm font-black text-slate-900">${d.domain}</p>
+                <tr class="hover:bg-white/5 transition border-b border-white/5 last:border-0">
+                    <td class="p-6">
+                        <p class="text-sm font-bold text-white">${d.domain}</p>
                         <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">${countryName} Sector</p>
                     </td>
-                    <td>${getStatusBadge(d.ipv6_dns)}</td>
-                    <td>${getStatusBadge(d.ipv6_web)}</td>
-                    <td>${getServiceMatrixBadge(d.service_matrix)}</td>
-                    <td>${getPerformanceBadge(d.ipv4_rtt_ms, d.ipv6_rtt_ms)}</td>
-                    <td>${getStatusBadge(d.dnssec)}</td>
-                    <td class="text-right">
+                    <td class="p-6">${getStatusBadge(d.ipv6_dns)}</td>
+                    <td class="p-6">${getStatusBadge(d.ipv6_web)}</td>
+                    <td class="p-6">${getServiceMatrixBadge(d.service_matrix)}</td>
+                    <td class="p-6">${getPerformanceBadge(d.ipv4_rtt_ms, d.ipv6_rtt_ms)}</td>
+                    <td class="p-6">${getStatusBadge(d.dnssec)}</td>
+                    <td class="p-6 text-right">
                         <span class="text-[10px] font-bold text-slate-500 font-mono">${d.checked_at ? new Date(d.checked_at).toLocaleDateString() : 'Pending'}</span>
                     </td>
                 </tr>
@@ -211,12 +211,12 @@ function changePage(delta) {
 
 function getStatusBadge(status) {
     if (status) {
-        return `<span class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border border-emerald-100">
-            <span class="w-1 h-1 bg-emerald-500 rounded-full animate-pulse"></span> Valid
+        return `<span class="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border border-emerald-500/20">
+            <span class="w-1 h-1 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></span> Active
         </span>`;
     }
-    return `<span class="inline-flex items-center gap-1.5 bg-rose-50 text-rose-600 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border border-rose-100">
-        Missing
+    return `<span class="inline-flex items-center gap-1.5 bg-slate-100 text-slate-500 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider">
+        <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg> No
     </span>`;
 }
 

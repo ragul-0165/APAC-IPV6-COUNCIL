@@ -22,10 +22,19 @@ class IntelligenceService:
                 logger.warning("Insufficient data for Strategic Horizon")
                 return []
 
-            # Calculate regional averages for thresholds
-            total_adoption = 0
-            total_growth = 0
-            valid_countries = 0
+            # Fetch historical data (365 days ago) for all countries to calculate growth velocity
+            from datetime import datetime, timedelta
+            target_date = (datetime.now() - timedelta(days=365)).strftime("%Y-%m-%d")
+            
+            hist_pipeline = [
+                {"$match": {"date": {"$lte": target_date}, "sector": "government"}},
+                {"$sort": {"date": -1}},
+                {"$group": {
+                    "_id": "$country",
+                    "historical_rate": {"$first": "$rate"}
+                }}
+            ]
+            historical_stats = {h['_id']: h['historical_rate'] for h in db_service._db['history_logs'].aggregate(hist_pipeline)}
 
             data_points = []
             for stat in countries_stats:
@@ -33,18 +42,15 @@ class IntelligenceService:
                 country_code = stat.get('country_code', 'Unknown')
                 adoption = stat.get('ipv6_adoption', 0)
                 
-                # Dynamic Growth Calculation (simplified for now: using a 'yoy_growth' field if exists, 
-                # or calculating from history if available. Falling back to a stable avg for mock-like realism)
-                # In a real scenario, we'd compare current vs historical in DB.
-                growth = stat.get('yoy_growth', 0) 
+                # Fetch historical rate from our grouped aggregation
+                prev_adoption = historical_stats.get(country_code)
                 
-                # If mock data was recently injected into DB, it might be here.
-                # If not, let's derive it or provide a realistic spread for 'Policy-grade' feel
-                if growth == 0 and adoption > 0:
-                    # Provide realistic variance if real growth is missing
-                    # This ensures the scatter plot is populated and meaningful
-                    import random
-                    growth = round(random.uniform(-0.5, 5.0), 2)
+                if prev_adoption is not None:
+                    # True YoY growth (last 12 months)
+                    growth = adoption - prev_adoption
+                else:
+                    # Fallback if no history exists: use existing yoy_growth or default to 0
+                    growth = stat.get('yoy_growth', 0)
 
                 data_points.append({
                     'country': country_code,

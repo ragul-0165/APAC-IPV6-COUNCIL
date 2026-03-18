@@ -7,14 +7,14 @@
 <div class="max-w-6xl mx-auto space-y-10 pb-20">
     <!-- Test Control Hero -->
     <div
-        class="bg-gradient-to-br from-blue-600 to-blue-800 rounded-[2.5rem] p-12 text-white shadow-2xl relative overflow-hidden group">
+        class="bg-gradient-to-br from-blue-600/30 to-blue-800/30 backdrop-blur-2xl rounded-[2.5rem] p-12 text-white border border-white/10 shadow-2xl relative overflow-hidden group">
         <div class="relative z-10 flex flex-col items-center text-center space-y-8">
-            <h2 class="text-4xl font-black tracking-tight font-display">Is your network future-ready?</h2>
-            <p class="text-blue-100 max-w-xl font-medium text-lg leading-relaxed">Perform a comprehensive analysis of
+            <h2 class="text-4xl font-black tracking-tight font-display text-white">Is your network future-ready?</h2>
+            <p class="text-blue-100/80 max-w-xl font-medium text-lg leading-relaxed">Perform a comprehensive analysis of
                 your NAT64, DNS64, and dual-stack capabilities using our industry-standard diagnostic engine.</p>
 
             <button onclick="runIPTest()"
-                class="bg-white text-blue-600 px-12 py-5 rounded-2xl font-black hover:bg-blue-50 transition shadow-2xl shadow-blue-500/40 active:scale-95 flex items-center gap-4">
+                class="bg-white text-blue-600 px-12 py-5 rounded-2xl font-black hover:bg-blue-50 transition shadow-2xl shadow-blue-500/20 active:scale-95 flex items-center gap-4">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
@@ -40,23 +40,23 @@
     <!-- [NEW] IPv6 Guide & Controls -->
     <div class="space-y-6">
         <!-- Collapsible Guide -->
-        <div class="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
+        <div class="glass-container overflow-hidden">
             <button onclick="document.getElementById('ipv6-guide').classList.toggle('hidden')"
-                class="w-full p-6 flex justify-between items-center bg-slate-50 hover:bg-slate-100 transition ">
+                class="w-full p-6 flex justify-between items-center bg-white/5 hover:bg-white/10 transition ">
                 <div class="flex items-center space-x-4">
-                    <span class="p-2 bg-blue-100 text-blue-600 rounded-lg"><svg class="w-5 h-5" fill="none"
+                    <span class="p-2 bg-blue-500/20 text-blue-400 rounded-lg"><svg class="w-5 h-5" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg></span>
-                    <span class="font-bold text-slate-700">What do these tests mean?</span>
+                    <span class="font-bold text-white">What do these tests mean?</span>
                 </div>
-                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
             </button>
-            <div id="ipv6-guide" class="hidden p-6 text-sm text-slate-600 leading-relaxed grid gap-4 bg-white">
-                <p><strong class="text-slate-900">IPv6:</strong> The next-generation protocol for the internet,
+            <div id="ipv6-guide" class="hidden p-6 text-sm text-slate-400 leading-relaxed grid gap-4 bg-transparent border-t border-white/5">
+                <p><strong class="text-white">IPv6:</strong> The next-generation protocol for the internet,
                     providing infinite addresses compared to the older IPv4.</p>
                 <div class="grid md:grid-cols-3 gap-6">
                     <div>
@@ -119,26 +119,26 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
             <!-- Score Card -->
             <div
-                class="lg:col-span-5 bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-xl shadow-blue-500/5 flex flex-col justify-between">
+                class="lg:col-span-5 card-premium rounded-[2.5rem] p-10 flex flex-col justify-between">
                 <div>
-                    <h3 class="text-xl font-black text-gray-900 mb-2 font-display">Readiness Certificate</h3>
-                    <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">Connectivity Audit Rating</p>
+                    <h3 class="text-xl font-black text-white mb-2 font-display">Readiness Certificate</h3>
+                    <p class="text-xs text-slate-500 font-bold uppercase tracking-widest">Connectivity Audit Rating</p>
                 </div>
 
                 <div class="py-12 flex items-center justify-center">
                     <div class="relative">
                         <svg class="w-48 h-48 transform -rotate-90">
-                            <circle class="text-gray-100" stroke-width="12" stroke="currentColor" fill="transparent"
+                            <circle class="text-white/5" stroke-width="12" stroke="currentColor" fill="transparent"
                                 r="80" cx="96" cy="96" />
-                            <circle id="score-circle" class="text-blue-600 transition-all duration-1000"
+                            <circle id="score-circle" class="text-blue-500 transition-all duration-1000 shadow-[0_0_20px_rgba(59,130,246,0.4)]"
                                 stroke-width="12" stroke-dasharray="502.6" stroke-dashoffset="502.6"
                                 stroke-linecap="round" stroke="currentColor" fill="transparent" r="80" cx="96"
                                 cy="96" />
                         </svg>
                         <div class="absolute inset-0 flex flex-col items-center justify-center">
-                            <span id="score-value" class="text-6xl font-black text-slate-900 tracking-tighter">-</span>
+                            <span id="score-value" class="text-6xl font-black text-white tracking-tighter">-</span>
                             <span
-                                class="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mt-1">Status</span>
+                                class="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mt-1">Status</span>
                         </div>
                     </div>
                 </div>
@@ -150,24 +150,24 @@
 
             <!-- IP Details -->
             <div class="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-purple-50/50 p-8 rounded-3xl border border-purple-100">
+                <div class="bg-purple-500/10 p-8 rounded-3xl border border-purple-500/20">
                     <p class="text-[10px] font-black text-purple-400 uppercase tracking-widest mb-2">Public IPv6 Address
                     </p>
-                    <p id="ipv6-result" class="text-xl font-mono font-bold text-purple-900 break-all">Not detected</p>
+                    <p id="ipv6-result" class="text-xl font-mono font-bold text-purple-300 break-all">Not detected</p>
                 </div>
-                <div class="bg-blue-50/50 p-8 rounded-3xl border border-blue-100">
+                <div class="bg-blue-500/10 p-8 rounded-3xl border border-blue-500/20">
                     <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2">Public IPv4 Address
                     </p>
-                    <p id="ipv4-result" class="text-xl font-mono font-bold text-blue-900 break-all">Not detected</p>
+                    <p id="ipv4-result" class="text-xl font-mono font-bold text-blue-300 break-all">Not detected</p>
                 </div>
-                <div class="bg-white p-8 rounded-3xl border border-gray-100 col-span-1 md:col-span-2 shadow-sm">
+                <div class="card-premium p-8 rounded-3xl col-span-1 md:col-span-2 shadow-sm">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Network
+                            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Network
                                 Identity (ASN)</p>
-                            <p id="asn-info" class="text-lg font-bold text-gray-800">Identifying...</p>
+                            <p id="asn-info" class="text-lg font-bold text-white">Identifying...</p>
                         </div>
-                        <div class="bg-gray-100 p-3 rounded-xl"><svg class="w-6 h-6 text-gray-400" fill="none"
+                        <div class="bg-white/5 p-3 rounded-xl"><svg class="w-6 h-6 text-slate-400" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -175,14 +175,14 @@
                     </div>
                 </div>
                 <div
-                    class="bg-emerald-50/50 p-8 rounded-3xl border border-emerald-100 col-span-1 md:col-span-2 shadow-sm">
+                    class="bg-emerald-500/10 p-8 rounded-3xl border border-emerald-500/20 col-span-1 md:col-span-2 shadow-sm">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-1">Geographic
                                 Location</p>
-                            <p id="location-info" class="text-lg font-bold text-emerald-800">Detecting...</p>
+                            <p id="location-info" class="text-lg font-bold text-emerald-200">Detecting...</p>
                         </div>
-                        <div class="bg-emerald-100 p-3 rounded-xl"><svg class="w-6 h-6 text-emerald-400" fill="none"
+                        <div class="bg-emerald-500/20 p-3 rounded-xl"><svg class="w-6 h-6 text-emerald-400" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -197,10 +197,10 @@
         <!-- [NEW] Latency Comparison Section -->
         <div id="latency-section" class="hidden space-y-6">
             <div class="flex items-center justify-between mt-20 mb-6">
-                <h3 class="text-2xl font-black text-gray-900 font-display">Latency Comparison</h3>
+                <h3 class="text-2xl font-black text-white font-display">Latency Comparison</h3>
                 <div id="experience-score-badge"
                     class="hidden bg-slate-900 text-white px-4 py-2 rounded-xl flex items-center gap-3">
-                    <span class="text-[9px] font-black uppercase tracking-widest text-slate-400">Experience Score</span>
+                    <span class="text-[9px] font-black uppercase tracking-widest text-slate-400">IPv6 Network Performance Score</span>
                     <span id="experience-score-val" class="text-lg font-black text-blue-400">--</span>
                 </div>
             </div>
@@ -238,7 +238,7 @@
         <!-- [NEW] Test History Section -->
         <div id="history-section" class="hidden space-y-6">
             <div class="flex items-center justify-between mt-20 mb-6">
-                <h3 class="text-2xl font-black text-gray-900 font-display">Test History</h3>
+                <h3 class="text-2xl font-black text-white font-display">Test History</h3>
                 <button onclick="clearDiagnosticsHistory()"
                     class="text-xs font-bold text-red-500 hover:text-red-700 transition">Clear History</button>
             </div>
@@ -251,7 +251,7 @@
         <div id="discovery-section" class="space-y-6">
             <div class="flex items-center justify-between mt-20 mb-6">
                 <div>
-                    <h3 class="text-2xl font-black text-gray-900 font-display">Autonomous Discovery</h3>
+                    <h3 class="text-2xl font-black text-white font-display">Autonomous Discovery</h3>
                     <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Surfacing Hidden
                         Infrastructure via Certificate SANs</p>
                 </div>
@@ -283,7 +283,7 @@
 
         <!-- [RESTORED] Advanced Technical Log Section -->
         <div id="advanced-log-section" class="hidden space-y-6">
-            <h3 class="text-2xl font-black text-gray-900 font-display mt-20 mb-6">Technical Audit Log</h3>
+            <h3 class="text-2xl font-black text-white font-display mt-20 mb-6">Technical Audit Log</h3>
             <div class="bg-slate-900 rounded-[2rem] p-8 border border-slate-800 shadow-2xl relative overflow-hidden">
                 <div class="absolute top-0 right-10 w-32 h-32 bg-blue-500/10 blur-[100px] rounded-full"></div>
                 <div
@@ -298,7 +298,7 @@
 
         <!-- Technical Breakdown Grid -->
         <div class="flex items-center justify-between mt-20 mb-10">
-            <h3 class="text-2xl font-black text-gray-900 font-display m-0">Technical Breakdown</h3>
+            <h3 class="text-2xl font-black text-white font-display m-0">Technical Breakdown</h3>
             <button id="copy-results-btn" onclick="copyDiagnosticsToClipboard()"
                 class="hidden bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

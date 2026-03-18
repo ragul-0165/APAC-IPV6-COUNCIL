@@ -88,7 +88,10 @@ function onEachMapFeature(feature, layer) {
     let tooltipContent = `<strong>${feature.properties.name || code}</strong>`;
 
     if (stats && stats.ipv6_adoption !== undefined) {
-        tooltipContent += `<br/>Adoption: ${stats.ipv6_adoption.toFixed(1)}%`;
+        tooltipContent += `<br/>AI Aggregate: ${stats.ipv6_adoption.toFixed(1)}%`;
+        if (stats.raw_source_fallback) {
+            tooltipContent += `<br/><span style="font-size: 0.8em; color: #94a3b8;">Raw APNIC: ${stats.raw_source_fallback}</span>`;
+        }
     } else {
         tooltipContent += `<br/>No Data`;
     }

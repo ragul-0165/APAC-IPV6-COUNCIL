@@ -5,6 +5,7 @@ import os
 import time
 from datetime import datetime
 from services.database_service import db_service
+from services.inference_service import inference_service
 
 class StatsService:
     CACHE_DIR = '.cache'
@@ -119,10 +120,13 @@ class StatsService:
             try:
                 record = db_service.apac_stats.find_one({"country_code": location_code})
                 if record:
+                    raw_adoption = record["ipv6_adoption"]
+                    ai_optimized = inference_service.get_optimized_adoption(location_code, raw_adoption)
                     return {
                         "country": record["country_code"],
-                        "ipv6_adoption": record["ipv6_adoption"],
-                        "source": record.get("source", "APNIC Labs"),
+                        "ipv6_adoption": ai_optimized,  # Replaced globally with AI number
+                        "source": "AI Aggregate Model",
+                        "raw_source_fallback": record.get("source", "APNIC Labs"),
                         "last_updated": record.get("last_updated")
                     }
             except Exception as e:
@@ -143,11 +147,14 @@ class StatsService:
             
             if location_code in stats:
                 country_data = stats[location_code]
+                raw_adoption = country_data.get('ipv6_adoption', 0)
+                ai_optimized = inference_service.get_optimized_adoption(location_code, raw_adoption)
                 return {
                     "country": country_data.get('country'),
-                    "ipv6_adoption": country_data.get('ipv6_adoption'),
+                    "ipv6_adoption": ai_optimized,  # Replaced globally with AI number
                     "region": metadata.get('region', 'APAC'),
-                    "data_source": country_data.get('source', 'APNIC Labs'),
+                    "data_source": "AI Aggregate Model",
+                    "raw_source_fallback": country_data.get('source', 'APNIC Labs'),
                     "last_updated": metadata.get('fetched_at')
                 }
             else:
@@ -168,10 +175,13 @@ class StatsService:
                 cursor = db_service.apac_stats.find()
                 results = {}
                 for record in cursor:
-                    results[record["country_code"]] = {
-                        "country": record["country_code"],
-                        "ipv6_adoption": record["ipv6_adoption"],
-                        "source": record.get("source", "APNIC Labs")
+                    c_code = record["country_code"]
+                    raw_adoption = record["ipv6_adoption"]
+                    ai_optimized = inference_service.get_optimized_adoption(c_code, raw_adoption)
+                    results[c_code] = {
+                        "country": c_code,
+                        "ipv6_adoption": ai_optimized,  # Replaced globally
+                        "source": "AI Aggregate Model"
                     }
                 if results:
                     return results
@@ -185,7 +195,14 @@ class StatsService:
         try:
             with open(normalized_file, 'r') as f:
                 data = json.load(f)
-            return data.get('stats', {})
+            
+            stats_dict = data.get('stats', {})
+            for c_code, c_data in stats_dict.items():
+                raw_adoption = c_data.get("ipv6_adoption", 0)
+                stats_dict[c_code]["ipv6_adoption"] = inference_service.get_optimized_adoption(c_code, raw_adoption)
+                stats_dict[c_code]["source"] = "AI Aggregate Model"
+                
+            return stats_dict
         except Exception as e:
             logging.error(f"Error reading normalized stats: {e}")
             return {}

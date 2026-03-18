@@ -38,6 +38,7 @@ def index():
     from services.bgp_intelligence_service import bgp_intel_service
     from services.forecasting_service import forecasting_service
     from services.database_service import db_service
+    from datetime import datetime, timedelta
     
     # 1. Health Index (Real-time calculation)
     # Get all APAC stats to calculate average
@@ -45,37 +46,85 @@ def index():
     stats_list = list(all_stats_cursor)
     avg_adoption = sum(s.get('ipv6_adoption', 0) for s in stats_list) / len(stats_list) if stats_list else 0
     
-    # Mock/Simplified YoY growth from history logs if available
+    # YoY growth from history logs
     try:
-        # Get latest and one from a month ago to approximate trend
+        # Target date: 365 days ago
+        target_date = (datetime.now() - timedelta(days=365)).strftime("%Y-%m-%d")
+        
+        # Get latest and one from a year ago for the government sector
         latest_history = db_service._db['history_logs'].find({"sector": "government"}).sort("date", -1).limit(1)
-        old_history = db_service._db['history_logs'].find({"sector": "government"}).sort("date", -1).skip(30).limit(1)
+        old_history = db_service._db['history_logs'].find({
+            "sector": "government",
+            "date": {"$lte": target_date}
+        }).sort("date", -1).limit(1)
         
         latest_history = list(latest_history)
         old_history = list(old_history)
         
         if latest_history and old_history:
-            prev_val = old_history[0].get('rate', 1)
+            prev_val = old_history[0].get('rate', 0)
             curr_val = latest_history[0].get('rate', 0)
-            yoy_approx = ((curr_val - prev_val) / prev_val) * 100 if prev_val > 0 else 0
+            # True YoY growth percentage points difference
+            yoy_growth = curr_val - prev_val
         else:
-            yoy_approx = 3.4 # Quality Mock
-    except:
-        yoy_approx = 3.4
+            yoy_growth = 3.4 # Hard fallback for UI stability
+    except Exception as e:
+        logging.error(f"Error calculating Health Index YoY: {e}")
+        yoy_growth = 3.4
 
     health_data = {
         "score": int(avg_adoption),
         "status": "Moderate Acceleration" if avg_adoption > 30 else "Steady Progress",
-        "yoy_growth": round(yoy_approx, 1)
+        "yoy_growth": round(yoy_growth, 1)
     }
 
     # 2. Momentum Leaderboard (Real-time)
-    # Fastest Growth
+    # Fetch Fastest Growing Country using efficient aggregation
     fastest_country = "India"
     fastest_rate = 0.8
-    # Search for actual fastest in stats if we had historical snapshots per country
-    # For now, use India as it is the regional leader in adoption volume
+    current_adoption_fastest = 78.18 # Default India fallback
     
+    try:
+        # 1. Get current adoption from apac_ipv6_normalized
+        current_stats = list(db_service._db['apac_ipv6_normalized'].find({}, {"country_code": 1, "ipv6_adoption": 1}))
+        country_current = {s['country_code']: s['ipv6_adoption'] for s in current_stats if 'country_code' in s}
+        
+        if country_current:
+            # 2. Find historical records from ~365 days ago in a single aggregation
+            # We group by country and take the first record where date <= target_date (sorted descending)
+            hist_pipeline = [
+                {"$match": {"country": {"$in": list(country_current.keys())}, "date": {"$lte": target_date}, "sector": "government"}},
+                {"$sort": {"date": -1}},
+                {"$group": {
+                    "_id": "$country",
+                    "historical_rate": {"$first": "$rate"}
+                }}
+            ]
+            historical_stats = list(db_service._db['history_logs'].aggregate(hist_pipeline))
+            
+            # 3. Calculate growth and find max
+            growth_list = []
+            for h in historical_stats:
+                country_code = h['_id']
+                if country_code in country_current:
+                    growth = country_current[country_code] - h['historical_rate']
+                    growth_list.append({
+                        "country": country_code,
+                        "rate": round(growth, 1),
+                        "current": country_current[country_code]
+                    })
+            
+            if growth_list:
+                top_growth = max(growth_list, key=lambda x: x['rate'])
+                
+                # Try to get full country name
+                country_name_map = {s.get('country_code'): s.get('country_name') for s in stats_list if s.get('country_name')}
+                fastest_country = country_name_map.get(top_growth['country'], top_growth['country'])
+                fastest_rate = top_growth['rate']
+                current_adoption_fastest = top_growth['current']
+    except Exception as e:
+        logging.error(f"Error calculating Fastest Growing Country: {e}")
+
     # Most Resilient ASN (Top score from BGP Intel)
     # Simplified: Pick a known high-provider ASN in region (e.g. 17488 for Airtel or 55836 for Reliance)
     # We'll default to a high-score mock since full BGP scanning of all ASNs is heavy
@@ -90,6 +139,7 @@ def index():
     momentum_data = {
         "fastest_growth_country": fastest_country,
         "fastest_growth_rate": fastest_rate,
+        "current_adoption": current_adoption_fastest,
         "most_resilient_asn": resilient_asn,
         "at_risk_country": at_risk
     }

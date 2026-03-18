@@ -2,17 +2,21 @@ from flask import Blueprint, render_template, request, jsonify
 import logging
 from services.stats_service import StatsService
 from services.registry_service import RegistryService
+from services.ml_sector_service import ml_sector_service
 from visualization import generate_lab_visualizations
 
 lab_bp = Blueprint('lab', __name__, url_prefix='/lab')
+
 stats_service = StatsService()
 registry_service = RegistryService()
+
 
 @lab_bp.route('/')
 def index():
     """Main Lab Interface"""
     chart_path = generate_lab_visualizations()
     return render_template('lab.html', chart_path=chart_path)
+
 
 @lab_bp.route('/api/countries')
 def get_countries():
@@ -24,12 +28,12 @@ def get_countries():
             codes = list(cursor)
             if codes:
                 return jsonify({"apac_codes": codes})
-        
-        # Fallback to JSON
+
         return jsonify({"error": "APAC country codes not available in database"}), 500
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @lab_bp.route('/api/map/countries.geo.json')
 def get_map_data():
@@ -40,12 +44,12 @@ def get_map_data():
             map_doc = db_service.geojson_map.find_one({"id": "countries_map"})
             if map_doc and "data" in map_doc:
                 return jsonify(map_doc["data"])
-        
-        # Fallback to local file
+
         return jsonify({"error": "GeoJSON map data not available in database"}), 500
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @lab_bp.route('/api/apac/ipv6')
 def get_ipv6_stats():
@@ -53,23 +57,34 @@ def get_ipv6_stats():
     Internal Lab API: Returns normalized IPv6 stats for APAC.
     Usage: /lab/api/apac/ipv6?location=IN
     """
+
     location = (request.args.get('country') or request.args.get('location') or 'IN').upper()
+
     stats = stats_service.get_apac_ipv6_stats(location)
-    
+
     if stats:
+        # Note: stats_service already injects ai_optimized_rate into the stats dictionary
+        # using the 4-source consensus model.
         return jsonify(stats)
+
     else:
         return jsonify({
             'error': f'Statistics for location {location} not found in APAC dataset.',
             'region': 'APAC'
         }), 404
 
+
 @lab_bp.route('/api/apac/all_stats')
 def get_all_apac_stats():
     """
     Internal Lab API: Returns ALL normalized stats for map coloring.
     """
-    return jsonify(stats_service.get_all_apac_ipv6_stats())
+
+    all_stats = stats_service.get_all_apac_ipv6_stats()
+    
+    # stats_service automatically injects AI predictions for all 56+ regions.
+    return jsonify(all_stats)
+
 
 @lab_bp.route('/lookup', methods=['POST'])
 def lab_lookup():
@@ -78,24 +93,29 @@ def lab_lookup():
     query = data.get('query', '').strip()
     result = registry_service.lookup_resource(query)
     return jsonify(result)
+
+
 @lab_bp.route('/api/delta')
 def get_authority_delta():
     """Returns discrepancy between official and measured stats."""
     from services.delta_service import delta_service
     return jsonify(delta_service.get_delta_report())
 
+
 @lab_bp.route('/api/performance-tax')
 def get_performance_tax():
     """Returns latency penalty metrics for IPv6 transition."""
     from services.performance_service import performance_service
+
     sector = request.args.get('sector', 'gov')
     location = (request.args.get('location') or request.args.get('country') or '').upper()
-    
+
     if location == 'APAC':
         result = performance_service.get_regional_aggregate(sector)
         return jsonify([result] if result else [])
-    
+
     return jsonify(performance_service.get_country_aggregates(sector))
+
 
 @lab_bp.route('/api/equality-index')
 def get_equality_index():
@@ -103,3 +123,16 @@ def get_equality_index():
     from services.inequality_service import inequality_service
     sector = request.args.get('sector', 'gov')
     return jsonify(inequality_service.calculate_inequality_index(sector))
+
+
+@lab_bp.route('/api/classify-sector', methods=['POST'])
+def classify_domain_sector():
+    """Runs the XGBoost Classifier on a given domain."""
+    data = request.json
+    domain = data.get('domain', '').strip()
+    
+    if not domain:
+        return jsonify({"error": "No domain provided"}), 400
+        
+    result = ml_sector_service.classify_domain(domain)
+    return jsonify(result)

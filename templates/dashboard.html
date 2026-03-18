@@ -11,30 +11,39 @@
 <div class="space-y-8">
     <!-- Welcome Card -->
     <div
-        class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
+        class="bg-gradient-to-r from-blue-600/40 to-indigo-700/40 backdrop-blur-xl rounded-2xl p-8 text-white border border-white/10 shadow-2xl relative overflow-hidden">
         <div class="relative z-10">
-            <h2 class="text-3xl font-bold mb-2">Welcome to APAC IPv6</h2>
-            <p class="text-blue-100 max-w-2xl">Track IPv6 adoption across Asia-Pacific. Monitor growth, identify risks, and plan your transition with real-time insights.</p>
+            <h2 class="text-3xl font-black mb-2 tracking-tight">Welcome to APAC IPv6</h2>
+            <p class="text-blue-100/80 max-w-2xl font-medium">Track IPv6 adoption across Asia-Pacific. Monitor growth, identify risks, and plan your transition with real-time insights.</p>
         </div>
-        <svg class="absolute -right-20 -bottom-20 w-80 h-80 text-blue-500 opacity-20" fill="currentColor"
+        <svg class="absolute -right-20 -bottom-20 w-80 h-80 text-white opacity-5" fill="currentColor"
             viewBox="0 0 20 20">
             <path
                 d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 015.25-2.906z" />
         </svg>
     </div>
 
-
-
     <!-- Regional Heatmap Section -->
     {% include 'components/regional_heatmap.html' %}
 
     <!-- Regional Intelligence Snapshot -->
-    <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
+    <div class="card-premium p-8 rounded-2xl">
         <div class="flex items-center justify-between mb-8">
-            <h3 class="text-xl font-bold text-slate-800">Regional Intelligence Snapshot</h3>
+            <div class="flex items-center space-x-3">
+                <h3 class="text-xl font-bold text-white tracking-tight">Regional Intelligence Snapshot</h3>
+                <span class="group/tip relative flex items-center cursor-help">
+                    <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center gap-1">
+                        <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        AI Optimized
+                    </span>
+                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 border border-white/10 text-[10px] text-white rounded-lg opacity-0 group-hover/tip:opacity-100 transition-opacity pointer-events-none font-bold z-50 shadow-2xl">
+                        Adoption rates are modeled using Machine Learning against 4 global telemetry sources (APNIC, Google, Cloudflare, and Pulse) to ensure consensus.
+                    </span>
+                </span>
+            </div>
             <div class="flex items-center space-x-2">
-                <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Real-Time Data</span>
+                <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(59,130,246,0.5)]"></span>
+                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Real-Time Data</span>
             </div>
         </div>
 

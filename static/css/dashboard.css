@@ -1,23 +1,19 @@
 /* Dashboard Executive Styles Refresh */
 .card-premium {
-    background: white;
-    border: 1px solid rgba(226, 232, 240, 0.4);
-    box-shadow:
-        0 4px 6px -1px rgba(0, 0, 0, 0.02),
-        0 2px 4px -1px rgba(0, 0, 0, 0.01),
-        0 0 0 1px rgba(0, 0, 0, 0.01);
+    background: var(--card-bg);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+        0 20px 25px -5px rgba(0, 0, 0, 0.3);
     border-radius: 20px;
     transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    position: relative;
-    z-index: 1;
 }
 
 .card-premium:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow:
-        0 20px 25px -5px rgba(0, 0, 0, 0.05),
-        0 10px 10px -5px rgba(0, 0, 0, 0.02);
-    border-color: rgba(37, 99, 235, 0.15);
+    transform: translateY(-4px);
+    background: rgba(15, 23, 42, 0.5);
+    border-color: rgba(255, 255, 255, 0.15);
 }
 
 #visualization-container {

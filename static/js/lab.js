@@ -345,13 +345,12 @@ async function updateLabStats() {
 }
 
 async function performLabLookup() {
-    // ... (Existing lookup logic) ...
     const query = document.getElementById('lab-query').value.trim();
     const resultsContainer = document.getElementById('lab-lookup-results');
 
     if (!query) return;
 
-    resultsContainer.innerHTML = '<p class="text-xs text-slate-500 animate-pulse">Querying Registry...</p>';
+    resultsContainer.innerHTML = '<p class="text-[10px] text-slate-500 animate-pulse">Querying Registry...</p>';
     resultsContainer.classList.remove('hidden');
 
     try {
@@ -363,31 +362,77 @@ async function performLabLookup() {
         const data = await response.json();
 
         if (data.error) {
-            resultsContainer.innerHTML = `<div class="p-4 bg-red-50 text-red-600 rounded-xl text-xs font-bold border border-red-100">${data.error}</div>`;
+            resultsContainer.innerHTML = `<div class="p-4 text-rose-400 text-[10px] font-bold">${data.error}</div>`;
         } else {
             resultsContainer.innerHTML = `
-                <div class="space-y-3 animate-in fade-in slide-in-from-top-2">
-                    <div class="flex justify-between text-[10px] font-bold">
-                        <span class="text-slate-400">ORGANIZATION</span>
-                        <span class="text-slate-900">${data.organization || 'N/A'}</span>
+                <div class="space-y-2 animate-in fade-in slide-in-from-top-2">
+                    <div class="flex justify-between border-b border-white/5 pb-1">
+                        <span class="text-slate-500">ORG</span>
+                        <span class="text-white">${data.organization || 'N/A'}</span>
                     </div>
-                    <div class="flex justify-between text-[10px] font-bold">
-                        <span class="text-slate-400">RESOURCE</span>
-                        <span class="text-slate-900">${data.resource || data.query}</span>
+                    <div class="flex justify-between border-b border-white/5 pb-1">
+                        <span class="text-slate-500">RES</span>
+                        <span class="text-white">${data.resource || data.query}</span>
                     </div>
-                    <div class="flex justify-between text-[10px] font-bold">
-                        <span class="text-slate-400">COUNTRY</span>
-                        <span class="text-slate-900">${data.country || 'N/A'}</span>
+                    <div class="flex justify-between border-b border-white/5 pb-1">
+                        <span class="text-slate-500">CTRY</span>
+                        <span class="text-white">${data.country || 'N/A'}</span>
                     </div>
-                    <div class="flex justify-between text-[10px] font-bold">
-                        <span class="text-slate-400">STATUS</span>
-                        <span class="text-blue-600">${data.status || 'Active'}</span>
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">STATUS</span>
+                        <span class="text-blue-400">${data.status || 'Active'}</span>
                     </div>
                 </div>
             `;
         }
     } catch (error) {
-        resultsContainer.innerHTML = '<div class="p-4 bg-red-50 text-red-600 rounded-xl text-xs font-bold border border-red-100">System lookup failed</div>';
+        resultsContainer.innerHTML = '<div class="p-4 text-rose-400 text-[10px] font-bold">Lookup failed</div>';
+    }
+}
+
+async function performSectorClassification() {
+    const query = document.getElementById('ml-sector-query').value.trim();
+    const resultsContainer = document.getElementById('ml-sector-results');
+    const labelEl = document.getElementById('ml-prediction-label');
+    const degreeEl = document.getElementById('ml-bgp-degree');
+    const confidenceEl = document.getElementById('ml-confidence');
+
+    if (!query) return;
+
+    // Loading State
+    resultsContainer.classList.remove('hidden');
+    labelEl.innerText = "Analyzing...";
+    labelEl.className = "text-xs font-black text-slate-500 animate-pulse uppercase tracking-widest";
+    degreeEl.innerText = "--";
+    confidenceEl.innerText = "--%";
+
+    try {
+        const response = await fetch('/lab/api/classify-sector', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ domain: query })
+        });
+        const data = await response.json();
+
+        if (data.error) {
+            labelEl.innerText = "Error";
+            labelEl.className = "text-xs font-black text-rose-500 uppercase tracking-widest";
+            return;
+        }
+
+        // Success State
+        labelEl.innerText = data.prediction_label;
+        labelEl.className = `text-xs font-black uppercase tracking-widest ${data.is_ready ? 'text-purple-400' : 'text-slate-400'}`;
+        
+        degreeEl.innerText = data.features.bgp_degree;
+        confidenceEl.innerText = `${(data.confidence * 100).toFixed(0)}%`;
+
+        // Animation
+        resultsContainer.classList.add('animate-in', 'fade-in', 'slide-in-from-bottom-2');
+
+    } catch (error) {
+        console.error("Classification failed", error);
+        labelEl.innerText = "System Overflow";
     }
 }
 

@@ -153,7 +153,7 @@ function renderGovMonitor() {
     // Render Rows
     flatList.forEach(item => {
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-50 transition border-b border-gray-50 last:border-0";
+        tr.className = "hover:bg-white/5 transition border-b border-white/5 last:border-0";
 
         // Status determination
         let status = 'Not Ready';
@@ -172,7 +172,7 @@ function renderGovMonitor() {
         }
 
         tr.innerHTML = `
-            <td class="p-6 font-bold text-slate-900">${item.domain}</td>
+            <td class="p-6 font-bold text-white">${item.domain}</td>
             <td class="p-6">${renderBool(item.ipv6_dns)}</td>
             <td class="p-6">${renderBool(item.ipv6_web)}</td>
             <td class="p-6">${getServiceMatrixBadge(item.service_matrix)}</td>
@@ -216,7 +216,7 @@ function renderPagination(fullList) {
     tbody.innerHTML = '';
     pageData.forEach(item => {
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-50 transition border-b border-gray-50 last:border-0";
+        tr.className = "hover:bg-white/5 transition border-b border-white/5 last:border-0";
 
         // Status determination
         let status = 'Not Ready';
@@ -235,7 +235,7 @@ function renderPagination(fullList) {
         }
 
         tr.innerHTML = `
-            <td class="p-6 font-bold text-slate-900">${item.domain}</td>
+            <td class="p-6 font-bold text-white">${item.domain}</td>
             <td class="p-6">${renderBool(item.ipv6_dns)}</td>
             <td class="p-6">${renderBool(item.ipv6_web)}</td>
             <td class="p-6">${getServiceMatrixBadge(item.service_matrix)}</td>
