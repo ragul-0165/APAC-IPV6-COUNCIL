@@ -1,9 +1,9 @@
-# Environment variables
+# ---------------- ENV ----------------
 .env
 .env.local
 .env.*.local
 
-# Python
+# ---------------- PYTHON ----------------
 __pycache__/
 *.py[cod]
 *$py.class
@@ -13,32 +13,45 @@ venv/
 ENV/
 env/
 
+# ---------------- ML / MODEL FILES ----------------
+*.pkl
+*.joblib
+*.h5
+*.pt
 
-# Data backups
-data/backup_*/
+# ---------------- TEMP / DEBUG ----------------
+tmp/
+*.tmp
 
-# Logs
-*.log
-app.log
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Cache
-.cache/
-
-# ---------- DATA EXCLUDED FROM VERSION CONTROL ----------
+# ---------------- DATA ----------------
 ASN/
 data/
 datasets/
 datasets/bgp/
 datasets/documents/
+
+# ---------------- OUTPUT FILES ----------------
 static/output/
 static/reports/
+
+# ---------------- LOGS ----------------
+*.log
+*.txt
+app.log
+train_log.txt
+
+# ---------------- NOTEBOOK ----------------
+.ipynb_checkpoints/
+
+# ---------------- IDE ----------------
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ---------------- OS ----------------
+.DS_Store
+Thumbs.db
+
+# ---------------- CACHE ----------------
+.cache/
