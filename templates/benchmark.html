@@ -10,7 +10,7 @@
 <div class="max-w-7xl mx-auto space-y-8 pb-20">
     <!-- Hero Header -->
     <div
-        class="bg-white rounded-[1.5rem] lg:rounded-[2.5rem] p-6 lg:p-10 border border-gray-100 shadow-2xl shadow-blue-500/5 relative overflow-hidden">
+        class="bg-[#030712] rounded-[1.5rem] lg:rounded-[2.5rem] p-6 lg:p-10 border border-slate-800 shadow-2xl relative overflow-hidden">
         <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 lg:gap-8">
             <div class="flex items-center gap-6">
                 <div
@@ -21,8 +21,8 @@
                     </svg>
                 </div>
                 <div>
-                    <h2 class="text-3xl font-black text-slate-900 tracking-tight">Peer Benchmarking</h2>
-                    <p class="text-slate-400 font-bold uppercase text-[10px] tracking-widest mt-1">Head-to-Head National
+                    <h2 class="text-3xl font-black text-white tracking-tight">Peer Benchmarking</h2>
+                    <p class="text-slate-500 font-bold uppercase text-[10px] tracking-widest mt-1">Head-to-Head National
                         Analysis</p>
                 </div>
             </div>
@@ -30,12 +30,12 @@
             <!-- Selectors -->
             <div class="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
                 <select id="entity1-select"
-                    class="w-full sm:w-48 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/20 transition">
+                    class="w-full sm:w-48 bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm font-bold text-white outline-none focus:ring-2 focus:ring-blue-500/20 transition">
                     <option value="" disabled selected>Select Economy A</option>
                 </select>
-                <div class="hidden sm:block text-slate-300 font-black italic">VS</div>
+                <div class="hidden sm:block text-slate-700 font-black italic">VS</div>
                 <select id="entity2-select"
-                    class="w-full sm:w-48 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/20 transition">
+                    class="w-full sm:w-48 bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm font-bold text-white outline-none focus:ring-2 focus:ring-blue-500/20 transition">
                     <option value="" disabled selected>Select Economy B</option>
                 </select>
                 <button onclick="runComparison()"
@@ -49,19 +49,19 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- Entity 1 Column -->
             <div
-                class="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm space-y-8 relative overflow-hidden group">
+                class="bg-[#030712] rounded-[2.5rem] p-8 border border-slate-800 shadow-sm space-y-8 relative overflow-hidden group">
                 <div class="absolute top-0 right-0 p-8">
                     <span id="e1-id"
-                        class="text-6xl font-black text-slate-50 uppercase tracking-tighter group-hover:text-blue-50 transition duration-500">IN</span>
+                        class="text-6xl font-black text-white/5 uppercase tracking-tighter transition duration-500">IN</span>
                 </div>
 
                 <div class="relative z-10">
-                    <h3 id="e1-name" class="text-4xl font-black text-slate-900 mb-2">India</h3>
+                    <h3 id="e1-name" class="text-4xl font-black text-white mb-2">India</h3>
                     <div class="flex items-center gap-2">
                         <span id="e1-rank-badge"
-                            class="bg-emerald-500 text-white text-[9px] font-black px-2 py-1 rounded-lg uppercase">Rank
+                            class="bg-emerald-500/10 text-emerald-400 text-[9px] font-black px-2 py-1 rounded-lg uppercase border border-emerald-500/20">Rank
                             #1</span>
-                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">APAC Region</span>
+                        <span class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">APAC Region</span>
                     </div>
                 </div>
 
@@ -69,44 +69,50 @@
                 <div class="flex flex-col items-center py-10">
                     <div class="relative w-48 h-48 flex items-center justify-center">
                         <svg class="w-full h-full -rotate-90">
-                            <circle cx="96" cy="96" r="88" fill="transparent" stroke="#f1f5f9" stroke-width="12">
-                            </circle>
-                            <circle id="e1-gauge" cx="96" cy="96" r="88" fill="transparent" stroke="#2563eb"
-                                stroke-width="12" stroke-dasharray="552.92" stroke-dashoffset="552.92"
-                                stroke-linecap="round" class="transition-all duration-1000 ease-out"></circle>
+                            <defs>
+                                <filter id="glow-pro-1" x="-50%" y="-50%" width="200%" height="200%">
+                                    <feGaussianBlur stdDeviation="5" result="blur" />
+                                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                                </filter>
+                            </defs>
+                            <circle cx="96" cy="96" r="80" fill="transparent" stroke="#111827" style="stroke-width: 20px;"></circle>
+                            <circle id="e1-gauge" cx="96" cy="96" r="80" fill="transparent" stroke="#3b82f6"
+                                stroke-dasharray="502.65" stroke-dashoffset="502.65"
+                                stroke-linecap="round" class="transition-all duration-1000 ease-out"
+                                style="stroke-width: 20px !important; filter: url(#glow-pro-1);"></circle>
                         </svg>
-                        <div class="absolute text-center">
-                            <span id="e1-score" class="text-5xl font-black text-slate-900 tabular-nums">0</span>
+                        <div class="absolute text-center flex flex-col items-center">
+                            <span id="e1-score" class="text-6xl font-black text-white tabular-nums leading-none">0</span>
                             <span
-                                class="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Readiness</span>
+                                class="block text-[11px] font-black text-slate-500 uppercase tracking-[0.2em] mt-3">STATUS</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Secondary Metrics -->
                 <div class="grid grid-cols-1 gap-4">
-                    <div class="bg-slate-50 rounded-2xl p-5 border border-slate-100">
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Government Sync
+                    <div class="bg-slate-900/50 rounded-2xl p-5 border border-slate-800">
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Government Sync
                         </p>
-                        <p id="e1-gov-sync" class="text-2xl font-black text-emerald-600">High</p>
+                        <p id="e1-gov-sync" class="text-2xl font-black text-emerald-400">High</p>
                     </div>
                 </div>
             </div>
 
             <!-- Entity 2 Column -->
             <div
-                class="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm space-y-8 relative overflow-hidden group">
+                class="bg-[#030712] rounded-[2.5rem] p-8 border border-slate-800 shadow-sm space-y-8 relative overflow-hidden group">
                 <div class="absolute top-0 left-0 p-8">
                     <span id="e2-id"
-                        class="text-6xl font-black text-slate-50 uppercase tracking-tighter group-hover:text-indigo-50 transition duration-500">VN</span>
+                        class="text-6xl font-black text-white/5 uppercase tracking-tighter transition duration-500">VN</span>
                 </div>
 
                 <div class="relative z-10 text-right">
-                    <h3 id="e2-name" class="text-4xl font-black text-slate-900 mb-2">Vietnam</h3>
+                    <h3 id="e2-name" class="text-4xl font-black text-white mb-2">Vietnam</h3>
                     <div class="flex items-center gap-2 justify-end">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">APAC Region</span>
+                        <span class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">APAC Region</span>
                         <span id="e2-rank-badge"
-                            class="bg-blue-500 text-white text-[9px] font-black px-2 py-1 rounded-lg uppercase">Rank
+                            class="bg-blue-500/10 text-blue-400 text-[9px] font-black px-2 py-1 rounded-lg uppercase border border-blue-500/20">Rank
                             #4</span>
                     </div>
                 </div>
@@ -115,51 +121,57 @@
                 <div class="flex flex-col items-center py-6 lg:py-10">
                     <div class="relative w-48 h-48 flex items-center justify-center">
                         <svg class="w-full h-full -rotate-90">
-                            <circle cx="96" cy="96" r="88" fill="transparent" stroke="#f1f5f9" stroke-width="12">
-                            </circle>
-                            <circle id="e2-gauge" cx="96" cy="96" r="88" fill="transparent" stroke="#6366f1"
-                                stroke-width="12" stroke-dasharray="552.92" stroke-dashoffset="552.92"
-                                stroke-linecap="round" class="transition-all duration-1000 ease-out"></circle>
+                            <defs>
+                                <filter id="glow-pro-2" x="-50%" y="-50%" width="200%" height="200%">
+                                    <feGaussianBlur stdDeviation="5" result="blur" />
+                                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                                </filter>
+                            </defs>
+                            <circle cx="96" cy="96" r="80" fill="transparent" stroke="#111827" style="stroke-width: 20px;"></circle>
+                            <circle id="e2-gauge" cx="96" cy="96" r="80" fill="transparent" stroke="#6366f1"
+                                stroke-dasharray="502.65" stroke-dashoffset="502.65"
+                                stroke-linecap="round" class="transition-all duration-1000 ease-out"
+                                style="stroke-width: 20px !important; filter: url(#glow-pro-2);"></circle>
                         </svg>
-                        <div class="absolute text-center">
-                            <span id="e2-score" class="text-5xl font-black text-slate-900 tabular-nums">0</span>
+                        <div class="absolute text-center flex flex-col items-center">
+                            <span id="e2-score" class="text-6xl font-black text-white tabular-nums leading-none">0</span>
                             <span
-                                class="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Readiness</span>
+                                class="block text-[11px] font-black text-slate-500 uppercase tracking-[0.2em] mt-3">STATUS</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Secondary Metrics -->
                 <div class="grid grid-cols-1 gap-4">
-                    <div class="bg-slate-50 rounded-2xl p-5 border border-slate-100">
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Government Sync
+                    <div class="bg-slate-900/50 rounded-2xl p-5 border border-slate-800">
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Government Sync
                         </p>
-                        <p id="e2-gov-sync" class="text-2xl font-black text-indigo-600">Moderate</p>
+                        <p id="e2-gov-sync" class="text-2xl font-black text-indigo-400">Moderate</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- National Adoption Comparative Chart -->
-        <div class="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-sm relative overflow-hidden">
+        <div class="bg-[#030712] rounded-[2.5rem] p-10 border border-slate-800 shadow-sm relative overflow-hidden">
             <div class="flex items-center justify-between mb-8">
                 <div class="flex items-center space-x-3">
                     <div>
-                        <h4 class="text-xl font-black text-slate-900 leading-none">National Adoption Macro</h4>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">Comparative ISP Layer Metrics</p>
+                        <h4 class="text-xl font-black text-white leading-none">National Adoption Macro</h4>
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-2">Comparative ISP Layer Metrics</p>
                     </div>
                     <span class="group/tip relative flex items-center cursor-help mt-1">
-                        <span class="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider bg-indigo-50 text-indigo-500 border border-indigo-100 flex items-center gap-1">
+                        <span class="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
                             <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                             AI Verified
                         </span>
-                        <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 text-[10px] text-white rounded-lg opacity-0 group-hover/tip:opacity-100 transition-opacity pointer-events-none font-bold z-50 shadow-2xl">
+                        <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 border border-slate-800 text-[10px] text-white rounded-lg opacity-0 group-hover/tip:opacity-100 transition-opacity pointer-events-none font-bold z-50 shadow-2xl">
                             The primary metric shown here is the AI Aggregate output, ensuring it aligns with the 4 global peer data sources shown below.
                         </span>
                     </span>
                 </div>
-                <div class="bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
-                    <span class="text-[10px] font-black text-slate-500 uppercase tracking-wider">Macro Analysis</span>
+                <div class="bg-slate-900 px-4 py-2 rounded-xl border border-slate-800">
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Macro Analysis</span>
                 </div>
             </div>
             <div id="national-adoption-chart" class="min-h-[300px]"></div>

@@ -66,3 +66,10 @@ The application will be available at `http://127.0.0.1:5000`.
 - `static/`: Frontend assets (CSS, JS, Media).
 - `templates/`: HTML page layouts.
 - `data/` & `datasets/`: Local mapping and fallback data.
+
+---
+
+## 🏗️ Future Roadmap
+- **Real-Time Momentum Tracking**: Implementation of live Year-over-Year (YoY) growth calculations using 365-day historical telemetry.
+- **AI Forecasting Expansion**: Predictive modeling for IPv6 completion dates across diverse sectors (Education, Enterprise).
+- **Consensus Optimization**: Enhanced Random Forest weighting using additional telemetry sources (Cloudflare Radar, Pulse).

@@ -1,6 +1,7 @@
 import logging
 from .database_service import db_service
 from .stats_service import StatsService
+from .inference_service import inference_service
 
 logger = logging.getLogger(__name__)
 
@@ -37,10 +38,17 @@ class IntelligenceService:
             historical_stats = {h['_id']: h['historical_rate'] for h in db_service._db['history_logs'].aggregate(hist_pipeline)}
 
             data_points = []
+            total_adoption = 0
+            total_growth = 0
+            valid_countries = 0
+            
             for stat in countries_stats:
                 # Basic validation
                 country_code = stat.get('country_code', 'Unknown')
-                adoption = stat.get('ipv6_adoption', 0)
+                raw_adoption = stat.get('ipv6_adoption', 0)
+                
+                # Apply AI Inference for Strategic Accuracy
+                adoption = inference_service.get_optimized_adoption(country_code, raw_adoption)
                 
                 # Fetch historical rate from our grouped aggregation
                 prev_adoption = historical_stats.get(country_code)

@@ -1,30 +1,37 @@
-from pymongo import MongoClient
 import pandas as pd
+import os
 
-client = MongoClient("mongodb+srv://ipv6_admin:nltvc_apac@cluster0.rka6zzr.mongodb.net/apac_ipv6_hub?retryWrites=true&w=majority&appName=Cluster0")
+# Paths
+GROUND_TRUTH_FILE = "data/ground_truth.csv"
+OUTPUT_FILE = "data/ipv6_training_dataset.csv"
 
-db = client["apac_ipv6_hub"]
-collection = db["external_ipv6_stats"]
+def export():
+    if not os.path.exists(GROUND_TRUTH_FILE):
+        print(f"ERROR: {GROUND_TRUTH_FILE} missing. Run build_ground_truth.py first.")
+        return
 
-docs = list(collection.find({}, {"_id":0}))
+    print(f"Loading real ground truth from {GROUND_TRUTH_FILE}...")
+    df = pd.read_csv(GROUND_TRUTH_FILE)
 
-df = pd.DataFrame(docs)
+    # Ensure consistent column naming for the ML model interface
+    # Features: APNIC, Google, Cloudflare, IPv6_Pulse
+    # Target: adoption_score
+    
+    # We'll just ensure it's clean and has necessary columns
+    cols = ["country", "year", "APNIC", "Google", "Cloudflare", "IPv6_Pulse", "samples", "adoption_score"]
+    
+    # Add constant year 2024 if missing
+    if 'year' not in df.columns:
+        df['year'] = 2024
+        
+    export_df = df[cols]
+    
+    # Fill any remaining NaNs with 0 to ensure model sanity
+    export_df = export_df.fillna(0)
+    
+    export_df.to_csv(OUTPUT_FILE, index=False)
+    print(f"Clean training dataset exported to {OUTPUT_FILE}")
+    print(export_df.head())
 
-df = df[["country","source","ipv6_percent"]]
-
-# FIX: handle duplicates
-pivot = df.pivot_table(
-    index="country",
-    columns="source",
-    values="ipv6_percent",
-    aggfunc="mean"
-)
-
-pivot.reset_index(inplace=True)
-
-pivot["adoption_score"] = pivot[["APNIC","Google","Cloudflare"]].mean(axis=1)
-
-pivot.to_csv("data/ipv6_training_dataset.csv", index=False)
-
-print("Training dataset exported successfully")
-print(pivot.head())
+if __name__ == "__main__":
+    export()

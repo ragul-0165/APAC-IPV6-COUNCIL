@@ -71,7 +71,7 @@ function updateEntityColumn(index, data) {
 
     // Gauge Logic
     const gauge = document.getElementById(`e${index}-gauge`);
-    const circumference = 2 * Math.PI * 88;
+    const circumference = 502.65; // 2 * Math.PI * 80
     const offset = circumference - (data.domain_readiness / 100) * circumference;
     gauge.style.strokeDashoffset = offset;
 
@@ -112,41 +112,70 @@ function updateDetailedTable(e1, e2) {
 
 function renderAdoptionChart(e1, e2) {
     const options = {
-        series: [{
-            name: 'National Adoption (%)',
-            data: [e1.national_adoption, e2.national_adoption]
-        }],
+        series: [
+            {
+                name: 'AI Domain Readiness',
+                data: [Math.round(e1.domain_readiness), Math.round(e2.domain_readiness)]
+            },
+            {
+                name: 'National Adoption (%)',
+                data: [e1.national_adoption, e2.national_adoption]
+            }
+        ],
         chart: {
             type: 'bar',
-            height: 300,
+            height: 350,
             toolbar: { show: false },
-            animations: { enabled: true, easing: 'easeinout', speed: 800 }
+            animations: { enabled: true, easing: 'easeinout', speed: 800 },
+            fontFamily: 'inherit'
         },
         plotOptions: {
             bar: {
-                borderRadius: 15,
-                columnWidth: '45%',
-                distributed: true,
+                borderRadius: 8,
+                columnWidth: '60%',
                 dataLabels: { position: 'top' }
             }
         },
-        colors: ['#2563eb', '#6366f1'],
+        colors: ['#06b6d4', '#6366f1'],
         dataLabels: {
             enabled: true,
             formatter: (val) => val + "%",
-            offsetY: -25,
-            style: { fontSize: '12px', fontWeight: '900', colors: ["#1e293b"] }
+            offsetY: -20,
+            style: { fontSize: '10px', fontWeight: '900', colors: ["#64748b"] }
         },
-        legend: { show: false },
+        stroke: {
+            show: true,
+            width: 4,
+            colors: ['transparent']
+        },
+        legend: { 
+            show: true, 
+            position: 'top', 
+            horizontalAlign: 'right',
+            fontFamily: 'inherit',
+            fontWeight: 800,
+            fontSize: '10px',
+            labels: { colors: '#64748b' },
+            markers: { radius: 12 }
+        },
         xaxis: {
             categories: [e1.country_name, e2.country_name],
-            labels: { style: { fontWeight: '800', fontSize: '12px', colors: '#64748b' } },
+            labels: { style: { fontWeight: '900', fontSize: '11px', colors: '#1e293b' } },
             axisBorder: { show: false },
             axisTicks: { show: false }
         },
-        yaxis: { show: false, max: 100 },
-        grid: { show: false },
-        tooltip: { theme: 'dark', y: { formatter: (val) => val + "%" } }
+        yaxis: { 
+            show: true, 
+            max: 100,
+            labels: { style: { fontWeight: '700', fontSize: '10px', colors: '#94a3b8' } }
+        },
+        grid: { 
+            show: true, 
+            borderColor: '#f1f5f9',
+            strokeDashArray: 4,
+            xaxis: { lines: { show: false } }
+        },
+        tooltip: { theme: 'light', y: { formatter: (val) => val + "%" } }
     };
 
     if (adoptionChart) {

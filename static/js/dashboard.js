@@ -51,6 +51,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 rateEl.textContent = `${rate.toFixed(1)}%`;
             }
 
+            // [NEW] Update AI Metrics (Confidence & Explanation)
+            const confidenceEl = document.getElementById('dash-ai-confidence');
+            const explanationEl = document.getElementById('dash-ai-explanation');
+
+            if (data.ai_confidence && confidenceEl) {
+                confidenceEl.innerText = data.ai_confidence;
+                // Color-coding Confidence Levels
+                let colorClass = 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+                if (data.ai_confidence === 'High') colorClass = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+                else if (data.ai_confidence === 'Low') colorClass = 'bg-rose-500/10 text-rose-400 border-rose-500/30';
+                
+                confidenceEl.className = `px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border shadow-lg ${colorClass}`;
+            }
+
+            if (data.ai_explanation && explanationEl) {
+                explanationEl.textContent = data.ai_explanation;
+            }
+
             // Update Country Label
             const labelEl = document.getElementById('dash-country-label');
             if (labelEl) {

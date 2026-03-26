@@ -120,11 +120,13 @@ class StatsService:
             try:
                 record = db_service.apac_stats.find_one({"country_code": location_code})
                 if record:
-                    raw_adoption = record["ipv6_adoption"]
-                    ai_optimized = inference_service.get_optimized_adoption(location_code, raw_adoption)
+                    raw_adoption = record.get("ipv6_adoption", 0)
+                    ai_data = inference_service.get_optimized_adoption(location_code, raw_adoption, include_metrics=True)
                     return {
                         "country": record["country_code"],
-                        "ipv6_adoption": ai_optimized,  # Replaced globally with AI number
+                        "ipv6_adoption": ai_data["prediction"],
+                        "ai_confidence": ai_data["confidence"],
+                        "ai_explanation": ai_data["explanation"],
                         "source": "AI Aggregate Model",
                         "raw_source_fallback": record.get("source", "APNIC Labs"),
                         "last_updated": record.get("last_updated")
@@ -148,10 +150,12 @@ class StatsService:
             if location_code in stats:
                 country_data = stats[location_code]
                 raw_adoption = country_data.get('ipv6_adoption', 0)
-                ai_optimized = inference_service.get_optimized_adoption(location_code, raw_adoption)
+                ai_data = inference_service.get_optimized_adoption(location_code, raw_adoption, include_metrics=True)
                 return {
                     "country": country_data.get('country'),
-                    "ipv6_adoption": ai_optimized,  # Replaced globally with AI number
+                    "ipv6_adoption": ai_data["prediction"],
+                    "ai_confidence": ai_data["confidence"],
+                    "ai_explanation": ai_data["explanation"],
                     "region": metadata.get('region', 'APAC'),
                     "data_source": "AI Aggregate Model",
                     "raw_source_fallback": country_data.get('source', 'APNIC Labs'),
@@ -177,10 +181,12 @@ class StatsService:
                 for record in cursor:
                     c_code = record["country_code"]
                     raw_adoption = record["ipv6_adoption"]
-                    ai_optimized = inference_service.get_optimized_adoption(c_code, raw_adoption)
+                    ai_data = inference_service.get_optimized_adoption(c_code, raw_adoption, include_metrics=True)
                     results[c_code] = {
                         "country": c_code,
-                        "ipv6_adoption": ai_optimized,  # Replaced globally
+                        "ipv6_adoption": ai_data["prediction"],
+                        "ai_confidence": ai_data["confidence"],
+                        "ai_explanation": ai_data["explanation"],
                         "source": "AI Aggregate Model"
                     }
                 if results:

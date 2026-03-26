@@ -119,32 +119,40 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
             <!-- Score Card -->
             <div
-                class="lg:col-span-5 card-premium rounded-[2.5rem] p-10 flex flex-col justify-between">
-                <div>
+                class="lg:col-span-5 card-premium rounded-[2.5rem] p-10 flex flex-col justify-between relative overflow-hidden group/score">
+                <div class="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 blur-[80px] rounded-full group-hover/score:bg-blue-500/20 transition-all duration-700"></div>
+                
+                <div class="relative z-10">
                     <h3 class="text-xl font-black text-white mb-2 font-display">Readiness Certificate</h3>
                     <p class="text-xs text-slate-500 font-bold uppercase tracking-widest">Connectivity Audit Rating</p>
                 </div>
 
-                <div class="py-12 flex items-center justify-center">
+                <div class="py-12 flex items-center justify-center relative z-10">
                     <div class="relative">
-                        <svg class="w-48 h-48 transform -rotate-90">
+                        <svg class="w-48 h-48 transform -rotate-90" viewBox="0 0 192 192">
+                            <defs>
+                                <linearGradient id="score-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#60a5fa;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
                             <circle class="text-white/5" stroke-width="12" stroke="currentColor" fill="transparent"
                                 r="80" cx="96" cy="96" />
-                            <circle id="score-circle" class="text-blue-500 transition-all duration-1000 shadow-[0_0_20px_rgba(59,130,246,0.4)]"
+                            <circle id="score-circle" class="transition-all duration-1000"
                                 stroke-width="12" stroke-dasharray="502.6" stroke-dashoffset="502.6"
-                                stroke-linecap="round" stroke="currentColor" fill="transparent" r="80" cx="96"
-                                cy="96" />
+                                stroke-linecap="round" stroke="url(#score-gradient)" fill="transparent" r="80" cx="96"
+                                cy="96" style="filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.5));" />
                         </svg>
                         <div class="absolute inset-0 flex flex-col items-center justify-center">
-                            <span id="score-value" class="text-6xl font-black text-white tracking-tighter">-</span>
+                            <span id="score-value" class="text-6xl font-black text-white tracking-tighter leading-none">0</span>
                             <span
-                                class="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mt-1">Status</span>
+                                class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mt-2">Status</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-gray-50 rounded-2xl p-4 text-center">
-                    <p id="score-label" class="text-sm font-bold text-gray-600">Calculating profile...</p>
+                <div class="bg-white/5 backdrop-blur-md rounded-2xl p-4 text-center border border-white/5 relative z-10">
+                    <p id="score-label" class="text-sm font-bold text-slate-400">Initialize test to audit profile...</p>
                 </div>
             </div>
 

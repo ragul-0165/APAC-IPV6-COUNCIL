@@ -253,14 +253,14 @@ function renderPagination(fullList) {
     if (!controls) {
         controls = document.createElement('div');
         controls.id = 'pagination-controls';
-        controls.className = "flex justify-center items-center gap-4 py-6 border-t border-gray-100";
+        controls.className = "flex justify-center items-center gap-4 py-8 border-t border-white/5";
         tbody.parentNode.parentNode.appendChild(controls); // Append after table container
     }
 
     controls.innerHTML = `
-        <button onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''} class="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-bold uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed transition">Previous</button>
-        <span class="text-xs font-black text-slate-500 uppercase tracking-widest">Page ${currentPage} of ${totalPages}</span>
-        <button onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''} class="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-bold uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed transition">Next</button>
+        <button onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''} class="px-6 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-xs font-black uppercase tracking-widest text-slate-300 disabled:opacity-20 disabled:cursor-not-allowed transition-all">Previous</button>
+        <span class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Page ${currentPage} of ${totalPages}</span>
+        <button onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''} class="px-6 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-xs font-black uppercase tracking-widest text-slate-300 disabled:opacity-20 disabled:cursor-not-allowed transition-all">Next</button>
     `;
 }
 
@@ -650,15 +650,15 @@ function renderLeaderboard() {
         else if (item.level === 'Moderate') levelColor = 'text-amber-500';
 
         const tr = document.createElement('tr');
-        tr.className = "border-b border-gray-50 last:border-0 hover:bg-slate-50 transition";
+        tr.className = "border-b border-white/5 last:border-0 hover:bg-white/5 transition-colors group";
         tr.innerHTML = `
-            <td class="py-3 pl-4 font-black text-slate-300">#${idx + 1}</td>
-            <td class="py-3 font-bold text-slate-700 flex items-center">
-                <img src="https://flagcdn.com/24x18/${item.country.toLowerCase()}.png" class="mr-2 rounded shadow-sm w-4 h-3">
+            <td class="py-4 pl-4 font-black text-slate-400 group-hover:text-white transition">#${idx + 1}</td>
+            <td class="py-4 font-bold text-slate-300 flex items-center group-hover:text-white transition">
+                <img src="https://flagcdn.com/24x18/${item.country.toLowerCase()}.png" class="mr-3 rounded-sm shadow-sm w-4 h-3 opacity-80 group-hover:opacity-100">
                 ${COUNTRY_NAMES[item.country] || item.country}
             </td>
-            <td class="py-3 text-right font-black text-slate-900">${item.score}${item.is_benchmark ? '%' : ''}</td>
-            <td class="py-3 text-right pr-4 text-xs font-bold uppercase tracking-wider ${levelColor}">${item.level}</td>
+            <td class="py-4 text-right font-black text-white">${item.score}${item.is_benchmark ? '%' : ''}</td>
+            <td class="py-4 text-right pr-4 text-[10px] font-black uppercase tracking-widest ${levelColor}">${item.level}</td>
         `;
         tbody.appendChild(tr);
     });

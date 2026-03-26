@@ -186,15 +186,15 @@ function renderPagination(rows, tbody) {
     if (!controls) {
         controls = document.createElement('div');
         controls.id = 'pagination-controls';
-        controls.className = "flex justify-center items-center gap-4 py-6 border-t border-gray-100 col-span-full";
+        controls.className = "flex justify-center items-center gap-4 py-8 border-t border-white/5 col-span-full";
         // Find a place to append. Table container is best.
         tbody.closest('.overflow-x-auto').parentNode.appendChild(controls);
     }
 
     controls.innerHTML = `
-        <button onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''} class="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-bold uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed transition">Previous</button>
-        <span class="text-xs font-black text-slate-500 uppercase tracking-widest">Page ${currentPage} of ${totalPages}</span>
-        <button onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''} class="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-bold uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed transition">Next</button>
+        <button onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''} class="px-6 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-[10px] text-white font-black uppercase tracking-widest disabled:opacity-20 disabled:cursor-not-allowed transition border border-white/5">Previous</button>
+        <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Page ${currentPage} of ${totalPages}</span>
+        <button onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''} class="px-6 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-[10px] text-white font-black uppercase tracking-widest disabled:opacity-20 disabled:cursor-not-allowed transition border border-white/5">Next</button>
     `;
 
     // Store current filtered data for Next/Prev buttons to use

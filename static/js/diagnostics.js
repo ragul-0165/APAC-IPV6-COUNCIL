@@ -155,15 +155,20 @@ function renderDiagnostics(data) {
     document.getElementById('score-circle').style.strokeDashoffset = offset;
 
     const scoreLabel = document.getElementById('score-label');
+    const scoreContainer = scoreLabel.parentElement;
+    
     if (score >= 90) {
         scoreLabel.innerText = "Excellent: Full IPv6 Readiness";
-        scoreLabel.className = "text-sm font-bold text-green-600";
+        scoreLabel.className = "text-sm font-black text-emerald-400";
+        scoreContainer.className = "bg-emerald-500/10 backdrop-blur-md rounded-2xl p-4 text-center border border-emerald-500/20 relative z-10";
     } else if (score >= 50) {
         scoreLabel.innerText = "Good: Partial IPv6 Capabilities";
-        scoreLabel.className = "text-sm font-bold text-amber-600";
+        scoreLabel.className = "text-sm font-black text-amber-400";
+        scoreContainer.className = "bg-amber-500/10 backdrop-blur-md rounded-2xl p-4 text-center border border-amber-500/20 relative z-10";
     } else {
         scoreLabel.innerText = "Attention: IPv4 Legacy Mode";
-        scoreLabel.className = "text-sm font-bold text-red-600";
+        scoreLabel.className = "text-sm font-black text-red-400";
+        scoreContainer.className = "bg-red-500/10 backdrop-blur-md rounded-2xl p-4 text-center border border-red-500/20 relative z-10";
     }
 
     // Advanced Metadata

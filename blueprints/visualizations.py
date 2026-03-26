@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, send_from_directory
 from services.stats_service import StatsService
+from services.inference_service import inference_service
 import logging
 
 visualizations_bp = Blueprint('visualizations', __name__)
@@ -41,20 +42,46 @@ def index():
     from datetime import datetime, timedelta
     
     # 1. Health Index (Real-time calculation)
-    # Get all APAC stats to calculate average
+    # Get all APAC stats (Optimized with AI model) to calculate average
     all_stats_cursor = db_service.apac_stats.find({})
-    stats_list = list(all_stats_cursor)
-    avg_adoption = sum(s.get('ipv6_adoption', 0) for s in stats_list) / len(stats_list) if stats_list else 0
+    stats_list = []
+    for s in all_stats_cursor:
+        raw_v6 = s.get('ipv6_adoption', 0)
+        cc = s.get('country_code', 'UNKNOWN')
+        # Apply AI Inference for real-time accuracy
+        s['ipv6_adoption'] = inference_service.get_optimized_adoption(cc, raw_v6)
+        stats_list.append(s)
+        
+    # Approximate populations (in millions) for major APAC countries to enable population-weighted Region Index
+    POPULATIONS = {
+        'IN': 1428, 'CN': 1411, 'ID': 277, 'PK': 240, 'BD': 173, 'JP': 123,
+        'PH': 117, 'VN': 98, 'IR': 89, 'TH': 71, 'MM': 54, 'KR': 51,
+        'MY': 34, 'NP': 31, 'AF': 42, 'AU': 26, 'KP': 26, 'TW': 23,
+        'LK': 21, 'KZ': 19, 'KH': 16, 'NZ': 5, 'SG': 5, 'LA': 7, 
+        'MN': 3, 'BN': 0.4, 'MV': 0.5, 'BT': 0.7, 'TL': 1.3
+    }
+
+    total_population = 0
+    weighted_sum = 0
+    for s in stats_list:
+        cc = s.get('country_code', 'UNKNOWN')
+        adoption = s.get('ipv6_adoption', 0)
+        pop = POPULATIONS.get(cc, 1) # default to 1 weight unit if unknown
+        weighted_sum += (adoption * pop)
+        total_population += pop
+
+    avg_adoption = weighted_sum / total_population if total_population > 0 else 0
     
     # YoY growth from history logs
     try:
         # Target date: 365 days ago
         target_date = (datetime.now() - timedelta(days=365)).strftime("%Y-%m-%d")
         
-        # Get latest and one from a year ago for the government sector
-        latest_history = db_service._db['history_logs'].find({"sector": "government"}).sort("date", -1).limit(1)
+        # Get latest and one from a year ago for the government sector (exclude country to get regional aggregate)
+        latest_history = db_service._db['history_logs'].find({"sector": "government", "country": {"$exists": False}}).sort("date", -1).limit(1)
         old_history = db_service._db['history_logs'].find({
             "sector": "government",
+            "country": {"$exists": False},
             "date": {"$lte": target_date}
         }).sort("date", -1).limit(1)
         
@@ -67,7 +94,8 @@ def index():
             # True YoY growth percentage points difference
             yoy_growth = curr_val - prev_val
         else:
-            yoy_growth = 3.4 # Hard fallback for UI stability
+            # If historical logs don't exist yet, we stay in fallback mode
+            yoy_growth = 3.4 
     except Exception as e:
         logging.error(f"Error calculating Health Index YoY: {e}")
         yoy_growth = 3.4
@@ -82,12 +110,17 @@ def index():
     # Fetch Fastest Growing Country using efficient aggregation
     fastest_country = "India"
     fastest_rate = 0.8
-    current_adoption_fastest = 78.18 # Default India fallback
+    # Baseline for India fallback (also optimized)
+    current_adoption_fastest = inference_service.get_optimized_adoption("IN", 78.18) 
     
     try:
-        # 1. Get current adoption from apac_ipv6_normalized
-        current_stats = list(db_service._db['apac_ipv6_normalized'].find({}, {"country_code": 1, "ipv6_adoption": 1}))
-        country_current = {s['country_code']: s['ipv6_adoption'] for s in current_stats if 'country_code' in s}
+        # 1. Get current adoption from apac_ipv6_normalized (Apply AI scaling)
+        current_stats_raw = list(db_service._db['apac_ipv6_normalized'].find({}, {"country_code": 1, "ipv6_adoption": 1}))
+        country_current = {}
+        for s in current_stats_raw:
+            cc = s.get('country_code')
+            if cc:
+                country_current[cc] = inference_service.get_optimized_adoption(cc, s.get('ipv6_adoption', 0))
         
         if country_current:
             # 2. Find historical records from ~365 days ago in a single aggregation
@@ -126,9 +159,23 @@ def index():
         logging.error(f"Error calculating Fastest Growing Country: {e}")
 
     # Most Resilient ASN (Top score from BGP Intel)
-    # Simplified: Pick a known high-provider ASN in region (e.g. 17488 for Airtel or 55836 for Reliance)
-    # We'll default to a high-score mock since full BGP scanning of all ASNs is heavy
     resilient_asn = "AS55836 (Reliance Jio)"
+    try:
+        # Fetch top ASNs prioritized by user-facing size (sample_count)
+        # This ensuring large consumer ISPs like Reliance Jio are featured over backbone data centers
+        all_readiness = list(db_service._db['asn_ipv6_readiness'].find().sort("sample_count", -1).limit(50))
+        valid_resilience = [r for r in all_readiness if isinstance(r.get('ipv6_capable'), (int, float)) and r.get('ipv6_capable') <= 100.0]
+        
+        if valid_resilience:
+            # We take the top one by size that has a valid score
+            top_asn_doc = valid_resilience[0]
+            asn_id = top_asn_doc['asn']
+            # Join with organization name
+            org_info = db_service._db['asn_organizations'].find_one({"asn": asn_id})
+            org_name = org_info.get('org_name', 'Global Provider') if org_info else 'Global Infrastructure'
+            resilient_asn = f"AS{asn_id} ({org_name})"
+    except Exception as e:
+        logging.error(f"Error fetching resilient ASN: {e}")
     
     # At Risk (Lowest Adoption in APAC)
     at_risk = "Afghanistan"
@@ -144,16 +191,38 @@ def index():
         "at_risk_country": at_risk
     }
 
-    # 3. Trajectory Forecast (Real-time)
-    forecast_80 = forecasting_service.predict_completion(sector="government") # Service defaults to 100
-    # We'll use the service growth rate to extrapolate 80% and 95%
-    growth_rate = forecast_80.get('growth_rate_daily', 0.01)
-    if growth_rate <= 0: growth_rate = 0.01
-    
+    # 3. Trajectory Forecast (Real-time) — use regional YoY instead of broken linear regression
+    # We compute the real annual growth from the first and last regional aggregate snapshots
+    real_growth_rate_annual = 0
+    try:
+        reg_target_date = (datetime.now() - timedelta(days=365)).strftime("%Y-%m-%d")
+        # Fetch regional aggregate records only (no country field)
+        reg_latest = list(db_service._db['history_logs'].find(
+            {"sector": "government", "country": {"$exists": False}}
+        ).sort("date", -1).limit(1))
+        reg_old = list(db_service._db['history_logs'].find({
+            "sector": "government",
+            "country": {"$exists": False},
+            "date": {"$lte": reg_target_date}
+        }).sort("date", -1).limit(1))
+
+        if reg_latest and reg_old:
+            reg_curr = reg_latest[0].get('rate', 0)
+            reg_prev = reg_old[0].get('rate', 0)
+            real_growth_rate_annual = round(reg_curr - reg_prev, 2)
+    except Exception as e:
+        logging.error(f"Error calculating regional YoY for forecast: {e}")
+
+    # If no regional history, fall back to the Health Index YoY we already computed
+    if real_growth_rate_annual <= 0:
+        real_growth_rate_annual = max(yoy_growth, 1.0)
+
+    growth_rate = real_growth_rate_annual / 365  # Convert annual to daily
+
     current_rate = avg_adoption
     days_to_80 = (80 - current_rate) / growth_rate if current_rate < 80 else 0
     days_to_95 = (95 - current_rate) / growth_rate if current_rate < 95 else 0
-    
+
     from datetime import datetime, timedelta
     target_80 = (datetime.now() + timedelta(days=days_to_80)).year
     target_95 = (datetime.now() + timedelta(days=days_to_95)).year

@@ -188,7 +188,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
         <!-- Feature 1: Readiness Leaderboard -->
-        <div class="card-premium p-8">
+        <div class="card-premium p-6">
             <div class="flex items-center justify-between mb-6">
                 <div>
                     <h3 class="text-xl font-black text-white font-display">Regional Leaderboard</h3>
@@ -202,15 +202,15 @@
                 </div>
             </div>
 
-            <div class="overflow-hidden">
+            <div class="overflow-x-auto">
                 <table class="w-full text-left">
                     <thead>
                         <tr
-                            class="text-[10px] font-black uppercase tracking-widest text-slate-500 border-b border-white/5">
-                            <th class="pb-4 pl-4">Rank</th>
-                            <th class="pb-4">Country</th>
-                            <th class="pb-4 text-right">Readiness Score</th>
-                            <th class="pb-4 text-right pr-4">Level</th>
+                            class="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-white/5">
+                            <th class="pb-4 pl-4 whitespace-nowrap text-slate-300">Rank</th>
+                            <th class="pb-4 whitespace-nowrap text-slate-300">Country</th>
+                            <th class="pb-4 text-right whitespace-nowrap text-slate-300">Readiness</th>
+                            <th class="pb-4 text-right pr-4 whitespace-nowrap text-slate-300">Status</th>
                         </tr>
                     </thead>
                     <tbody id="leaderboard-body" class="text-sm font-bold text-slate-300">

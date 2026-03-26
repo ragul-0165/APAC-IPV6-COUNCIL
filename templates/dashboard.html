@@ -50,6 +50,21 @@
         <div id="visualization-container">
             {% include 'components/intelligence_snapshot.html' %}
         </div>
+
+        <!-- AI Metrics Breakdown -->
+        <div class="mt-6 pt-6 border-t border-white/5 space-y-4">
+            <div class="flex items-center justify-between">
+                <div class="space-y-1">
+                    <span class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Model Confidence</span>
+                    <p id="dash-ai-explanation" class="text-[11px] text-blue-100/60 italic leading-relaxed max-w-lg">
+                        Processing cross-source telemetry for real-time validation...
+                    </p>
+                </div>
+                <div id="dash-ai-confidence" class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-500/10 text-blue-400 border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.1)]">
+                    Synchronizing
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

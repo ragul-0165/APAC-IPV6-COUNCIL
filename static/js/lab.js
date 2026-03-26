@@ -322,10 +322,23 @@ async function updateLabStats() {
             rateDisplay.textContent = `${rate}%`;
             progressBar.style.width = `${rate}%`;
 
-            // Add animation class
-            rateDisplay.classList.remove('animate-pulse');
-            void rateDisplay.offsetWidth; // Trigger reflow
-            rateDisplay.classList.add('animate-in', 'fade-in', 'slide-in-from-bottom-1');
+            // [NEW] Update AI Metrics (Confidence & Explanation)
+            const confidenceEl = document.getElementById('lab-ai-confidence');
+            const explanationEl = document.getElementById('lab-ai-explanation');
+
+            if (statsData.ai_confidence && confidenceEl) {
+                confidenceEl.innerText = statsData.ai_confidence;
+                // Color-coding
+                let colorClass = 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+                if (statsData.ai_confidence === 'High') colorClass = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+                else if (statsData.ai_confidence === 'Low') colorClass = 'bg-rose-500/10 text-rose-400 border-rose-500/30';
+                
+                confidenceEl.className = `px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider border shadow-sm ${colorClass}`;
+            }
+
+            if (statsData.ai_explanation && explanationEl) {
+                explanationEl.textContent = statsData.ai_explanation;
+            }
 
             // [NEW] Refresh Forecast for this specific country
             loadForecast(location);
