@@ -12,8 +12,9 @@ if not os.path.exists(DATA_PATH):
 
 df = pd.read_csv(DATA_PATH)
 
-# Feature selection (Truly Independent)
-FEATURES = ["year", "Google", "Cloudflare", "IPv6_Pulse"]
+# Feature selection — all 4 independent sources
+# adoption_score is now a weighted consensus, NOT copied from APNIC
+FEATURES = ["APNIC", "Google", "Cloudflare", "IPv6_Pulse"]
 X = df[FEATURES]
 y = df["adoption_score"]
 weights = df["samples"]
@@ -24,15 +25,16 @@ X_train, X_test, y_train, y_test, w_train, w_test = train_test_split(
     X, y, weights, test_size=0.2, random_state=42
 )
 
-# Random Forest model with Hyperparameter Tuning
-rf = RandomForestRegressor(random_state=42)
+from sklearn.linear_model import Ridge
+
+# Upgrade to Ridge Regression to properly map the linear consensus weights
+# and avoid Random Forest boundary clamping.
+rf = Ridge(alpha=1.0)
 param_grid = {
-    'n_estimators': [100, 300, 500],
-    'max_depth': [4, 6, 8, None],
-    'min_samples_leaf': [1, 2]
+    'alpha': [0.1, 1.0, 10.0]
 }
 
-print("Running Weighted Random Forest Training with GridSearchCV...")
+print("Running Consensus Training with Ridge Regression...")
 grid_search = GridSearchCV(estimator=rf, param_grid=param_grid, cv=3, n_jobs=-1, scoring='r2')
 grid_search.fit(X_train, y_train, sample_weight=w_train)
 
@@ -40,15 +42,20 @@ model = grid_search.best_estimator_
 print(f"Best Parameters: {grid_search.best_params_}")
 
 # Evaluate model
+
 score = model.score(X_test, y_test, sample_weight=w_test)
 print(f"Robust Real AI R^2 Score: {score:.4f}")
 
 # Log Feature Importances (The Real Proof of Independence)
-importances = model.feature_importances_
+importances = model.coef_
+# Normalize coefficients for percentage display
+importances_pct = (np.abs(importances) / np.sum(np.abs(importances))) * 100
+
 print("\n--- Feature Importances (Source Significance) ---")
-for feat, imp in zip(FEATURES, importances):
-    print(f"{feat:12}: {imp*100:6.2f}%")
+for feat, imp in zip(FEATURES, importances_pct):
+    print(f"{feat:12}: {imp:6.2f}%")
 print("------------------------------------------------\n")
+
 
 # Create models folder if not exists
 os.makedirs("models", exist_ok=True)

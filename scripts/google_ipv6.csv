@@ -1,0 +1,264 @@
+country_code,country,google_ipv6
+AF,Afghanistan,0.68
+AL,Albania,6.94
+DZ,Algeria,0.03
+AS,American Samoa,0.0
+AD,Andorra,3.15
+AO,Angola,15.23
+AI,Anguilla,22.53
+AQ,Antarctica,0.0
+AG,Antigua & Barbuda,3.11
+AR,Argentina,28.22
+AM,Armenia,8.02
+AW,Aruba,1.75
+AU,Australia,36.45
+AT,Austria,36.77
+AZ,Azerbaijan,0.25
+BS,Bahamas,25.62
+BH,Bahrain,18.52
+BD,Bangladesh,18.6
+BB,Barbados,13.48
+BY,Belarus,9.61
+BE,Belgium,70.49
+BZ,Belize,34.67
+BJ,Benin,1.13
+BM,Bermuda,18.56
+BT,Bhutan,39.63
+BO,Bolivia,44.38
+BA,Bosnia & Herzegovina,9.93
+BW,Botswana,8.13
+BV,Bouvet Island,0.0
+BR,Brazil,55.34
+IO,British Indian Ocean Territory,0.0
+VG,British Virgin Islands,14.81
+BN,Brunei,1.01
+BG,Bulgaria,23.37
+BF,Burkina Faso,10.45
+BI,Burundi,12.34
+KH,Cambodia,0.24
+CM,Cameroon,4.17
+CA,Canada,41.07
+CV,Cape Verde,3.43
+BQ,Caribbean Netherlands,3.71
+KY,Cayman Islands,2.96
+CF,Central African Republic,0.0
+TD,Chad,19.0
+CL,Chile,16.94
+CN,China,4.7
+CX,Christmas Island,0.0
+CC,Cocos (Keeling) Islands,0.0
+CO,Colombia,18.72
+KM,Comoros,0.0
+CG,Congo - Brazzaville,34.83
+CD,Congo - Kinshasa,11.44
+CK,Cook Islands,0.0
+CR,Costa Rica,16.08
+HR,Croatia,5.59
+CU,Cuba,0.47
+CW,CuraÃ§ao,6.39
+AN,CuraÃ§ao,0.0
+CY,Cyprus,18.36
+CZ,Czechia,41.21
+CI,CÃ´te dâIvoire,24.54
+DK,Denmark,22.68
+DJ,Djibouti,0.21
+DM,Dominica,31.99
+DO,Dominican Republic,37.07
+EC,Ecuador,33.68
+EG,Egypt,3.74
+SV,El Salvador,20.19
+GQ,Equatorial Guinea,0.21
+ER,Eritrea,0.0
+EE,Estonia,54.03
+SZ,Eswatini,3.82
+ET,Ethiopia,0.07
+EU,European Union,0.0
+FK,Falkland Islands (Islas Malvinas),0.0
+FO,Faroe Islands,1.8
+FJ,Fiji,31.02
+FI,Finland,48.12
+FR,France,87.39
+FX,France,0.0
+GF,French Guiana,0.0
+PF,French Polynesia,0.0
+TF,French Southern Territories,0.0
+GA,Gabon,32.15
+GM,Gambia,1.5
+GE,Georgia,11.22
+DE,Germany,78.14
+DD,Germany,0.0
+GH,Ghana,3.34
+GI,Gibraltar,0.0
+GR,Greece,64.5
+GL,Greenland,1.09
+GD,Grenada,7.66
+GP,Guadeloupe,0.0
+GU,Guam,3.91
+GT,Guatemala,58.52
+GG,Guernsey,0.0
+GN,Guinea,0.96
+GW,Guinea-Bissau,0.0
+GY,Guyana,33.65
+HT,Haiti,13.46
+HM,Heard & McDonald Islands,0.0
+HN,Honduras,25.04
+HK,Hong Kong,2.18
+HU,Hungary,53.15
+IS,Iceland,0.0
+IN,India,76.19
+ID,Indonesia,27.48
+IR,Iran,2.69
+IQ,Iraq,0.17
+IE,Ireland,40.23
+IM,Isle of Man,17.37
+IL,Israel,54.45
+IT,Italy,19.36
+JM,Jamaica,16.99
+JP,Japan,58.18
+JE,Jersey,0.0
+JO,Jordan,19.68
+KZ,Kazakhstan,19.96
+KE,Kenya,6.05
+KI,Kiribati,0.0
+XK,Kosovo,0.06
+KW,Kuwait,28.4
+KG,Kyrgyzstan,1.39
+LA,Laos,0.13
+LV,Latvia,28.58
+LB,Lebanon,1.13
+LS,Lesotho,0.64
+LR,Liberia,7.17
+LY,Libya,1.55
+LI,Liechtenstein,0.0
+LT,Lithuania,38.35
+LU,Luxembourg,45.32
+MO,Macao,33.48
+MG,Madagascar,7.71
+MW,Malawi,3.41
+MY,Malaysia,64.42
+MV,Maldives,14.3
+ML,Mali,17.54
+MT,Malta,0.0
+MH,Marshall Islands,0.0
+MQ,Martinique,0.0
+MR,Mauritania,3.92
+MU,Mauritius,0.56
+YT,Mayotte,0.0
+MX,Mexico,53.09
+FM,Micronesia,0.0
+MD,Moldova,13.05
+MC,Monaco,4.31
+MN,Mongolia,31.5
+ME,Montenegro,0.33
+MS,Montserrat,0.0
+MA,Morocco,1.01
+MZ,Mozambique,6.61
+MM,Myanmar (Burma),8.13
+NA,Namibia,0.56
+NR,Nauru,0.0
+NP,Nepal,55.66
+NL,Netherlands,28.12
+NT,Neutral Zone,0.0
+NC,New Caledonia,0.0
+NZ,New Zealand,21.85
+NI,Nicaragua,40.39
+NE,Niger,17.66
+NG,Nigeria,4.47
+NU,Niue,0.0
+NF,Norfolk Island,0.0
+KP,North Korea,0.0
+MK,North Macedonia,0.18
+MP,Northern Mariana Islands,4.0
+NO,Norway,47.13
+OM,Oman,20.3
+QO,Outlying Oceania,0.0
+PK,Pakistan,22.0
+PW,Palau,0.0
+PS,Palestine,0.1
+PA,Panama,6.59
+PG,Papua New Guinea,13.6
+PY,Paraguay,35.05
+PE,Peru,39.38
+PH,Philippines,19.01
+PN,Pitcairn Islands,0.0
+PL,Poland,18.62
+PT,Portugal,42.74
+XA,Pseudo-Accents,0.0
+XB,Pseudo-Bidi,0.0
+PR,Puerto Rico,52.01
+QA,Qatar,41.33
+RO,Romania,32.38
+RU,Russia,26.96
+SU,Russia,0.0
+RW,Rwanda,17.98
+RE,RÃ©union,0.0
+WS,Samoa,7.68
+SM,San Marino,0.0
+SA,Saudi Arabia,69.46
+SN,Senegal,23.6
+RS,Serbia,6.06
+YU,Serbia,0.0
+SC,Seychelles,0.83
+SL,Sierra Leone,4.44
+SG,Singapore,20.65
+SX,Sint Maarten,21.24
+SK,Slovakia,10.05
+SI,Slovenia,8.55
+SB,Solomon Islands,17.33
+SO,Somalia,0.51
+ZA,South Africa,2.36
+GS,South Georgia & South Sandwich Islands,0.0
+KR,South Korea,19.5
+SS,South Sudan,21.03
+ES,Spain,10.66
+LK,Sri Lanka,56.47
+BL,St. BarthÃ©lemy,0.0
+SH,St. Helena,0.0
+KN,St. Kitts & Nevis,2.33
+LC,St. Lucia,11.56
+MF,St. Martin,0.0
+PM,St. Pierre & Miquelon,0.0
+VC,St. Vincent & Grenadines,11.72
+SD,Sudan,9.45
+SR,Suriname,50.78
+SJ,Svalbard & Jan Mayen,0.0
+SE,Sweden,34.82
+CH,Switzerland,44.85
+SY,Syria,0.33
+ST,SÃ£o TomÃ© & PrÃ­ncipe,0.0
+TW,Taiwan,57.83
+TJ,Tajikistan,0.35
+TZ,Tanzania,0.55
+TH,Thailand,44.55
+TL,Timor-Leste,6.23
+TG,Togo,23.57
+TK,Tokelau,0.0
+TO,Tonga,0.0
+TT,Trinidad & Tobago,20.56
+TN,Tunisia,20.83
+TM,Turkmenistan,9.86
+TC,Turks & Caicos Islands,27.77
+TV,Tuvalu,0.0
+TR,TÃ¼rkiye,19.27
+UM,U.S. Outlying Islands,0.0
+VI,U.S. Virgin Islands,12.93
+UG,Uganda,1.57
+UA,Ukraine,14.68
+AE,United Arab Emirates,46.8
+GB,United Kingdom,54.31
+US,United States,53.71
+ZZ,Unknown Region,87.05
+UY,Uruguay,52.22
+UZ,Uzbekistan,9.93
+VU,Vanuatu,13.45
+VA,Vatican City,0.0
+VE,Venezuela,5.43
+VN,Vietnam,57.45
+WF,Wallis & Futuna,0.0
+EH,Western Sahara,0.0
+XC,XC,0.0
+YE,Yemen,6.61
+YD,Yemen,0.0
+ZM,Zambia,7.34
+ZW,Zimbabwe,22.33
+AX,Ãland Islands,0.0
