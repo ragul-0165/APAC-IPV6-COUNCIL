@@ -35,50 +35,75 @@ class ExternalIPv6DataService:
             return {}
 
     def fetch_google_data(self):
-        """Simulate Google traffic telemetry based on internal benchmarks with variance."""
-        # Google traffic typically mirrors APNIC but with a slight tilt towards mobile-heavy regions
-        baseline = self.fetch_apnic_data()
-        traffic_data = {cc: round(v * 0.95 + random.uniform(-2, 2), 1) for cc, v in baseline.items()}
-        self.save_external_stats("Google", traffic_data)
-        return traffic_data
+        """Fetch real Google traffic telemetry from authoritative merged dataset."""
+        try:
+            import pandas as pd
+            csv_path = 'datasets/merged_ipv6.csv'
+            if not os.path.exists(csv_path):
+                return {}
+            
+            df = pd.read_csv(csv_path)
+            # Apply consistent mapping fixes
+            df.loc[(df['country_code'] == 'BD') & (df['country'].str.contains('Brunei', na=False)), 'country_code'] = 'BN'
+            df.loc[(df['country_code'] == 'MA') & (df['country'].str.contains('Macau', na=False)), 'country_code'] = 'MO'
+            df = df.drop_duplicates(subset='country_code')
+            
+            traffic_data = {row['country_code']: row['google_ipv6_pct'] for _, row in df.iterrows() 
+                            if not pd.isna(row['google_ipv6_pct']) and row['google_ipv6_pct'] > 0}
+            
+            if traffic_data:
+                self.save_external_stats("Google", traffic_data)
+                return traffic_data
+            return {}
+        except Exception as e:
+            logging.error(f"Google CSV sync failed: {e}")
+            return {}
 
     def fetch_cloudflare_data(self):
-        """Simulate Cloudflare Radar telemetry based on internal benchmarks with variance."""
-        # Cloudflare often shows higher adoption due to CDN-heavy traffic
-        baseline = self.fetch_apnic_data()
-        cdn_data = {cc: round(v * 1.05 + random.uniform(-1, 3), 1) for cc, v in baseline.items()}
-        self.save_external_stats("Cloudflare", cdn_data)
-        return cdn_data
+        """Fetch real Cloudflare Radar telemetry from authoritative merged dataset."""
+        try:
+            import pandas as pd
+            csv_path = 'datasets/merged_ipv6.csv'
+            if not os.path.exists(csv_path):
+                return {}
+            
+            df = pd.read_csv(csv_path)
+            # Apply consistent mapping fixes
+            df.loc[(df['country_code'] == 'BD') & (df['country'].str.contains('Brunei', na=False)), 'country_code'] = 'BN'
+            df.loc[(df['country_code'] == 'MA') & (df['country'].str.contains('Macau', na=False)), 'country_code'] = 'MO'
+            df = df.drop_duplicates(subset='country_code')
+            
+            cdn_data = {row['country_code']: row['cloudflare_ipv6_pct'] for _, row in df.iterrows() 
+                        if not pd.isna(row['cloudflare_ipv6_pct']) and row['cloudflare_ipv6_pct'] > 0}
+            
+            if cdn_data:
+                self.save_external_stats("Cloudflare", cdn_data)
+                return cdn_data
+            return {}
+        except Exception as e:
+            logging.error(f"Cloudflare CSV sync failed: {e}")
+            return {}
 
     def fetch_ipv6_pulse_data(self):
-        """Fetch real-time IPv6 Pulse telemetry using the authoritative API key."""
-        if not self.pulse_api_key:
-            logging.warning("Pulse API key missing. Skipping live sync.")
-            return {}
+        """Fetch robust Pulse telemetry for all 56 regions from authoritative cached data."""
+        try:
+            import pandas as pd
+            csv_path = 'datasets/pulse_ipv6.csv'
+            if not os.path.exists(csv_path):
+                logging.warning("Pulse CSV missing. Skipping local sync.")
+                return {}
             
-        # For this hybrid approach, we fetch stats for the primary APAC countries
-        # The list matches our trained ground truth regions
-        countries = ["AU", "BD", "CN", "HK", "IN", "JP", "KR", "MY", "NZ", "PH", "PK", "SG", "TH", "VN"]
-        pulse_data = {}
-        
-        for cc in countries:
-            url = f"https://api.v6pulse.com/v1/stats/country/{cc}"
-            headers = {"Authorization": f"Bearer {self.pulse_api_key}"}
-            try:
-                response = requests.get(url, headers=headers, timeout=5)
-                if response.status_code == 200:
-                    data = response.json()
-                    # The API returns 'adoption' as a percentage
-                    val = data.get("adoption", 0)
-                    if val > 0:
-                        pulse_data[cc] = float(val)
-            except Exception as e:
-                logging.debug(f"Pulse fetch failed for {cc}: {e}")
-                continue
-        
-        if pulse_data:
-            self.save_external_stats("IPv6_Pulse", pulse_data)
-        return pulse_data
+            df = pd.read_csv(csv_path)
+            pulse_data = {row['country_code']: row['pulse_ipv6_pct'] for _, row in df.iterrows() 
+                          if not pd.isna(row['pulse_ipv6_pct'])}
+            
+            if pulse_data:
+                self.save_external_stats("IPv6_Pulse", pulse_data)
+                return pulse_data
+            return {}
+        except Exception as e:
+            logging.error(f"Pulse CSV sync failed: {e}")
+            return {}
 
     def save_external_stats(self, source, data):
         """Store normalized stats in MongoDB."""

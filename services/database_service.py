@@ -41,7 +41,7 @@ class MongoDBService:
         "ASN_READINESS": "asn_ipv6_readiness",
         "ASN_MASTER": "asn_organizations", # Fallback for legacy code
         "BGP_TOPOLOGY": "bgp_topology",
-        "POLICY_MANDATES": "policy_mandates",
+        "POLICY_MANDATES": "compliance_mandates",
         "GLOBAL_STATS": "global_ipv6_stats",
         "APAC_STATS": "apac_ipv6_normalized",
         "COUNTRY_CODES": "apac_country_codes",

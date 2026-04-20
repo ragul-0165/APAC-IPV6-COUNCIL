@@ -15,14 +15,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateLabStats();
     }
 
-    // Initialize Map
-    initMap();
-
     // Set default learning level
     setLearningLevel('advanced');
-
-    // Load Forecast
-    loadForecast();
 
     // Render Charts
     renderHierarchyChart();
@@ -52,7 +46,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadLedger();
 });
 
-
 // [NEW] Learning Level Logic
 function setLearningLevel(level) {
     // Reset tabs
@@ -66,13 +59,14 @@ function setLearningLevel(level) {
     });
 
     // Control visibility
-    const mapSection = document.getElementById('apac-map').closest('section');
+    const mapContainer = document.getElementById('apac-map');
+    const mapSection = mapContainer ? mapContainer.closest('section') : null;
     const vizSection = document.getElementById('viz-section');
-    const registrySection = document.getElementById('lab-lookup-results').closest('section');
-    const economySection = document.getElementById('lab-stat-display').closest('section');
+    const registrySection = document.getElementById('lab-lookup-results') ? document.getElementById('lab-lookup-results').closest('section') : null;
+    const economySection = document.getElementById('lab-stat-display') ? document.getElementById('lab-stat-display').closest('section') : null;
 
     if (level === 'beginner') {
-        // Show Map + Economy only
+        // Show Map (if exists) + Economy only
         if (mapSection) mapSection.style.display = 'block';
         if (economySection) economySection.style.display = 'block';
         if (vizSection) vizSection.style.display = 'none';
@@ -185,7 +179,18 @@ function onEachFeature(feature, layer) {
     let tooltipContent = `<strong>${feature.properties.name || code}</strong>`;
 
     if (stats && stats.ipv6_adoption !== undefined) {
-        tooltipContent += `<br/>Adoption: ${stats.ipv6_adoption.toFixed(1)}%`;
+        tooltipContent += `<br/><span style="color: #60a5fa; font-weight: 800;">AI Consensus: ${stats.ipv6_adoption.toFixed(1)}%</span>`;
+        
+        // Add breakdown if available in cache
+        if (stats.benchmarks) {
+            const b = stats.benchmarks;
+            tooltipContent += `<div style="border-top: 1px solid #334155; margin-top: 4px; padding-top: 4px; display: grid; grid-template-cols: 1fr 1fr; gap: 4px; font-size: 0.75em; color: #94a3b8;">`;
+            tooltipContent += `<span>APNIC: ${ (b.APNIC || 0).toFixed(1) }%</span>`;
+            tooltipContent += `<span>Google: ${ (b.Google || 0).toFixed(1) }%</span>`;
+            tooltipContent += `<span>Cloudflare: ${ (b.Cloudflare || 0).toFixed(1) }%</span>`;
+            tooltipContent += `<span>Pulse: ${ (b.Pulse || 0).toFixed(1) }%</span>`;
+            tooltipContent += `</div>`;
+        }
     } else {
         tooltipContent += `<br/>No Data`;
     }
@@ -305,17 +310,8 @@ async function updateLabStats() {
     }
 
     try {
-        let statsData;
-        if (location === 'APAC') {
-            const response = await fetch('/lab/api/apac/all_stats');
-            const allStats = await response.json();
-            const statsArray = Object.values(allStats);
-            const total = statsArray.reduce((acc, s) => acc + (s.ipv6_adoption || 0), 0);
-            statsData = { ipv6_adoption: total / statsArray.length };
-        } else {
-            const response = await fetch(`/lab/api/apac/ipv6?location=${location}`);
-            statsData = await response.json();
-        }
+        const response = await fetch(`/lab/api/apac/ipv6?location=${location}`);
+        const statsData = await response.json();
 
         if (statsData.ipv6_adoption !== undefined) {
             const rate = statsData.ipv6_adoption.toFixed(1);
@@ -340,8 +336,24 @@ async function updateLabStats() {
                 explanationEl.textContent = statsData.ai_explanation;
             }
 
-            // [NEW] Refresh Forecast for this specific country
-            loadForecast(location);
+            // [NEW] Update Telemetry Consensus Matrix
+            if (statsData.benchmarks) {
+                const b = statsData.benchmarks;
+                const sources = [
+                    { id: 'apnic', val: b.APNIC },
+                    { id: 'google', val: b.Google },
+                    { id: 'cloudflare', val: b.Cloudflare },
+                    { id: 'pulse', val: b.Pulse }
+                ];
+                
+                sources.forEach(s => {
+                    const txtEl = document.getElementById(`bench-${s.id}`);
+                    const barEl = document.getElementById(`bench-${s.id}-bar`);
+                    if (txtEl) txtEl.innerText = `${s.val.toFixed(1)}%`;
+                    if (barEl) barEl.style.width = `${s.val}%`;
+                });
+            }
+
             loadAuthorityDelta(location);
             loadPerformanceTax(location);
             loadEqualityIndex();
@@ -349,7 +361,6 @@ async function updateLabStats() {
         } else {
             rateDisplay.textContent = 'N/A';
             progressBar.style.width = '0%';
-            loadForecast(); // Fallback to regional
         }
     } catch (error) {
         console.error('Error fetching lab stats:', error);
@@ -450,6 +461,9 @@ async function performSectorClassification() {
 }
 
 async function loadForecast(country = null) {
+    const dateEl = document.getElementById('forecast-date');
+    if (!dateEl) return;
+
     try {
         let url = '/api/analytics/forecast/government';
         if (country) {
@@ -458,7 +472,6 @@ async function loadForecast(country = null) {
         const response = await fetch(url);
         const data = await response.json();
 
-        const dateEl = document.getElementById('forecast-date');
         const daysEl = document.getElementById('forecast-days');
         const rateEl = document.getElementById('forecast-rate');
         const barEl = document.getElementById('forecast-bar');

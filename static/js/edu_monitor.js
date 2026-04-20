@@ -105,17 +105,17 @@ function updateLeaderboard(ranking) {
 
     ranking.slice(0, 8).forEach(item => {
         const card = `
-            <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100/50 hover:border-indigo-100 transition group cursor-default">
+            <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5 hover:border-indigo-500/30 transition group cursor-default">
                 <div class="flex items-center gap-4">
-                    <span class="text-xs font-black text-slate-300 w-4 font-mono group-hover:text-indigo-400 transition">#${item.rank}</span>
+                    <span class="text-xs font-black text-slate-500 w-4 font-mono group-hover:text-indigo-400 transition">#${item.rank}</span>
                     <div>
-                        <p class="text-sm font-black text-slate-900 leading-tight">${item.full_name}</p>
-                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">${item.total_domains} Institutions</p>
+                        <p class="text-sm font-black text-white leading-tight">${item.full_name}</p>
+                        <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">${item.total_domains} Institutions</p>
                     </div>
                 </div>
                 <div class="text-right">
-                    <p class="text-sm font-black text-slate-900">${item.score}%</p>
-                    <div class="w-16 h-1 bg-slate-200 rounded-full mt-1 overflow-hidden">
+                    <p class="text-sm font-black text-white">${item.score}%</p>
+                    <div class="w-16 h-1 bg-white/10 rounded-full mt-1 overflow-hidden">
                         <div class="bg-indigo-500 h-full rounded-full" style="width: ${item.score}%"></div>
                     </div>
                 </div>

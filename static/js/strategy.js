@@ -31,27 +31,27 @@ async function loadComplianceScorecard() {
             const statusBg = m.status === 'Compliant' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : (m.status === 'On Track' ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-rose-50 text-rose-600 border-rose-100');
 
             tr.innerHTML = `
-                <td class="py-8">
+                <td class="py-8 p-8">
                     <div class="flex items-center gap-3">
                         <img src="https://flagcdn.com/w40/${m.country.toLowerCase()}.png" class="w-8 h-6 rounded shadow-sm">
                         <div>
-                            <p class="text-[13px] font-black text-slate-900 uppercase tracking-wider">${m.country}</p>
+                            <p class="text-[13px] font-black text-white uppercase tracking-wider">${m.country}</p>
                             <p class="text-[9px] font-bold text-slate-400 uppercase">Target Year: ${m.deadline}</p>
                         </div>
                     </div>
                 </td>
-                <td class="py-8">
+                <td class="py-8 p-8">
                     <div class="flex flex-col gap-1">
-                        <span class="text-sm font-black text-slate-700">${m.target_pct}% Adoption</span>
-                        <div class="w-24 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                            <div class="h-full bg-slate-400 w-full opacity-30"></div>
+                        <span class="text-sm font-black text-slate-300">${m.target_pct}% Adoption</span>
+                        <div class="w-24 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                            <div class="h-full bg-slate-500 w-full opacity-30"></div>
                         </div>
                     </div>
                 </td>
-                <td class="py-8">
+                <td class="py-8 p-8">
                     <div class="flex flex-col gap-1">
-                        <span class="text-sm font-black text-slate-900">${m.current_pct}% Measured</span>
-                        <div class="w-24 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <span class="text-sm font-black text-white">${m.current_pct}% Measured</span>
+                        <div class="w-24 h-1.5 bg-white/5 rounded-full overflow-hidden">
                             <div class="h-full bg-blue-500 transition-all duration-1000" style="width: ${m.current_pct}%"></div>
                         </div>
                     </div>

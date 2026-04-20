@@ -25,6 +25,10 @@ from blueprints.analytics import analytics_bp
 from blueprints.isp_intelligence import isp_intelligence_bp
 from services.database_service import db_service
 from services.automation_service import automation_service
+from services.inference_service import inference_service
+
+# Force-clear inference cache on reload/startup
+inference_service.clear_cache()
 
 # Initialize Flask app
 app = Flask(__name__, static_folder='static')

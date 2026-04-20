@@ -606,8 +606,67 @@ async function initHistoryChart() {
                 }
             }
         });
+
+        // [NEW] Update Trend Status UI
+        updateTrendStatus(history);
+
     } catch (e) {
         console.error("Chart failed", e);
+    }
+}
+
+function updateTrendStatus(history) {
+    const container = document.getElementById('trend-status-container');
+    const labelContainer = document.getElementById('trend-label-container');
+    const title = document.getElementById('trend-title');
+    const description = document.getElementById('trend-description');
+    const iconPath = document.getElementById('trend-icon-path');
+    const icon = document.getElementById('trend-icon');
+
+    if (!container || !history || history.length < 2) {
+        if (container) container.classList.add('opacity-50');
+        return;
+    }
+
+    container.classList.remove('opacity-50');
+
+    // Analysis: Compare latest to average of last few points
+    const latest = history[history.length - 1].rate;
+    const previousPoints = history.slice(-5, -1);
+    const avgPrevious = previousPoints.reduce((a, b) => a + b.rate, 0) / previousPoints.length;
+    
+    const diff = latest - avgPrevious;
+    const threshold = 0.5;
+
+    let state = 'stagnant';
+    if (diff > threshold) state = 'growth';
+    else if (diff < -threshold) state = 'decline';
+
+    // UI Updates
+    if (state === 'growth') {
+        container.className = "mt-4 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl transition-all duration-500";
+        labelContainer.className = "flex items-center space-x-2 text-emerald-400 font-black uppercase tracking-widest text-[10px] mb-1";
+        title.innerText = "Positive Growth";
+        description.innerText = "Government adoption is tracking upwards across the region.";
+        description.className = "text-[10px] text-emerald-100/60 font-medium";
+        iconPath.setAttribute('d', "M13 7h8m0 0v8m0-8l-8 8-4-4-6 6");
+        icon.style.transform = "rotate(0deg)";
+    } else if (state === 'decline') {
+        container.className = "mt-4 p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl transition-all duration-500";
+        labelContainer.className = "flex items-center space-x-2 text-rose-400 font-black uppercase tracking-widest text-[10px] mb-1";
+        title.innerText = "Downward Trend";
+        description.innerText = "Decline in active IPv6 government endpoints detected.";
+        description.className = "text-[10px] text-rose-100/60 font-medium";
+        iconPath.setAttribute('d', "M13 17h8m0 0V9m0 8l-8-8-4 4-6-6");
+        icon.style.transform = "rotate(0deg)";
+    } else {
+        container.className = "mt-4 p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl transition-all duration-500";
+        labelContainer.className = "flex items-center space-x-2 text-amber-400 font-black uppercase tracking-widest text-[10px] mb-1";
+        title.innerText = "Stagnation Detected";
+        description.innerText = "IPv6 infrastructure growth remains flat for this selection.";
+        description.className = "text-[10px] text-amber-100/60 font-medium";
+        iconPath.setAttribute('d', "M5 12h14");
+        icon.style.transform = "rotate(0deg)";
     }
 }
 

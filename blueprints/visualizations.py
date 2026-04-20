@@ -77,16 +77,13 @@ def index():
         # Target date: 365 days ago
         target_date = (datetime.now() - timedelta(days=365)).strftime("%Y-%m-%d")
         
-        # Get latest and one from a year ago for the government sector (exclude country to get regional aggregate)
-        latest_history = db_service._db['history_logs'].find({"sector": "government", "country": {"$exists": False}}).sort("date", -1).limit(1)
-        old_history = db_service._db['history_logs'].find({
-            "sector": "government",
-            "country": {"$exists": False},
-            "date": {"$lte": target_date}
-        }).sort("date", -1).limit(1)
+        # Load all regional logs to bypass MongoDB string collation issues
+        all_reg_logs = list(db_service._db['history_logs'].find({"sector": "government", "type": "regional_aggregate"}).sort("date", -1))
         
-        latest_history = list(latest_history)
-        old_history = list(old_history)
+        latest_history = [all_reg_logs[0]] if all_reg_logs else []
+        old_val = next((log for log in all_reg_logs if log['date'] <= target_date), None)
+        old_history = [old_val] if old_val else []
+
         
         if latest_history and old_history:
             prev_val = old_history[0].get('rate', 0)
@@ -196,15 +193,14 @@ def index():
     real_growth_rate_annual = 0
     try:
         reg_target_date = (datetime.now() - timedelta(days=365)).strftime("%Y-%m-%d")
-        # Fetch regional aggregate records only (no country field)
-        reg_latest = list(db_service._db['history_logs'].find(
-            {"sector": "government", "country": {"$exists": False}}
-        ).sort("date", -1).limit(1))
-        reg_old = list(db_service._db['history_logs'].find({
-            "sector": "government",
-            "country": {"$exists": False},
-            "date": {"$lte": reg_target_date}
-        }).sort("date", -1).limit(1))
+        # Load all regional aggregate records
+        all_forecast_logs = list(db_service._db['history_logs'].find(
+            {"sector": "government", "type": "regional_aggregate"}
+        ).sort("date", -1))
+        
+        reg_latest = [all_forecast_logs[0]] if all_forecast_logs else []
+        old_forecast_val = next((log for log in all_forecast_logs if log['date'] <= reg_target_date), None)
+        reg_old = [old_forecast_val] if old_forecast_val else []
 
         if reg_latest and reg_old:
             reg_curr = reg_latest[0].get('rate', 0)

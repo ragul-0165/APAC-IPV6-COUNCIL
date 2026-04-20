@@ -19,13 +19,19 @@ class ComplianceService:
             
             for m in mandates:
                 country = m.get('country')
-                target_year = m.get('deadline_year')
-                target_pct = m.get('target_pct')
+                # Find the Adoption Rate target for 2025 or the latest
+                milestones = m.get('milestones', [])
+                target_milestone = next((ms for ms in milestones if 'Adoption' in ms.get('metric', '')), None)
+                if not target_milestone and milestones:
+                    target_milestone = milestones[-1]
+                
+                if not target_milestone: continue
+
+                target_pct = target_milestone.get('target', 0)
+                target_date = target_milestone.get('date', '2025-12-31')
+                target_year = target_date.split('-')[0]
                 
                 # 2. Get Real-World Stats for this country
-                # We can reuse the aggregation logic from ASN Intelligence or just quick count
-                # Assuming gov domains for now as policies usually target gov first
-                
                 total_gov = db_service._db[db_service.COLLECTION_REGISTRY["GOV_DOMAINS"]].count_documents({"country": country})
                 
                 if total_gov == 0:
@@ -33,7 +39,6 @@ class ComplianceService:
                 else:
                     ready_gov = db_service._db[db_service.COLLECTION_REGISTRY["GOV_SCANS"]].count_documents({
                         "country": country,
-                         # Ready = Web + DNS (Standard definition)
                         "ipv6_web": True,
                         "ipv6_dns": True 
                     })
@@ -47,13 +52,13 @@ class ComplianceService:
                 elif gap >= 0: status = "Compliant"
                 
                 report.append({
-                    "country": country,
+                    "country": m.get('country_name', country),
                     "deadline": target_year,
                     "target_pct": target_pct,
                     "current_pct": round(real_pct, 1),
                     "gap": round(gap, 1),
                     "status": status,
-                    "source": m.get('source_doc')
+                    "source": m.get('official_roadmap', 'Verified Policy Doc')
                 })
                 
             return report

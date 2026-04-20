@@ -121,34 +121,34 @@ def process_domains(domains):
             'dnssec': 'unknown'
         }
         
-        if ns_status == 'exist':
-            success, ipv6_list, ipv4_list = check_ipv6_and_v4(domain)
-            if success:
-                res['ipv6'] = ', '.join(ipv6_list) if ipv6_list else 'None'
-                res['ipv4'] = ', '.join(ipv4_list) if ipv4_list else 'None'
-            
-            # Additional info
-            cert_info, expiry_date = check_tls(domain)
-            if cert_info:
-                # Extract organization from issuer
-                issuer = cert_info.get('issuer', ())
-                org = 'Unknown'
-                for rdn in issuer:
-                    for key, val in rdn:
-                        if key == 'organizationName':
-                            org = val
-                            break
-                    if org != 'Unknown': break
-                res['tls_issuer'] = org
-                res['tls_expiry'] = expiry_date.strftime('%Y-%m-%d %H:%M:%S') if expiry_date else 'N/A'
-            
-            # Hosting info
-            ip_info = get_website_ip_info(domain)
-            res['hosting_company'] = ip_info.get('org', 'Unknown')
-            res['hosting_location'] = ip_info.get('country', 'Unknown')
-            
-            # DNSSEC
-            res['dnssec'] = check_dnssec(domain)
+        # Perform all checks regardless of NS status
+        success, ipv6_list, ipv4_list = check_ipv6_and_v4(domain)
+        if success:
+            res['ipv6'] = ', '.join(ipv6_list) if ipv6_list else 'None'
+            res['ipv4'] = ', '.join(ipv4_list) if ipv4_list else 'None'
+        
+        # Additional info
+        cert_info, expiry_date = check_tls(domain)
+        if cert_info:
+            # Extract organization from issuer
+            issuer = cert_info.get('issuer', ())
+            org = 'Unknown'
+            for rdn in issuer:
+                for key, val in rdn:
+                    if key == 'organizationName':
+                        org = val
+                        break
+                if org != 'Unknown': break
+            res['tls_issuer'] = org
+            res['tls_expiry'] = expiry_date.strftime('%Y-%m-%d %H:%M:%S') if expiry_date else 'N/A'
+        
+        # Hosting info
+        ip_info = get_website_ip_info(domain)
+        res['hosting_company'] = ip_info.get('org', 'Unknown')
+        res['hosting_location'] = ip_info.get('country', 'Unknown')
+        
+        # DNSSEC
+        res['dnssec'] = check_dnssec(domain)
             
         results.append(res)
         logger.info(f"Finished analysis for {domain}")

@@ -48,7 +48,12 @@ class IntelligenceService:
                 raw_adoption = stat.get('ipv6_adoption', 0)
                 
                 # Apply AI Inference for Strategic Accuracy
-                adoption = inference_service.get_optimized_adoption(country_code, raw_adoption)
+                ai_data = inference_service.get_optimized_adoption(country_code, raw_adoption, include_metrics=True)
+                adoption = ai_data["prediction"]
+                
+                # Fetch individual benchmarks for tooltips
+                from .external_data_service import external_data_service
+                benchmarks = external_data_service.get_benchmarks(country_code)
                 
                 # Fetch historical rate from our grouped aggregation
                 prev_adoption = historical_stats.get(country_code)
@@ -64,7 +69,13 @@ class IntelligenceService:
                     'country': country_code,
                     'full_name': stat.get('country_name', country_code),
                     'adoption': float(adoption),
-                    'growth': float(growth)
+                    'growth': float(growth),
+                    'benchmarks': {
+                        'apnic': raw_adoption,
+                        'google': benchmarks.get("Google", {}).get(country_code, raw_adoption),
+                        'cloudflare': benchmarks.get("Cloudflare", {}).get(country_code, raw_adoption),
+                        'pulse': benchmarks.get("IPv6_Pulse", {}).get(country_code, 0)
+                    }
                 })
                 
                 total_adoption += adoption

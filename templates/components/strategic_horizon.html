@@ -88,7 +88,9 @@
             {% set y_pos = (y_offset + chart_height) - ((growth_val + 1) / 10) * chart_height %}
 
             <g class="country-point cursor-pointer" data-country="{{ p.full_name }}" data-adoption="{{ p.adoption }}"
-                data-growth="{{ p.growth }}" data-class="{{ p.classification }}">
+                data-growth="{{ p.growth }}" data-class="{{ p.classification }}"
+                data-apnic="{{ p.benchmarks.apnic }}" data-google="{{ p.benchmarks.google }}" 
+                data-cloudflare="{{ p.benchmarks.cloudflare }}" data-pulse="{{ p.benchmarks.pulse }}">
                 <circle cx="{{ x_pos }}" cy="{{ y_pos }}" r="6"
                     class="{% if p.color_class == 'emerald' %}fill-emerald-500 stroke-emerald-600{% elif p.color_class == 'amber' %}fill-amber-400 stroke-amber-500{% elif p.color_class == 'blue' %}fill-blue-500 stroke-blue-600{% else %}fill-rose-500 stroke-rose-600{% endif %} transition-all duration-300 hover:r-10"
                     stroke-width="1.5" opacity="0.85" />
@@ -108,21 +110,43 @@
 
     <!-- Dynamic Tooltip (Refined) -->
     <div id="horizon-tooltip"
-        class="fixed hidden bg-slate-900/95 backdrop-blur-sm text-white p-3 rounded-xl shadow-2xl border border-slate-700/50 pointer-events-none z-[100] min-w-[160px]">
+        class="fixed hidden bg-slate-900/95 backdrop-blur-md text-white p-4 rounded-xl shadow-2xl border border-white/10 pointer-events-none z-[100] min-w-[200px]">
         <p id="tooltip-country"
-            class="text-[11px] font-black uppercase tracking-widest border-b border-slate-700/50 pb-2 mb-2 text-blue-400">
+            class="text-[11px] font-black uppercase tracking-widest border-b border-white/10 pb-2 mb-3 text-blue-400">
         </p>
-        <div class="space-y-1.5">
-            <div class="flex justify-between text-[10px]">
-                <span class="text-slate-400 font-bold uppercase tracking-tighter">Adoption:</span>
-                <span id="tooltip-adoption" class="font-black tabular-nums"></span>
+        
+        <div class="space-y-2">
+            <div class="flex justify-between items-center text-[10px]">
+                <span class="text-slate-400 font-bold uppercase tracking-tighter">Unified Consensus:</span>
+                <span id="tooltip-adoption" class="font-black text-white tabular-nums"></span>
             </div>
-            <div class="flex justify-between text-[10px]">
+            
+            <div class="grid grid-cols-2 gap-x-4 gap-y-1 pt-2 border-t border-white/5">
+                <div class="flex flex-col">
+                    <span class="text-[7px] text-slate-500 font-black uppercase">APNIC</span>
+                    <span id="coord-apnic" class="text-[9px] font-bold text-slate-300">--%</span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-[7px] text-slate-500 font-black uppercase">Google</span>
+                    <span id="coord-google" class="text-[9px] font-bold text-slate-300">--%</span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-[7px] text-slate-500 font-black uppercase">Cloudflare</span>
+                    <span id="coord-cloudflare" class="text-[9px] font-bold text-slate-300">--%</span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-[7px] text-slate-500 font-black uppercase">Pulse</span>
+                    <span id="coord-pulse" class="text-[9px] font-bold text-slate-300">--%</span>
+                </div>
+            </div>
+
+            <div class="flex justify-between text-[10px] mt-2 pt-2 border-t border-white/5">
                 <span class="text-slate-400 font-bold uppercase tracking-tighter">Velocity:</span>
                 <span id="tooltip-growth" class="font-black tabular-nums"></span>
             </div>
-            <div class="flex flex-col mt-2 pt-2 border-t border-slate-700/50">
-                <span class="text-[8px] text-slate-500 font-black uppercase tracking-widest mb-1">Status</span>
+            
+            <div class="flex flex-col mt-2 pt-2 border-t border-white/10">
+                <span class="text-[8px] text-slate-500 font-black uppercase tracking-widest mb-1">Stratification</span>
                 <span id="tooltip-class" class="text-[10px] font-black uppercase"></span>
             </div>
         </div>
@@ -174,11 +198,21 @@
                 const adoption = point.getAttribute('data-adoption');
                 const growth = point.getAttribute('data-growth');
                 const classification = point.getAttribute('data-class');
+                const apnic = point.getAttribute('data-apnic');
+                const google = point.getAttribute('data-google');
+                const cf = point.getAttribute('data-cloudflare');
+                const pulse = point.getAttribute('data-pulse');
 
                 document.getElementById('tooltip-country').textContent = country;
                 document.getElementById('tooltip-adoption').textContent = adoption + '%';
                 document.getElementById('tooltip-growth').textContent = growth + '%';
                 document.getElementById('tooltip-class').textContent = classification;
+
+                // Set coordinates for 4-source grid
+                document.getElementById('coord-apnic').textContent = parseFloat(apnic).toFixed(1) + '%';
+                document.getElementById('coord-google').textContent = parseFloat(google).toFixed(1) + '%';
+                document.getElementById('coord-cloudflare').textContent = parseFloat(cf).toFixed(1) + '%';
+                document.getElementById('coord-pulse').textContent = parseFloat(pulse).toFixed(1) + '%';
 
                 // Set class color
                 const classSpan = document.getElementById('tooltip-class');

@@ -88,12 +88,18 @@ function onEachMapFeature(feature, layer) {
     let tooltipContent = `<strong>${feature.properties.name || code}</strong>`;
 
     if (stats && stats.ipv6_adoption !== undefined) {
-        tooltipContent += `<br/>AI Aggregate: ${stats.ipv6_adoption.toFixed(1)}%`;
-        if (stats.ai_confidence) {
-            tooltipContent += `<br/><span style="font-size: 0.8em; color: #60a5fa; font-weight: 800;">Confidence: ${stats.ai_confidence.toUpperCase()}</span>`;
+        tooltipContent += `<br/><span style="color: #60a5fa; font-weight: 800;">AI Consensus: ${stats.ipv6_adoption.toFixed(1)}%</span>`;
+        if (stats.benchmarks) {
+            const b = stats.benchmarks;
+            tooltipContent += `<div style="border-top: 1px solid #334155; margin-top: 4px; padding-top: 4px; display: grid; grid-template-cols: 1fr 1fr; gap: 4px; font-size: 0.75em; color: #94a3b8;">`;
+            tooltipContent += `<span>APNIC: ${b.APNIC.toFixed(1)}%</span>`;
+            tooltipContent += `<span>Google: ${b.Google.toFixed(1)}%</span>`;
+            tooltipContent += `<span>Cloudflare: ${b.Cloudflare.toFixed(1)}%</span>`;
+            tooltipContent += `<span>Pulse: ${b.Pulse.toFixed(1)}%</span>`;
+            tooltipContent += `</div>`;
         }
-        if (stats.raw_source_fallback) {
-            tooltipContent += `<br/><span style="font-size: 0.8em; color: #94a3b8;">Raw APNIC: ${stats.raw_source_fallback}</span>`;
+        if (stats.ai_confidence) {
+            tooltipContent += `<div style="margin-top: 4px; font-size: 0.7em; font-weight: 900; color: #3b82f6; text-transform: uppercase;">Confidence: ${stats.ai_confidence}</div>`;
         }
     } else {
         tooltipContent += `<br/>No Data`;

@@ -153,49 +153,44 @@ function renderISPTable(data) {
 
     pageData.forEach(item => {
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-50 transition group isp-row cursor-pointer";
+        tr.className = "hover:bg-white/5 transition group isp-row cursor-pointer";
         tr.onclick = () => openISPModal(item);
 
-        // Data is now guaranteed from Registry/CAIDA
         const orgName = item.org_name || 'Unknown (Registry)';
         const ipv6Score = item.ipv6_percentage !== null ? `${item.ipv6_percentage}%` : '---';
         const ipv6Width = item.ipv6_percentage || 0;
 
-        // BGP Resilience
         const bgp = item.bgp_resilience || { upstream_count: 0, score: 0, status: 'Unknown' };
-        const resilColor = bgp.score >= 60 ? 'text-emerald-600' : (bgp.score >= 10 ? 'text-amber-600' : 'text-red-600');
+        const resilColor = bgp.score >= 60 ? 'text-emerald-400' : (bgp.score >= 10 ? 'text-amber-400' : 'text-rose-400');
 
-        const verificationBadge = `<span class="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-600 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border border-indigo-100">
-                <span class="w-1 h-1 bg-indigo-500 rounded-full"></span> Registry Verified
+        const verificationBadge = `<span class="inline-flex items-center gap-1.5 bg-blue-500/10 text-blue-400 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border border-blue-500/20">
+                <span class="w-1 h-1 bg-blue-400 rounded-full"></span> Registry Verified
                </span>`;
 
         tr.innerHTML = `
-            <td class="py-5">
-                <span class="text-xs font-black text-slate-400 bg-slate-100 px-2 py-1 rounded-lg">AS${item.asn}</span>
+            <td class="p-6">
+                <span class="text-xs font-black text-slate-500 bg-white/5 px-2 py-1 rounded-lg">AS${item.asn}</span>
             </td>
-            <td class="py-5">
-                <p class="text-sm font-black text-slate-900">${orgName}</p>
-                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Source: ${item.data_source || 'Local Registry'}</p>
+            <td class="p-6">
+                <p class="text-sm font-black text-white">${orgName}</p>
+                <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Source: ${item.data_source || 'Local Registry'}</p>
             </td>
-            <td class="py-5">
+            <td class="p-6">
                 <div class="flex items-center gap-3">
-                    <span class="text-lg font-black text-slate-700 font-mono">${ipv6Score}</span>
-                    <div class="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                        <div class="h-full ${ipv6Width > 50 ? 'bg-emerald-500' : 'bg-blue-500'} w-0 transition-all duration-1000" style="width: ${ipv6Width}%"></div>
+                    <span class="text-lg font-black text-slate-300 font-mono">${ipv6Score}</span>
+                    <div class="w-20 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                        <div class="h-full ${ipv6Width > 50 ? 'bg-emerald-500' : 'bg-blue-500'} transition-all duration-1000" style="width: ${ipv6Width}%"></div>
                     </div>
                 </div>
             </td>
-            <td class="py-5">
+            <td class="p-6">
                 <div class="flex flex-col">
                     <span class="text-xs font-black ${resilColor}">${bgp.status}</span>
-                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">${bgp.upstream_count} Upstreams</span>
+                    <span class="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">${bgp.upstream_count} Upstreams</span>
                 </div>
             </td>
-            <td class="py-5">
+            <td class="p-6">
                 ${verificationBadge}
-                <p class="text-[8px] font-medium text-slate-400 mt-1 uppercase tracking-tighter">
-                   APNIC Labs Data
-                </p>
             </td>
         `;
         tbody.appendChild(tr);
@@ -209,14 +204,14 @@ function renderISPPagination(total) {
     if (!controls) {
         controls = document.createElement('div');
         controls.id = 'isp-pagination';
-        controls.className = "flex justify-center items-center gap-4 py-8 border-t border-slate-50";
+        controls.className = "flex justify-center items-center gap-4 py-8 border-t border-white/5 bg-white/5";
         document.getElementById('isp-table-body').parentNode.parentNode.appendChild(controls);
     }
 
     controls.innerHTML = `
-        <button onclick="changeISPPage(-1)" ${currentISPPage === 1 ? 'disabled' : ''} class="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-bold uppercase tracking-wider disabled:opacity-30 transition">Previous</button>
-        <span class="text-xs font-black text-slate-400">Page ${currentISPPage} of ${total}</span>
-        <button onclick="changeISPPage(1)" ${currentISPPage === total ? 'disabled' : ''} class="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-bold uppercase tracking-wider disabled:opacity-30 transition">Next</button>
+        <button onclick="changeISPPage(-1)" ${currentISPPage === 1 ? 'disabled' : ''} class="px-4 py-2 bg-slate-900 border border-white/10 hover:bg-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-300 disabled:opacity-30 transition">Previous</button>
+        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest px-4">Page ${currentISPPage} / ${total}</span>
+        <button onclick="changeISPPage(1)" ${currentISPPage === total ? 'disabled' : ''} class="px-4 py-2 bg-slate-900 border border-white/10 hover:bg-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-300 disabled:opacity-30 transition">Next</button>
     `;
 }
 
@@ -435,8 +430,18 @@ function renderBenchmarkChart(data) {
             axisBorder: { show: false },
             axisTicks: { show: false }
         },
-        yaxis: { show: false, max: 100 },
-        grid: { show: false }
+        yaxis: { 
+            show: false, 
+            max: 100 
+        },
+        grid: { 
+            show: true,
+            borderColor: 'rgba(255,255,255,0.05)',
+            strokeDashArray: 4,
+            yaxis: {
+                lines: { show: true }
+            }
+        }
     };
 
     if (benchmarkChart) {

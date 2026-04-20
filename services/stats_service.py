@@ -11,6 +11,15 @@ class StatsService:
     CACHE_DIR = '.cache'
     CACHE_EXPIRY = 86400  # 24 hours
 
+    # Approximate populations (in millions) for major APAC countries for population-weighted Region Index
+    POPULATIONS = {
+        'IN': 1428, 'CN': 1411, 'ID': 277, 'PK': 240, 'BD': 173, 'JP': 123,
+        'PH': 117, 'VN': 98, 'IR': 89, 'TH': 71, 'MM': 54, 'KR': 51,
+        'MY': 34, 'NP': 31, 'AF': 42, 'AU': 26, 'KP': 26, 'TW': 23,
+        'LK': 21, 'KZ': 19, 'KH': 16, 'NZ': 5, 'SG': 5, 'LA': 7, 
+        'MN': 3, 'BN': 0.4, 'MV': 0.5, 'BT': 0.7, 'TL': 1.3
+    }
+
     def __init__(self, cache_dir=None):
         if cache_dir:
             self.CACHE_DIR = cache_dir
@@ -108,12 +117,75 @@ class StatsService:
         # Return last 'days' entries
         return data[-days:]
 
+    def get_regional_aggregate_stats(self):
+        """Calculates population-weighted regional aggregate for APAC."""
+        if not db_service.connect():
+            return None
+            
+        try:
+            from services.external_data_service import external_data_service
+            all_benchmarks = external_data_service.get_benchmarks('ALL')
+            
+            cursor = db_service.apac_stats.find()
+            
+            total_pop = 0
+            weighted_ai = 0
+            
+            # Source accumulators
+            source_totals = {"APNIC": 0, "Google": 0, "Cloudflare": 0, "Pulse": 0}
+            source_counts = {"APNIC": 0, "Google": 0, "Cloudflare": 0, "Pulse": 0}
+            
+            for record in cursor:
+                cc = record["country_code"]
+                raw_adoption = record["ipv6_adoption"]
+                pop = self.POPULATIONS.get(cc, 1)
+                
+                # AI Inference
+                ai_data = inference_service.get_optimized_adoption(cc, raw_adoption)
+                
+                weighted_ai += (ai_data * pop)
+                total_pop += pop
+                
+                # Benchmarks (Simple average for display matrix)
+                b = {
+                    "APNIC": raw_adoption,
+                    "Google": all_benchmarks.get("Google", {}).get(cc),
+                    "Cloudflare": all_benchmarks.get("Cloudflare", {}).get(cc),
+                    "Pulse": all_benchmarks.get("IPv6_Pulse", {}).get(cc)
+                }
+                
+                for key, val in b.items():
+                    if val is not None and val > 0:
+                        source_totals[key] += val
+                        source_counts[key] += 1
+            
+            if total_pop == 0: return None
+            
+            return {
+                "country": "APAC",
+                "ipv6_adoption": round(weighted_ai / total_pop, 2),
+                "ai_confidence": "High",
+                "ai_explanation": "Population-weighted consensus across 56 APAC regions.",
+                "benchmarks": {
+                    k: round(source_totals[k] / source_counts[k], 2) if source_counts[k] > 0 else 0
+                    for k in source_totals
+                },
+                "source": "AI Aggregate Model (Regional)",
+                "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            }
+        except Exception as e:
+            logging.error(f"Regional aggregation failed: {e}")
+            return None
+
     def get_apac_ipv6_stats(self, location_code):
         """
         Returns normalized IPv6 stats for a specific APAC country from MongoDB 
-        with automatic JSON fallback.
+        with automatic JSON fallback. Supporting 'APAC' regional aggregate.
         """
         location_code = location_code.upper()
+
+        if location_code == 'APAC':
+            return self.get_regional_aggregate_stats()
 
         # 1. Try MongoDB
         if db_service.connect():
@@ -122,11 +194,22 @@ class StatsService:
                 if record:
                     raw_adoption = record.get("ipv6_adoption", 0)
                     ai_data = inference_service.get_optimized_adoption(location_code, raw_adoption, include_metrics=True)
+                    
+                    # Fetch individual benchmarks for the UI breakdown
+                    from services.external_data_service import external_data_service
+                    benchmarks = external_data_service.get_benchmarks(location_code)
+                    
                     return {
                         "country": record["country_code"],
                         "ipv6_adoption": ai_data["prediction"],
                         "ai_confidence": ai_data["confidence"],
                         "ai_explanation": ai_data["explanation"],
+                        "benchmarks": {
+                            "APNIC": raw_adoption,
+                            "Google": benchmarks.get("Google", {}).get(location_code, raw_adoption),
+                            "Cloudflare": benchmarks.get("Cloudflare", {}).get(location_code, raw_adoption),
+                            "Pulse": benchmarks.get("IPv6_Pulse", {}).get(location_code, 0)
+                        },
                         "source": "AI Aggregate Model",
                         "raw_source_fallback": record.get("source", "APNIC Labs"),
                         "last_updated": record.get("last_updated")
@@ -178,6 +261,9 @@ class StatsService:
             try:
                 cursor = db_service.apac_stats.find()
                 results = {}
+                from services.external_data_service import external_data_service
+                all_benchmarks = external_data_service.get_benchmarks('ALL')
+                
                 for record in cursor:
                     c_code = record["country_code"]
                     raw_adoption = record["ipv6_adoption"]
@@ -187,6 +273,12 @@ class StatsService:
                         "ipv6_adoption": ai_data["prediction"],
                         "ai_confidence": ai_data["confidence"],
                         "ai_explanation": ai_data["explanation"],
+                        "benchmarks": {
+                            "APNIC": raw_adoption,
+                            "Google": all_benchmarks.get("Google", {}).get(c_code, raw_adoption),
+                            "Cloudflare": all_benchmarks.get("Cloudflare", {}).get(c_code, raw_adoption),
+                            "Pulse": all_benchmarks.get("IPv6_Pulse", {}).get(c_code, 0)
+                        },
                         "source": "AI Aggregate Model"
                     }
                 if results:
@@ -203,9 +295,21 @@ class StatsService:
                 data = json.load(f)
             
             stats_dict = data.get('stats', {})
+            from services.external_data_service import external_data_service
+            all_benchmarks = external_data_service.get_benchmarks('ALL')
+            
             for c_code, c_data in stats_dict.items():
                 raw_adoption = c_data.get("ipv6_adoption", 0)
-                stats_dict[c_code]["ipv6_adoption"] = inference_service.get_optimized_adoption(c_code, raw_adoption)
+                ai_data = inference_service.get_optimized_adoption(c_code, raw_adoption, include_metrics=True)
+                stats_dict[c_code]["ipv6_adoption"] = ai_data["prediction"]
+                stats_dict[c_code]["ai_confidence"] = ai_data["confidence"]
+                stats_dict[c_code]["ai_explanation"] = ai_data["explanation"]
+                stats_dict[c_code]["benchmarks"] = {
+                    "APNIC": raw_adoption,
+                    "Google": all_benchmarks.get("Google", {}).get(c_code, raw_adoption),
+                    "Cloudflare": all_benchmarks.get("Cloudflare", {}).get(c_code, raw_adoption),
+                    "Pulse": all_benchmarks.get("IPv6_Pulse", {}).get(c_code, 0)
+                }
                 stats_dict[c_code]["source"] = "AI Aggregate Model"
                 
             return stats_dict

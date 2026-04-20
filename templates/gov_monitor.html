@@ -108,15 +108,15 @@
                     <canvas id="govHistoryChart"></canvas>
                 </div>
             </div>
-            <div class="mt-4 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl">
-                <div class="flex items-center space-x-2 text-emerald-400 font-black uppercase tracking-widest text-[10px] mb-1">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            <div id="trend-status-container" class="mt-4 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl transition-all duration-500">
+                <div id="trend-label-container" class="flex items-center space-x-2 text-emerald-400 font-black uppercase tracking-widest text-[10px] mb-1">
+                    <svg id="trend-icon" class="w-4 h-4 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path id="trend-icon-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                     </svg>
-                    <span>Positive Growth</span>
+                    <span id="trend-title">Positive Growth</span>
                 </div>
-                <p class="text-[10px] text-emerald-100/60 font-medium">Government adoption is tracking upwards across the region.</p>
+                <p id="trend-description" class="text-[10px] text-emerald-100/60 font-medium">Government adoption is tracking upwards across the region.</p>
             </div>
         </div>
     </div>
