@@ -1,11 +1,13 @@
 let currentCountry = 'IN';
 let currentISPPage = 1;
 const ISP_PER_PAGE = 25;
-let fullISPData = [];
-let filteredISPData = null;
 let currentFilter = 'all';
 let isVerifying = false;
 let benchmarkChart = null;
+let totalISPPages = 1;
+let totalISPRecords = 0;
+let searchDebounceTimer = null;
+let currentSearchQuery = '';
 
 document.addEventListener('DOMContentLoaded', () => {
     // [GLOBAL SYNC] Initialize based on global state
@@ -13,8 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadStats();
 
-    // Check if the current country is supported by the ISP explorer (currently only IN/MY)
-    if (['IN', 'MY'].includes(currentGlobalCountry)) {
+    // Check if the current country is supported by the ISP explorer (currently IN/MY/ID)
+    if (['IN', 'MY', 'ID'].includes(currentGlobalCountry)) {
         switchISPCountry(currentGlobalCountry, false);
     } else {
         switchISPCountry('IN', false); // Default to India for ISP view if global is unsupported
@@ -23,9 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // [GLOBAL SYNC] Listen for region changes
     window.addEventListener('countryChanged', (e) => {
         const newCountry = e.detail.country;
-        if (['IN', 'MY'].includes(newCountry) && newCountry !== currentCountry) {
+        if (['IN', 'MY', 'ID'].includes(newCountry) && newCountry !== currentCountry) {
             switchISPCountry(newCountry, false);
-        } else if (!['IN', 'MY'].includes(newCountry)) {
+        } else if (!['IN', 'MY', 'ID'].includes(newCountry)) {
             console.log(`ISP Explorer: Country ${newCountry} is not yet indexed. Maintaining ${currentCountry}.`);
         }
     });
@@ -39,14 +41,18 @@ async function loadStats() {
         // Update Banner Counts
         const inStat = document.getElementById('stat-count-in');
         const myStat = document.getElementById('stat-count-my');
+        const idStat = document.getElementById('stat-count-id');
         if (inStat) inStat.innerText = `${stats.india_count.toLocaleString()} ASNs`;
         if (myStat) myStat.innerText = `${stats.malaysia_count.toLocaleString()} ASNs`;
+        if (idStat) idStat.innerText = `${stats.indonesia_count.toLocaleString()} ASNs`;
 
         // Update Sidebar Badges
         const inBadge = document.getElementById('badge-count-in');
         const myBadge = document.getElementById('badge-count-my');
+        const idBadge = document.getElementById('badge-count-id');
         if (inBadge) inBadge.innerText = `${stats.india_count.toLocaleString()} ASNs`;
         if (myBadge) myBadge.innerText = `${stats.malaysia_count.toLocaleString()} ASNs`;
+        if (idBadge) idBadge.innerText = `${stats.indonesia_count.toLocaleString()} ASNs`;
 
     } catch (e) {
         console.error("Failed to load stats:", e);
@@ -56,14 +62,23 @@ async function loadStats() {
 async function switchISPCountry(code, updateGlobal = true) {
     currentCountry = code;
     currentFilter = 'all'; // Reset filter on country switch
+    currentISPPage = 1; // Reset page on country switch
+    currentSearchQuery = ''; // Reset search on country switch
+    const searchInput = document.getElementById('isp-search');
+    if (searchInput) searchInput.value = '';
+    
     const title = document.getElementById('country-title');
-    const fullCountryName = code === 'IN' ? 'India' : 'Malaysia';
+    
+    let fullCountryName = 'India';
+    if (code === 'MY') fullCountryName = 'Malaysia';
+    if (code === 'ID') fullCountryName = 'Indonesia';
 
     title.innerText = `${fullCountryName} Registry Explorer`;
 
     // Update active buttons
     const btnIn = document.getElementById('btn-in');
     const btnMy = document.getElementById('btn-my');
+    const btnId = document.getElementById('btn-id');
     if (btnIn) {
         btnIn.classList.toggle('border-blue-500', code === 'IN');
         btnIn.classList.toggle('bg-blue-50', code === 'IN');
@@ -71,6 +86,10 @@ async function switchISPCountry(code, updateGlobal = true) {
     if (btnMy) {
         btnMy.classList.toggle('border-blue-500', code === 'MY');
         btnMy.classList.toggle('bg-blue-50', code === 'MY');
+    }
+    if (btnId) {
+        btnId.classList.toggle('border-blue-500', code === 'ID');
+        btnId.classList.toggle('bg-blue-50', code === 'ID');
     }
 
     // Update global state if requested
@@ -81,19 +100,8 @@ async function switchISPCountry(code, updateGlobal = true) {
     await loadCountryData();
 }
 
-let asnCache = new Map();
-
 async function loadCountryData() {
     const tbody = document.getElementById('isp-table-body');
-    const cacheKey = `${currentCountry}_${currentFilter}`;
-
-    // Performance Guardrail: Check local cache first
-    if (asnCache.has(cacheKey)) {
-        console.log(`Loading ${cacheKey} from Performance Cache`);
-        fullISPData = asnCache.get(cacheKey);
-        renderISPAndInitialize();
-        return;
-    }
 
     // Loading State
     tbody.innerHTML = `
@@ -103,19 +111,28 @@ async function loadCountryData() {
     `;
 
     try {
-        const response = await fetch(`/api/asn?country=${currentCountry}&filter=${currentFilter}`);
-        if (!response.ok) throw new Error(`API Error: ${response.status}`);
-
-        fullISPData = await response.json();
-        console.log(`Loaded ${fullISPData.length} ASNs for ${currentCountry}`);
-
-        if (!Array.isArray(fullISPData)) {
-            throw new Error("API did not return a valid list of ASNs");
+        // Build URL with server-side pagination params
+        let url = `/api/asn?country=${currentCountry}&filter=${currentFilter}&page=${currentISPPage}&per_page=${ISP_PER_PAGE}`;
+        if (currentSearchQuery) {
+            url += `&search=${encodeURIComponent(currentSearchQuery)}`;
         }
 
-        // Cache the result
-        asnCache.set(cacheKey, fullISPData);
-        renderISPAndInitialize();
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`API Error: ${response.status}`);
+
+        const result = await response.json();
+        
+        // Server now returns {data: [...], total: N, page: N, per_page: N, total_pages: N}
+        const pageData = result.data || [];
+        totalISPRecords = result.total || 0;
+        totalISPPages = result.total_pages || 1;
+        currentISPPage = result.page || 1;
+
+        console.log(`Loaded page ${currentISPPage}/${totalISPPages} (${pageData.length} of ${totalISPRecords} ASNs) for ${currentCountry}`);
+
+        renderISPTable(pageData);
+        updateFilterUI();
+        fetchBenchmarks();
 
     } catch (e) {
         console.error("ASN Lookup Failed:", e);
@@ -126,28 +143,13 @@ async function loadCountryData() {
     }
 }
 
-function renderISPAndInitialize() {
-    filteredISPData = null;
-    currentISPPage = 1;
-    renderISPTable(fullISPData);
-    updateFilterUI();
-    fetchBenchmarks();
-}
-
-function renderISPTable(data) {
+function renderISPTable(pageData) {
     const tbody = document.getElementById('isp-table-body');
-    const totalPages = Math.ceil(data.length / ISP_PER_PAGE);
-
-    if (currentISPPage > totalPages) currentISPPage = 1;
-
     tbody.innerHTML = '';
-
-    const start = (currentISPPage - 1) * ISP_PER_PAGE;
-    const end = start + ISP_PER_PAGE;
-    const pageData = data.slice(start, end);
 
     if (pageData.length === 0) {
         tbody.innerHTML = `<tr><td colspan="4" class="py-10 text-center text-slate-400">No ASN records found matching query.</td></tr>`;
+        renderISPPagination();
         return;
     }
 
@@ -196,10 +198,10 @@ function renderISPTable(data) {
         tbody.appendChild(tr);
     });
 
-    renderISPPagination(totalPages);
+    renderISPPagination();
 }
 
-function renderISPPagination(total) {
+function renderISPPagination() {
     let controls = document.getElementById('isp-pagination');
     if (!controls) {
         controls = document.createElement('div');
@@ -210,39 +212,34 @@ function renderISPPagination(total) {
 
     controls.innerHTML = `
         <button onclick="changeISPPage(-1)" ${currentISPPage === 1 ? 'disabled' : ''} class="px-4 py-2 bg-slate-900 border border-white/10 hover:bg-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-300 disabled:opacity-30 transition">Previous</button>
-        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest px-4">Page ${currentISPPage} / ${total}</span>
-        <button onclick="changeISPPage(1)" ${currentISPPage === total ? 'disabled' : ''} class="px-4 py-2 bg-slate-900 border border-white/10 hover:bg-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-300 disabled:opacity-30 transition">Next</button>
+        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest px-4">Page ${currentISPPage} / ${totalISPPages} (${totalISPRecords} total)</span>
+        <button onclick="changeISPPage(1)" ${currentISPPage >= totalISPPages ? 'disabled' : ''} class="px-4 py-2 bg-slate-900 border border-white/10 hover:bg-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-300 disabled:opacity-30 transition">Next</button>
     `;
 }
 
 function changeISPPage(delta) {
-    currentISPPage += delta;
-    renderISPTable(filteredISPData || fullISPData);
+    const newPage = currentISPPage + delta;
+    if (newPage < 1 || newPage > totalISPPages) return;
+    currentISPPage = newPage;
+    loadCountryData();
     document.getElementById('isp-table-body').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function handleISPSearch() {
-    const query = document.getElementById('isp-search').value.toLowerCase();
+    const query = document.getElementById('isp-search').value.trim();
 
-    if (!query) {
-        filteredISPData = null;
-        currentISPPage = 1;
-        renderISPTable(fullISPData);
-        return;
-    }
-
-    filteredISPData = fullISPData.filter(item =>
-        (item.org_name && item.org_name.toLowerCase().includes(query)) ||
-        item.asn.toString().includes(query) ||
-        (item.asn_name && item.asn_name.toLowerCase().includes(query))
-    );
-
-    currentISPPage = 1;
-    renderISPTable(filteredISPData);
+    // Debounce: wait 300ms after user stops typing before querying
+    clearTimeout(searchDebounceTimer);
+    searchDebounceTimer = setTimeout(() => {
+        currentSearchQuery = query;
+        currentISPPage = 1; // Reset to page 1 on new search
+        loadCountryData();
+    }, 300);
 }
 
 function applyASNFilter(type) {
     currentFilter = type;
+    currentISPPage = 1; // Reset to page 1 on filter change
     loadCountryData();
 }
 

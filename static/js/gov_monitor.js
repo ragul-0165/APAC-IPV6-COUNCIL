@@ -69,6 +69,9 @@ async function loadCountries() {
         const selector = document.getElementById('gov-country-select');
 
         if (data.apac_codes && selector) {
+            // Sort countries alphabetically by name
+            data.apac_codes.sort((a, b) => a.name.localeCompare(b.name));
+
             // Keep "ALL"
             data.apac_codes.forEach(country => {
                 const option = document.createElement('option');

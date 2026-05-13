@@ -362,7 +362,14 @@ function renderSonarChart(ranking) {
 
 function populateCountryFilter(ranking) {
     const select = document.getElementById('country-filter');
-    ranking.forEach(item => {
+    if (!select) return;
+
+    // Create a copy and sort alphabetically
+    const sortedRanking = [...ranking].sort((a, b) => 
+        (a.full_name || '').localeCompare(b.full_name || '')
+    );
+
+    sortedRanking.forEach(item => {
         const opt = new Option(item.full_name, item.country);
         select.add(opt);
     });

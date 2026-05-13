@@ -55,3 +55,9 @@ Thumbs.db
 
 # ---------------- CACHE ----------------
 .cache/
+
+# Ignore temporary analysis and scratch files
+scratch/
+
+# Ensure requirements.txt is NOT ignored even though we ignore other .txt files
+!requirements.txt

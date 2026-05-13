@@ -26,7 +26,7 @@ async function initDashboardMap() {
         dragging: true,
         scrollWheelZoom: false,
         doubleClickZoom: false
-    }).setView([15, 105], 3);
+    }).setView([18, 115], 4);
 
     try {
         const [resGeo, resStats] = await Promise.all([

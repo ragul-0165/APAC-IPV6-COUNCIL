@@ -10,14 +10,14 @@ class ASNIntelligenceService:
     def __init__(self):
         self.db_connected = db_service.connect()
 
-    def get_country_directory(self, country_code, filter_type='all'):
+    def get_country_directory(self, country_code, filter_type='all', page=1, per_page=25, search=None):
         """
         Returns a verified list of ASNs for a given country,
         joining Registry data with CAIDA Organization names.
-        Supports advanced filtering.
+        Supports advanced filtering and server-side pagination.
         """
         if not self.db_connected:
-            return []
+            return {"data": [], "total": 0, "page": page, "per_page": per_page}
 
         # 1. Base Match
         match_query = {"country": country_code.upper()}
@@ -116,16 +116,54 @@ class ASNIntelligenceService:
             pipeline.append({"$match": {"ipv6_percentage": {"$gte": 50}}})
         elif filter_type == 'unready':
             pipeline.append({"$match": {"ipv6_percentage": {"$lt": 10}}})
-            
-        # Add a Limit if it's a specific "Top" view
-        if filter_type == 'top_performers':
-            pipeline.append({"$limit": 500})
-        
+
+        # Apply Search Filter (server-side)
+        if search and search.strip():
+            search_term = search.strip()
+            # Try to match by ASN number or organization name
+            search_filter = {"$or": [
+                {"org_name": {"$regex": search_term, "$options": "i"}},
+            ]}
+            # If search is numeric, also match ASN number
+            try:
+                asn_num = int(search_term)
+                search_filter["$or"].append({"asn": asn_num})
+            except ValueError:
+                pass
+            pipeline.append({"$match": search_filter})
+
+        # Use $facet to get both paginated data AND total count in one query
+        skip = (page - 1) * per_page
+        pipeline.append({
+            "$facet": {
+                "data": [
+                    {"$skip": skip},
+                    {"$limit": per_page}
+                ],
+                "total": [
+                    {"$count": "count"}
+                ]
+            }
+        })
+
         try:
-            return list(db_service._db[db_service.COLLECTION_REGISTRY["ASN_REGISTRY"]].aggregate(pipeline))
+            result = list(db_service._db[db_service.COLLECTION_REGISTRY["ASN_REGISTRY"]].aggregate(pipeline))
+            if result:
+                facet = result[0]
+                data = facet.get("data", [])
+                total_list = facet.get("total", [])
+                total = total_list[0]["count"] if total_list else 0
+                return {
+                    "data": data,
+                    "total": total,
+                    "page": page,
+                    "per_page": per_page,
+                    "total_pages": -(-total // per_page)  # ceiling division
+                }
+            return {"data": [], "total": 0, "page": page, "per_page": per_page, "total_pages": 0}
         except Exception as e:
             logging.error(f"Aggregation failed: {e}")
-            return []
+            return {"data": [], "total": 0, "page": page, "per_page": per_page, "total_pages": 0}
 
     # Removed methods: verify_asn_batch, enrich_asn_data (No longer needed)
 

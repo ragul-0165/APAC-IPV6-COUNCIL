@@ -6,7 +6,7 @@
                 Engine</p>
         </div>
         <div class="text-right">
-            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Status</span>
+            <span class="text-[12px] font-black text-slate-400 uppercase tracking-widest block mb-1">Status</span>
             <div class="flex items-center space-x-2">
                 <span class="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></span>
                 <span class="text-xs font-bold text-slate-600">Dynamic Benchmarking Active</span>
@@ -76,7 +76,7 @@
         <line x1="{{ tick_x }}" y1="{{ y_offset + chart_height }}" x2="{{ tick_x }}"
             y2="{{ y_offset + chart_height + 5 }}" stroke="#94a3b8" stroke-width="1" />
         <text x="{{ tick_x }}" y="{{ y_offset + chart_height + 20 }}" text-anchor="middle"
-            class="text-[9px] font-bold fill-slate-400 tabular-nums">{{ i * 10 }}%</text>
+            class="text-[11px] font-bold fill-slate-400 tabular-nums">{{ i * 10 }}%</text>
         {% endfor %}
 
         <!-- Data Points (Optimized size) -->
@@ -95,17 +95,17 @@
                     class="{% if p.color_class == 'emerald' %}fill-emerald-500 stroke-emerald-600{% elif p.color_class == 'amber' %}fill-amber-400 stroke-amber-500{% elif p.color_class == 'blue' %}fill-blue-500 stroke-blue-600{% else %}fill-rose-500 stroke-rose-600{% endif %} transition-all duration-300 hover:r-10"
                     stroke-width="1.5" opacity="0.85" />
                 <text x="{{ x_pos }}" y="{{ y_pos - 12 }}" text-anchor="middle"
-                    class="text-[8px] font-bold fill-slate-600 opacity-0 transition-opacity duration-200 pointer-events-none">{{
+                    class="text-[10px] font-bold fill-slate-600 opacity-0 transition-opacity duration-200 pointer-events-none">{{
                     p.country }}</text>
             </g>
             {% endfor %}
 
             <!-- Axis Labels (Prevent Clipping) -->
             <text x="{{ x_offset + chart_width / 2 }}" y="490" text-anchor="middle"
-                class="text-[10px] font-black fill-slate-500 uppercase tracking-widest">IPv6 Adoption Rate (%)</text>
+                class="text-[12px] font-black fill-slate-500 uppercase tracking-widest">IPv6 Adoption Rate (%)</text>
             <text x="25" y="{{ y_offset + chart_height / 2 }}" text-anchor="middle"
                 transform="rotate(-90 25 {{ y_offset + chart_height / 2 }})"
-                class="text-[10px] font-black fill-slate-500 uppercase tracking-widest">Growth Velocity (% YoY)</text>
+                class="text-[12px] font-black fill-slate-500 uppercase tracking-widest">Growth Velocity (% YoY)</text>
     </svg>
 
     <!-- Dynamic Tooltip (Refined) -->
@@ -116,7 +116,7 @@
         </p>
         
         <div class="space-y-2">
-            <div class="flex justify-between items-center text-[10px]">
+            <div class="flex justify-between items-center text-[12px]">
                 <span class="text-slate-400 font-bold uppercase tracking-tighter">Unified Consensus:</span>
                 <span id="tooltip-adoption" class="font-black text-white tabular-nums"></span>
             </div>
@@ -124,30 +124,30 @@
             <div class="grid grid-cols-2 gap-x-4 gap-y-1 pt-2 border-t border-white/5">
                 <div class="flex flex-col">
                     <span class="text-[7px] text-slate-500 font-black uppercase">APNIC</span>
-                    <span id="coord-apnic" class="text-[9px] font-bold text-slate-300">--%</span>
+                    <span id="coord-apnic" class="text-[11px] font-bold text-slate-300">--%</span>
                 </div>
                 <div class="flex flex-col">
                     <span class="text-[7px] text-slate-500 font-black uppercase">Google</span>
-                    <span id="coord-google" class="text-[9px] font-bold text-slate-300">--%</span>
+                    <span id="coord-google" class="text-[11px] font-bold text-slate-300">--%</span>
                 </div>
                 <div class="flex flex-col">
                     <span class="text-[7px] text-slate-500 font-black uppercase">Cloudflare</span>
-                    <span id="coord-cloudflare" class="text-[9px] font-bold text-slate-300">--%</span>
+                    <span id="coord-cloudflare" class="text-[11px] font-bold text-slate-300">--%</span>
                 </div>
                 <div class="flex flex-col">
                     <span class="text-[7px] text-slate-500 font-black uppercase">Pulse</span>
-                    <span id="coord-pulse" class="text-[9px] font-bold text-slate-300">--%</span>
+                    <span id="coord-pulse" class="text-[11px] font-bold text-slate-300">--%</span>
                 </div>
             </div>
 
-            <div class="flex justify-between text-[10px] mt-2 pt-2 border-t border-white/5">
+            <div class="flex justify-between text-[12px] mt-2 pt-2 border-t border-white/5">
                 <span class="text-slate-400 font-bold uppercase tracking-tighter">Velocity:</span>
                 <span id="tooltip-growth" class="font-black tabular-nums"></span>
             </div>
             
             <div class="flex flex-col mt-2 pt-2 border-t border-white/10">
-                <span class="text-[8px] text-slate-500 font-black uppercase tracking-widest mb-1">Stratification</span>
-                <span id="tooltip-class" class="text-[10px] font-black uppercase"></span>
+                <span class="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-1">Stratification</span>
+                <span id="tooltip-class" class="text-[12px] font-black uppercase"></span>
             </div>
         </div>
     </div>
@@ -158,29 +158,29 @@
     <div class="flex items-center space-x-3 p-3 rounded-xl bg-emerald-50/50 border border-emerald-100">
         <div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
         <div>
-            <p class="text-[10px] font-black text-emerald-800 uppercase">Champions</p>
-            <p class="text-[8px] font-bold text-emerald-600 uppercase">High Adoption + High Growth</p>
+            <p class="text-[12px] font-black text-emerald-800 uppercase">Champions</p>
+            <p class="text-[10px] font-bold text-emerald-600 uppercase">High Adoption + High Growth</p>
         </div>
     </div>
     <div class="flex items-center space-x-3 p-3 rounded-xl bg-indigo-50/50 border border-indigo-100">
         <div class="w-2.5 h-2.5 rounded-full bg-blue-500"></div>
         <div>
-            <p class="text-[10px] font-black text-blue-800 uppercase">Fast Climbers</p>
-            <p class="text-[8px] font-bold text-blue-600 uppercase">Low Adoption + High Growth</p>
+            <p class="text-[12px] font-black text-blue-800 uppercase">Fast Climbers</p>
+            <p class="text-[10px] font-bold text-blue-600 uppercase">Low Adoption + High Growth</p>
         </div>
     </div>
     <div class="flex items-center space-x-3 p-3 rounded-xl bg-amber-50/50 border border-amber-100">
         <div class="w-2.5 h-2.5 rounded-full bg-amber-400"></div>
         <div>
-            <p class="text-[10px] font-black text-amber-800 uppercase">Stagnant Giants</p>
-            <p class="text-[8px] font-bold text-amber-600 uppercase">High Adoption + Low Growth</p>
+            <p class="text-[12px] font-black text-amber-800 uppercase">Stagnant Giants</p>
+            <p class="text-[10px] font-bold text-amber-600 uppercase">High Adoption + Low Growth</p>
         </div>
     </div>
     <div class="flex items-center space-x-3 p-3 rounded-xl bg-rose-50/50 border border-rose-100">
         <div class="w-2.5 h-2.5 rounded-full bg-rose-500"></div>
         <div>
-            <p class="text-[10px] font-black text-rose-800 uppercase">Risk Zone</p>
-            <p class="text-[8px] font-bold text-rose-600 uppercase">Low Adoption + Low Growth</p>
+            <p class="text-[12px] font-black text-rose-800 uppercase">Risk Zone</p>
+            <p class="text-[10px] font-bold text-rose-600 uppercase">Low Adoption + Low Growth</p>
         </div>
     </div>
 </div>

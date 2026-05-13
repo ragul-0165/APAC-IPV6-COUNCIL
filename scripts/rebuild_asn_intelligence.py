@@ -39,12 +39,13 @@ def rebuild_asn_db():
         logging.error(f"[ERROR] Critical: {apnic_file} not found!")
         return
 
-    logging.info("[STEP] STEP 1: Ingesting APNIC Registry (IN & MY) into STAGING...")
+    logging.info("[STEP] STEP 1: Ingesting APNIC Registry (IN, MY & ID) into STAGING...")
     
     asn_docs = []
     asn_set = set() # To track uniqueness
     count_in = 0
     count_my = 0
+    count_id = 0
     
     with open(apnic_file, 'r', encoding='utf-8') as f:
         for line in f:
@@ -55,7 +56,7 @@ def rebuild_asn_db():
             # apnic|IN|asn|55836|1|20120224|allocated
             registry, cc, type_, start, value, date, status = parts[:7]
             if type_ != 'asn': continue
-            if cc not in ['IN', 'MY']: continue
+            if cc not in ['IN', 'MY', 'ID']: continue
             if status not in ['allocated', 'assigned']: continue
             
             try:
@@ -76,7 +77,8 @@ def rebuild_asn_db():
                     asn_set.add(asn)
                     
                     if cc == 'IN': count_in += 1
-                    else: count_my += 1
+                    elif cc == 'MY': count_my += 1
+                    else: count_id += 1
             except ValueError:
                 continue
 
@@ -84,7 +86,7 @@ def rebuild_asn_db():
         db[staging["registry"]].create_index([("asn", 1)], unique=True)
         db[staging["registry"]].create_index([("country", 1)])
         db[staging["registry"]].insert_many(asn_docs)
-        logging.info(f"   - Staged {len(asn_docs)} ASNs (IN: {count_in}, MY: {count_my})")
+        logging.info(f"   - Staged {len(asn_docs)} ASNs (IN: {count_in}, MY: {count_my}, ID: {count_id})")
     else:
         logging.error("[ERROR] No ASNs found for IN/MY in APNIC file!")
         return

@@ -37,6 +37,10 @@ class IntelligenceService:
             ]
             historical_stats = {h['_id']: h['historical_rate'] for h in db_service._db['history_logs'].aggregate(hist_pipeline)}
 
+            # Fetch ALL benchmarks in one batch query (not per-country)
+            from .external_data_service import external_data_service
+            all_benchmarks = external_data_service.get_benchmarks('ALL')
+
             data_points = []
             total_adoption = 0
             total_growth = 0
@@ -51,9 +55,13 @@ class IntelligenceService:
                 ai_data = inference_service.get_optimized_adoption(country_code, raw_adoption, include_metrics=True)
                 adoption = ai_data["prediction"]
                 
-                # Fetch individual benchmarks for tooltips
-                from .external_data_service import external_data_service
-                benchmarks = external_data_service.get_benchmarks(country_code)
+                # Use pre-fetched benchmarks (no per-country DB query)
+                benchmarks = {
+                    'apnic': raw_adoption,
+                    'google': all_benchmarks.get("Google", {}).get(country_code, raw_adoption),
+                    'cloudflare': all_benchmarks.get("Cloudflare", {}).get(country_code, raw_adoption),
+                    'pulse': all_benchmarks.get("IPv6_Pulse", {}).get(country_code, 0)
+                }
                 
                 # Fetch historical rate from our grouped aggregation
                 prev_adoption = historical_stats.get(country_code)
@@ -70,12 +78,7 @@ class IntelligenceService:
                     'full_name': stat.get('country_name', country_code),
                     'adoption': float(adoption),
                     'growth': float(growth),
-                    'benchmarks': {
-                        'apnic': raw_adoption,
-                        'google': benchmarks.get("Google", {}).get(country_code, raw_adoption),
-                        'cloudflare': benchmarks.get("Cloudflare", {}).get(country_code, raw_adoption),
-                        'pulse': benchmarks.get("IPv6_Pulse", {}).get(country_code, 0)
-                    }
+                    'benchmarks': benchmarks
                 })
                 
                 total_adoption += adoption

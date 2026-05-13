@@ -11,6 +11,8 @@ class IPv6InferenceService:
         self.model = None
         self.model_path = os.path.join(os.getcwd(), 'models', 'ipv6_adoption_model.pkl')
         self._load_model()
+        # Pre-load trained countries ONCE at startup (was previously loaded on every prediction call)
+        self._trained_countries = self._load_trained_countries()
 
     def _load_model(self):
 
@@ -25,17 +27,23 @@ class IPv6InferenceService:
             self.logger.error(f"[ERROR] Failed to load ML Model: {e}")
             self.model = None
 
-    def _get_trained_countries(self):
-        """Load the list of countries for which we have a verified 4-source ML model."""
+    def _load_trained_countries(self):
+        """Load the list of countries at startup (one-time CSV read, not per-call)."""
         try:
             dataset_path = os.path.join(os.getcwd(), 'data', 'ipv6_training_dataset.csv')
             if os.path.exists(dataset_path):
                 import pandas as pd
                 df = pd.read_csv(dataset_path)
-                return set(df['country'].unique())
+                countries = set(df['country'].unique())
+                self.logger.info(f"[OK] Loaded {len(countries)} trained countries from CSV")
+                return countries
         except Exception as e:
             self.logger.error(f"Failed to load trained countries: {e}")
         return set()
+
+    def _get_trained_countries(self):
+        """Returns the pre-loaded trained countries set (no file I/O)."""
+        return self._trained_countries
 
     @functools.lru_cache(maxsize=100)
     def get_optimized_adoption(self, country_code, raw_apnic_fallback, include_metrics=False):

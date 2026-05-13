@@ -89,7 +89,7 @@ def sync_data():
             logging.info(f"✓ Organizations synced.")
 
     # --- 2. Sync IPv6 Readiness (APNIC Labs) ---
-    for country in ['IN', 'MY']:
+    for country in ['IN', 'MY', 'ID']:
         v6_file = os.path.join("ASN", f"ipv6_readiness_{country}.json")
         if os.path.exists(v6_file):
             logging.info(f"🚀 Syncing IPv6 Readiness for {country}...")

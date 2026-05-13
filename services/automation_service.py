@@ -11,6 +11,7 @@ from scripts.sync_authentic_edu_data import sync_authentic_data
 from scripts.sync_authentic_gov_data import sync_authentic_gov_data
 from services.domain_monitor_service import APACDomainMonitorService
 from services.edu_monitor_service import APACEduMonitorService
+from services.dashboard_cache_service import dashboard_cache_service
 
 class AutomationService:
     def __init__(self):
@@ -76,11 +77,33 @@ class AutomationService:
             replace_existing=True
         )
 
+        # 5. Hourly Job: Dashboard Cache Rebuild (pre-compute heavy metrics)
+        self.scheduler.add_job(
+            self.rebuild_dashboard_cache,
+            'interval',
+            hours=1,
+            id='hourly_dashboard_cache',
+            max_instances=1,
+            coalesce=True,
+            replace_existing=True
+        )
+
         self.scheduler.start()
         self.logger.info("[START] Automation Service Started (Pulse Engine Active)")
 
-        # 5. Startup Check: Record snapshot if missing for today
+        # 6. Startup: Build dashboard cache immediately so first visitor gets instant load
+        self.rebuild_dashboard_cache()
+
+        # 7. Startup Check: Record snapshot if missing for today
         self.record_daily_snapshots(startup_check=True)
+
+    def rebuild_dashboard_cache(self):
+        """Pre-computes all heavy dashboard metrics and stores in MongoDB cache."""
+        self.logger.info("[INFO] Rebuilding dashboard cache...")
+        try:
+            dashboard_cache_service.rebuild_cache()
+        except Exception as e:
+            self.logger.error(f"[ERROR] Dashboard cache rebuild failed: {e}")
 
     def sync_ipv6_scores(self):
         """Wrapper for fetch_ipv6_realtime logic."""

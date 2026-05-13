@@ -12,7 +12,8 @@ const COUNTRY_NAMES = {
     "KI": "Kiribati", "MH": "Marshall Islands", "FM": "Micronesia", "NR": "Nauru",
     "PW": "Palau", "TV": "Tuvalu", "KP": "Korea, DPR", "MP": "N. Mariana Islands",
     "NU": "Niue", "WF": "Wallis and Futuna", "CX": "Christmas Island", "CC": "Cocos Islands",
-    "NF": "Norfolk Island", "IO": "British Indian Ocean Territory", "TK": "Tokelau", "PN": "Pitcairn"
+    "NF": "Norfolk Island", "IO": "British Indian Ocean Territory", "TK": "Tokelau", "PN": "Pitcairn",
+    "TF": "French Southern Territories"
 };
 
 function toggleAIChat() {

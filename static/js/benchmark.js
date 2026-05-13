@@ -13,6 +13,9 @@ async function populateSelectors() {
         const s1 = document.getElementById('entity1-select');
         const s2 = document.getElementById('entity2-select');
 
+        // Sort ranking alphabetically by full_name
+        ranking.sort((a, b) => (a.full_name || '').localeCompare(b.full_name || ''));
+
         ranking.forEach(item => {
             const opt1 = new Option(item.full_name, item.country);
             const opt2 = new Option(item.full_name, item.country);

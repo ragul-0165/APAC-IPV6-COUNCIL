@@ -7,22 +7,31 @@ isp_intelligence_bp = Blueprint('isp_intelligence', __name__)
 @isp_intelligence_bp.route('/api/asn')
 def get_asn_list():
     """
-    Standardized API for Country-wise ASN List.
-    GET /api/asn?country=IN
+    Standardized API for Country-wise ASN List with server-side pagination.
+    GET /api/asn?country=IN&page=1&per_page=25&filter=all&search=reliance
     """
     country = request.args.get('country', 'IN').upper()
     filter_type = request.args.get('filter', 'all')
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 25, type=int)
+    search = request.args.get('search', None)
     
-    directory = asn_intel_service.get_country_directory(country, filter_type)
+    # Clamp per_page to prevent abuse
+    per_page = min(per_page, 100)
+    page = max(page, 1)
     
-    # Serialize for JSON
-    for d in directory:
-        d['_id'] = str(d['_id'])
-        # Ensure we have a default for status
+    result = asn_intel_service.get_country_directory(
+        country, filter_type, page=page, per_page=per_page, search=search
+    )
+    
+    # Serialize _id fields for JSON
+    for d in result.get('data', []):
+        if '_id' in d:
+            d['_id'] = str(d['_id'])
         if 'status' not in d:
             d['status'] = 'allocated'
             
-    return jsonify(directory)
+    return jsonify(result)
 
 @isp_intelligence_bp.route('/api/asn/bgp')
 def get_asn_bgp_details():
@@ -56,10 +65,12 @@ def get_global_isp_stats():
     db = db_service._db
     in_count = db[db_service.COLLECTION_REGISTRY["ASN_REGISTRY"]].count_documents({"country": "IN"})
     my_count = db[db_service.COLLECTION_REGISTRY["ASN_REGISTRY"]].count_documents({"country": "MY"})
+    id_count = db[db_service.COLLECTION_REGISTRY["ASN_REGISTRY"]].count_documents({"country": "ID"})
     
     return jsonify({
-        "pilot_regions": ["IN", "MY"],
-        "total_asns_mapped": in_count + my_count,
+        "pilot_regions": ["IN", "MY", "ID"],
+        "total_asns_mapped": in_count + my_count + id_count,
         "india_count": in_count,
-        "malaysia_count": my_count
+        "malaysia_count": my_count,
+        "indonesia_count": id_count
     })

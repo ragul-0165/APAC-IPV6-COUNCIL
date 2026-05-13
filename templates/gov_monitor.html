@@ -42,13 +42,13 @@
                                 d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                         <span
-                            class="text-[8px] lg:text-[9px] font-black uppercase tracking-widest text-blue-100 group-hover:text-white transition">Briefing</span>
+                            class="text-[10px] lg:text-[11px] font-black uppercase tracking-widest text-blue-100 group-hover:text-white transition">Briefing</span>
                     </button>
                 </div>
             </div>
 
             <div class="lg:col-span-4 bg-white/5 rounded-2xl p-6 border border-white/5">
-                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 block">Filter by
+                <label class="text-[12px] font-bold text-slate-500 uppercase tracking-widest mb-3 block">Filter by
                     Territory</label>
                 <div class="relative">
                     <select id="gov-country-select" onchange="renderGovMonitor()"
@@ -69,10 +69,10 @@
                 </div>
 
                 <div class="mt-4 pt-4 border-t border-white/5">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">Data
+                    <label class="text-[12px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">Data
                         Authority Source</label>
                     <select id="gov-data-source" onchange="handleGovSourceChange()"
-                        class="w-full bg-white/5 border border-white/5 rounded-xl p-3 text-[10px] font-black uppercase tracking-widest text-slate-400 cursor-pointer hover:bg-white/10 transition-colors">
+                        class="w-full bg-white/5 border border-white/5 rounded-xl p-3 text-[12px] font-black uppercase tracking-widest text-slate-400 cursor-pointer hover:bg-white/10 transition-colors">
                         <option value="INTERNAL">Internal Metrics (Live)</option>
                         <option value="APNIC">APNIC Registry Stats</option>
                         <option value="Google">Google User Traffic</option>
@@ -94,7 +94,7 @@
             class="lg:col-span-2 card-premium p-0 h-[400px] relative z-0 overflow-hidden">
             <div id="gov-map" class="h-full w-full z-0 bg-[#020617]"></div>
             <div
-                class="absolute bottom-4 left-4 bg-slate-900/80 backdrop-blur-md px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 border border-white/10 z-[1000]">
+                class="absolute bottom-4 left-4 bg-slate-900/80 backdrop-blur-md px-4 py-2 rounded-xl text-[12px] font-black uppercase tracking-widest text-slate-400 border border-white/10 z-[1000]">
                 Regional Readiness Intensity
             </div>
         </div>
@@ -109,14 +109,14 @@
                 </div>
             </div>
             <div id="trend-status-container" class="mt-4 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl transition-all duration-500">
-                <div id="trend-label-container" class="flex items-center space-x-2 text-emerald-400 font-black uppercase tracking-widest text-[10px] mb-1">
+                <div id="trend-label-container" class="flex items-center space-x-2 text-emerald-400 font-black uppercase tracking-widest text-[12px] mb-1">
                     <svg id="trend-icon" class="w-4 h-4 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path id="trend-icon-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                     </svg>
                     <span id="trend-title">Positive Growth</span>
                 </div>
-                <p id="trend-description" class="text-[10px] text-emerald-100/60 font-medium">Government adoption is tracking upwards across the region.</p>
+                <p id="trend-description" class="text-[12px] text-emerald-100/60 font-medium">Government adoption is tracking upwards across the region.</p>
             </div>
         </div>
     </div>
@@ -125,7 +125,7 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="card-premium p-6 flex items-center justify-between">
             <div>
-                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">IPv6 Web Reachable</p>
+                <p class="text-[12px] font-black text-slate-500 uppercase tracking-widest mb-1">IPv6 Web Reachable</p>
                 <h3 class="text-3xl font-black text-white" id="stat-v6-web">--%</h3>
             </div>
             <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center justify-center shadow-lg shadow-blue-900/20">
@@ -138,7 +138,7 @@
 
         <div class="card-premium p-6 flex items-center justify-between">
             <div>
-                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">IPv6 DNS Ready</p>
+                <p class="text-[12px] font-black text-slate-500 uppercase tracking-widest mb-1">IPv6 DNS Ready</p>
                 <h3 class="text-3xl font-black text-white" id="stat-v6-dns">--%</h3>
             </div>
             <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center justify-center shadow-lg shadow-purple-900/20">
@@ -151,7 +151,7 @@
 
         <div class="card-premium p-6 flex items-center justify-between">
             <div>
-                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Secure (DNSSEC)</p>
+                <p class="text-[12px] font-black text-slate-500 uppercase tracking-widest mb-1">Secure (DNSSEC)</p>
                 <h3 class="text-3xl font-black text-white" id="stat-dnssec">--%</h3>
             </div>
             <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center shadow-lg shadow-emerald-900/20">
@@ -167,7 +167,7 @@
             <div class="flex items-center justify-between mb-4">
                 <div>
                     <h3 class="text-sm font-black text-white">ISP Infrastructure Distribution</h3>
-                    <p class="text-[10px] text-slate-500 font-bold tracking-widest uppercase">Observed ASN Indicators
+                    <p class="text-[12px] text-slate-500 font-bold tracking-widest uppercase">Observed ASN Indicators
                     </p>
                 </div>
                 <div class="text-blue-400">
@@ -206,7 +206,7 @@
                 <table class="w-full text-left">
                     <thead>
                         <tr
-                            class="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-white/5">
+                            class="text-[12px] font-black uppercase tracking-widest text-slate-400 border-b border-white/5">
                             <th class="pb-4 pl-4 whitespace-nowrap text-slate-300">Rank</th>
                             <th class="pb-4 whitespace-nowrap text-slate-300">Country</th>
                             <th class="pb-4 text-right whitespace-nowrap text-slate-300">Readiness</th>
@@ -276,7 +276,7 @@
                 </div>
 
                 <div class="mt-8 p-4 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm">
-                    <p class="text-[10px] leading-relaxed text-slate-300">
+                    <p class="text-[12px] leading-relaxed text-slate-300">
                         <strong>Insight:</strong> <span id="failure-insight-text">Select a country to see specific
                             infrastructure gaps.</span>
                     </p>
@@ -292,7 +292,7 @@
             <h3 class="text-xl font-black text-white font-display">Compliance Matrix</h3>
 
             <!-- Legend -->
-            <div class="flex items-center space-x-4 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+            <div class="flex items-center space-x-4 text-[12px] font-bold uppercase tracking-wider text-slate-500">
                 <span class="flex items-center"><span
                         class="w-2 h-2 bg-emerald-500 rounded-full mr-1.5 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>Ready</span>
                 <span class="flex items-center"><span
@@ -306,7 +306,7 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr
-                        class="bg-white/5 border-b border-white/5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                        class="bg-white/5 border-b border-white/5 text-[12px] font-black text-slate-500 uppercase tracking-[0.2em]">
                         <th class="p-6">Domain</th>
                         <th class="p-6">IPv6 DNS</th>
                         <th class="p-6">IPv6 Web</th>
