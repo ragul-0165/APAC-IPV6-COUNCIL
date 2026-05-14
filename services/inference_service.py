@@ -2,6 +2,7 @@ import os
 import joblib
 import logging
 import functools
+import pandas as pd
 from services.external_data_service import external_data_service
 
 # Hot-reload trigger for new Ridge Regression model
@@ -32,7 +33,6 @@ class IPv6InferenceService:
         try:
             dataset_path = os.path.join(os.getcwd(), 'data', 'ipv6_training_dataset.csv')
             if os.path.exists(dataset_path):
-                import pandas as pd
                 df = pd.read_csv(dataset_path)
                 countries = set(df['country'].unique())
                 self.logger.info(f"[OK] Loaded {len(countries)} trained countries from CSV")
@@ -79,8 +79,10 @@ class IPv6InferenceService:
                 f_cf = float(cloudflare_val) if cloudflare_val is not None else 0.0
                 f_pulse = float(pulse_val) if pulse_val is not None else 0.0
                 
-                features = [[f_apnic, f_google, f_cf, f_pulse]]
-                score = float(self.model.predict(features)[0])
+                # Features must be a DataFrame with names to avoid scikit-learn warnings
+                features_df = pd.DataFrame([[f_apnic, f_google, f_cf, f_pulse]], 
+                                         columns=['APNIC', 'Google', 'Cloudflare', 'IPv6_Pulse'])
+                score = float(self.model.predict(features_df)[0])
                 confidence = "High"
                 explanation = "Optimized 4-source consensus (APNIC 35%, Google 25%, Cloudflare 25%, Pulse 15%)."
                 self.logger.info(f"ML Consensus Prediction for {country_code}: {score:.2f}")

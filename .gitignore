@@ -18,6 +18,7 @@ env/
 *.joblib
 *.h5
 *.pt
+!models/*.pkl
 
 # ---------------- TEMP / DEBUG ----------------
 tmp/
@@ -29,6 +30,7 @@ data/
 datasets/
 datasets/bgp/
 datasets/documents/
+!data/ipv6_training_dataset.csv
 
 # ---------------- OUTPUT FILES ----------------
 static/output/

@@ -228,12 +228,10 @@ class MongoDBService:
             self._db.history_logs.create_index([("sector", ASCENDING)])
             
             # ASN Intelligence Collections
-            self._db.asn_registry.create_index([("asn", ASCENDING)])
+            self._db.asn_registry.create_index([("asn", ASCENDING)], unique=True)
             self._db.asn_registry.create_index([("country", ASCENDING)])
-            self._db.asn_organizations.create_index([("asn", ASCENDING)])
-            self._db.asn_registry.create_index([("country", ASCENDING)])
-            self._db.asn_organizations.create_index([("asn", ASCENDING)])
-            self._db.asn_ipv6_readiness.create_index([("asn", ASCENDING)])
+            self._db.asn_organizations.create_index([("asn", ASCENDING)], unique=True)
+            self._db.asn_ipv6_readiness.create_index([("asn", ASCENDING)], unique=True)
             
             # BGP Topology Collection
             # compound index for uniqueness and fast lookups of dependencies
