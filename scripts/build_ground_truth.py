@@ -88,6 +88,38 @@ def build():
         if pulse > 0:
             time.sleep(0.2)
             
+        # ── Dynamically Weighted Consensus Target ──────────────────
+        # Trust-based weights (must sum to 1.0):
+        #   APNIC 35%  — largest sample sizes, most authoritative for APAC
+        #   Google 25% — broad user-base measurement
+        #   Cloudflare 25% — CDN-level traffic measurement
+        #   Pulse 15%  — ISOC community measurement
+        #
+        # If a source value is 0 (missing data), its weight is
+        # redistributed proportionally among the remaining sources
+        # so the final score is never unfairly dragged down.
+        source_weights = {
+            "APNIC": (apnic_val, 0.35),
+            "Google": (google, 0.25),
+            "Cloudflare": (cloudflare, 0.25),
+            "Pulse": (pulse, 0.15),
+        }
+
+        active_sources = {k: v for k, v in source_weights.items() if v[0] > 0}
+
+        if active_sources:
+            # Redistribute total weight among active (non-zero) sources
+            total_active_weight = sum(w for _, w in active_sources.values())
+            consensus_score = sum(
+                val * (weight / total_active_weight)
+                for val, weight in active_sources.values()
+            )
+        else:
+            consensus_score = 0.0
+
+        num_sources = len(active_sources)
+        # ─────────────────────────────────────────────────────────────
+
         records.append({
             "country": cc,
             "year": 2026,
@@ -96,7 +128,8 @@ def build():
             "Cloudflare": cloudflare,
             "IPv6_Pulse": pulse,
             "samples": samples,
-            "adoption_score": apnic_val
+            "adoption_score": round(consensus_score, 2),
+            "source_count": num_sources
         })
         
     df = pd.DataFrame(records)

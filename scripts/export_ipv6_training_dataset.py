@@ -18,7 +18,7 @@ def export():
     # Target: adoption_score
     
     # We'll just ensure it's clean and has necessary columns
-    cols = ["country", "year", "APNIC", "Google", "Cloudflare", "IPv6_Pulse", "samples", "adoption_score"]
+    cols = ["country", "year", "APNIC", "Google", "Cloudflare", "IPv6_Pulse", "samples", "adoption_score", "source_count"]
     
     # Add constant year 2024 if missing
     if 'year' not in df.columns:
